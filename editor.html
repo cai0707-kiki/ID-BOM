@@ -41,13 +41,16 @@
         .col-fixed{position:sticky;z-index:5;background:#fff}
         .col-num{left:0;width:36px;min-width:36px}
         .col-act{left:36px;width:72px;min-width:72px}
-        .col-f1{left:108px;min-width:108px;width:108px}
-        .col-f2{left:216px;min-width:140px;width:140px}
-        .col-f3{left:356px;min-width:240px;width:240px}
+        .col-f1{left:108px;min-width:110px;width:110px}
+        .col-f2{left:218px;min-width:140px;width:140px}
+        .col-f3{left:358px;min-width:200px;width:200px}
+        .col-f3 th, .col-f3 td{position:relative}
+        .resize-handle{position:absolute;right:0;top:0;bottom:0;width:4px;cursor:col-resize;user-select:none;z-index:20}
+        .resize-handle:hover,.resize-handle.active{background:#f97316}
         tr:hover .col-fixed{background:#f8fafc}
         tr.editing .col-fixed{background:#eff6ff}
         th.col-fixed{z-index:15;background:#f8fafc}
-        .col-scroll{min-width:72px;max-width:72px;width:72px;white-space:nowrap}
+        .col-scroll{min-width:120px;max-width:200px;width:140px;white-space:nowrap}
         .btn-row.del:hover{background:#fee2e2;color:#ef4444}
         .btn-row{width:20px;height:20px;border:none;background:transparent;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:11px;padding:0}
         .btn-row:hover{background:#f1f5f9;color:#333}
@@ -116,8 +119,8 @@
             <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
             <div class="modal-body" style="text-align:center">
                 <div id="importDropzone">
-                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件</button>
-                    <input type="file" id="csvFileInput" accept=".csv,.txt" onchange="onFileSelected(event)" style="display:none">
+                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
+                    <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)" style="display:none">
                 </div>
                 <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
             </div>
@@ -141,7 +144,7 @@
 <script>
 // ==================== Column Definitions ====================
 var CAMERA_HEADERS = ['数据分类','产品大类','产品系列','具体型号','物料代码','物料描述','备注',
-    '电源','安装板','安装板标识','一体线','一体线标识','IO电源线','IO电源线标识',
+    '电源','电源标识','安装板','安装板标识','一体线','一体线标识','IO电源线','IO电源线标识',
     '网线','网线标识','灯板','灯板标识','镜头罩','镜头罩标识','FA镜头','FA镜头标识','扩展配件','扩展配件标识'];
 var ACCESSORY_HEADERS = ['数据分类','配件类别','产品系列','物料名称','物料代码','物料描述','备注','标签','标识'];
 
@@ -167,7 +170,6 @@ function init() {
     rebuildDropdownCache();
     renderTable();
     updateStats();
-    setupDragDrop();
 }
 
 function loadDataFromParent() {
@@ -282,7 +284,8 @@ function renderTable() {
     for (var c = 1; c < headers.length; c++) {
         var isFixed = fixedCols.indexOf(c) >= 0;
         var cls = isFixed ? ' col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : ' col-scroll';
-        th += '<th class="' + cls + '">' + headers[c] + '</th>';
+        var resizeHtml = (c === 3) ? '<div class="resize-handle" onmousedown="startResize(event)"></div>' : '';
+        th += '<th class="' + cls + '">' + headers[c] + resizeHtml + '</th>';
     }
     th += '</tr>';
     document.getElementById('editorHead').innerHTML = th;
@@ -455,7 +458,7 @@ function clearSearch() { document.getElementById('searchBox').value = ''; render
 // ==================== CSV Import ====================
 function showImportModal() {
     importData = null;
-    lastImportFile = null;
+    pendingImports = {camera: null, accessory: null};
     document.getElementById('importInfo').style.display = 'none';
     document.getElementById('btnImport').disabled = true;
     document.getElementById('csvFileInput').value = '';
@@ -463,98 +466,99 @@ function showImportModal() {
 }
 function closeImportModal() { document.getElementById('importModal').classList.remove('active'); importData = null; }
 
-function setupDragDrop() {}
 
-var lastImportFile = null;
 
-function onFileSelected(e) { if (e.target.files.length) processFile(e.target.files[0]); }
+var pendingImports = {camera: null, accessory: null};
 
-function processFile(file) {
-    lastImportFile = file;
+function onFileSelected(e) {
+    var files = e.target.files;
+    if (!files.length) return;
+    pendingImports = {camera: null, accessory: null};
+    var remaining = files.length;
+    var infoLines = [];
+    for (var i = 0; i < files.length; i++) {
+        (function(f) {
+            readFile(f, function(target, count, fname) {
+                infoLines.push((target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + fname + ' · ' + count + ' 行');
+                remaining--;
+                if (remaining === 0) {
+                    var infoEl = document.getElementById('importInfo');
+                    infoEl.innerHTML = infoLines.join('<br>');
+                    infoEl.style.display = 'block';
+                    infoEl.style.color = '#166534';
+                    document.getElementById('btnImport').disabled = !(pendingImports.camera || pendingImports.accessory);
+                }
+            });
+        })(files[i]);
+    }
+}
+
+function readFile(file, callback) {
     var fname = (file.name || '').toLowerCase();
-    // Try UTF-8 first, then GBK
     var reader = new FileReader();
     reader.onload = function(e) {
         var text = e.target.result;
         var hasGarbage = /\ufffd/.test(text.substring(0, 500));
         if (hasGarbage) {
-            // Try GBK
             var reader2 = new FileReader();
-            reader2.onload = function(e2) { processFileContent(e2.target.result, file.name, fname, 'gbk'); };
-            reader2.onerror = function() { processFileContent(text, file.name, fname, 'utf-8'); };
+            reader2.onload = function(e2) { parseAndStore(e2.target.result, fname, callback); };
+            reader2.onerror = function() { parseAndStore(text, fname, callback); };
             reader2.readAsText(file, 'gbk');
         } else {
-            processFileContent(text, file.name, fname, 'utf-8');
+            parseAndStore(text, fname, callback);
         }
     };
     reader.readAsText(file, 'utf-8');
 }
 
-function showImportError(msg) {
-    var info = document.getElementById('importInfo');
-    info.textContent = '❌ ' + msg;
-    info.style.display = 'block';
-    info.style.color = '#991b1b';
-    document.getElementById('btnImport').disabled = true;
-}
-
-function processFileContent(text, origName, fname, encoding) {
+function parseAndStore(text, fname, callback) {
     var rows = parseCSV(text);
-    if (!rows.length) { showImportError('CSV文件为空'); return; }
-
+    if (!rows.length) return;
     var target = '';
     if (fname.indexOf('camera') >= 0) target = 'camera';
     else if (fname.indexOf('accessory') >= 0) target = 'accessory';
-
     var first = rows[0];
-    var hasHeader = false;
     if (first.length > 0) {
         var fc = first[0].toLowerCase().replace(/^\ufeff/, '');
-        if (fc.indexOf('数据分类') >= 0 || fc.indexOf('产品大类') >= 0 || fc.indexOf('配件类别') >= 0) {
-            hasHeader = true;
-            rows = rows.slice(1);
-        }
+        if (fc.indexOf('\u6570\u636e\u5206\u7c7b') >= 0 || fc.indexOf('\u4ea7\u54c1\u5927\u7c7b') >= 0 || fc.indexOf('\u914d\u4ef6\u7c7b\u522b') >= 0) rows = rows.slice(1);
     }
-
     if (!target) {
         for (var i = 0; i < Math.min(10, rows.length); i++) {
-            if (rows[i][0] && rows[i][0].trim() === '相机') { target = 'camera'; break; }
-            if (rows[i][0] && rows[i][0].trim() === '配件') { target = 'accessory'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '\u76f8\u673a') { target = 'camera'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '\u914d\u4ef6') { target = 'accessory'; break; }
         }
     }
     if (!target) target = (first.length >= 20) ? 'camera' : 'accessory';
-
     var headers = target === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS;
     var expectedCols = headers.length;
-
     var normalized = rows.map(function(r) {
         var nr = [];
         for (var i = 0; i < expectedCols; i++) nr.push((r[i] || '').toString().trim());
         return nr;
     }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
-
-    if (normalized.length === 0) { showImportError('未解析到有效数据行'); return; }
-
-    importData = normalized;
-    importTarget = target;
-
-    var info = document.getElementById('importInfo');
-    info.textContent = (target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + normalized.length + ' 行';
-    info.style.display = 'block';
-    info.style.color = '#166534';
-    document.getElementById('btnImport').disabled = false;
+    if (normalized.length === 0) return;
+    if (target === 'camera') pendingImports.camera = normalized;
+    else pendingImports.accessory = normalized;
+    callback(target, normalized.length, fname);
 }
 
 function confirmImport() {
-    if (!importData) return;
-    var count = importData.length;
-    var target = importTarget;
-    if (target === 'camera') cameraData = importData; else accessoryData = importData;
+    var imported = [];
+    if (pendingImports.camera && Array.isArray(pendingImports.camera)) {
+        cameraData = pendingImports.camera;
+        imported.push('\u76f8\u673a ' + cameraData.length + ' \u884c');
+    }
+    if (pendingImports.accessory && Array.isArray(pendingImports.accessory)) {
+        accessoryData = pendingImports.accessory;
+        imported.push('\u914d\u4ef6 ' + accessoryData.length + ' \u884c');
+    }
+    if (!imported.length) return;
     modifiedCells = {}; selectedRows = {};
     rebuildDropdownCache();
     closeImportModal();
-    switchTab(target);
-    showToast('成功导入 ' + count + ' 行', 'success');
+    switchTab(pendingImports.camera ? 'camera' : 'accessory');
+    showToast('\u6210\u529f\u5bfc\u5165 ' + imported.join('\uff0c'), 'success');
+    pendingImports = {camera: null, accessory: null};
 }
 
 // ==================== CSV Export ====================
@@ -581,7 +585,9 @@ function saveChanges() {
     modifiedCells = {};
     renderTable();
     updateStats();
-    showToast('数据已保存！', 'success');
+    showToast('数据已保存并同步！', 'success');
+    // Auto-sync: trigger storage event for index.html
+    try { localStorage.setItem('idbom_sync_ts', Date.now().toString()); } catch(e) {}
 }
 
 function flushPendingEdits() {
@@ -647,6 +653,35 @@ function parseCSV(text) {
     }
     if (field || cur.length) { cur.push(field); if (cur.length && !(cur.length === 1 && cur[0] === '')) rows.push(cur); }
     return rows;
+}
+
+// Column Resize
+var resizeState = null;
+function startResize(e) {
+    e.preventDefault();
+    var th = e.target.parentElement;
+    resizeState = { startX: e.clientX, startWidth: th.offsetWidth, th: th };
+    e.target.classList.add('active');
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+}
+function doResize(e) {
+    if (!resizeState) return;
+    var newWidth = Math.max(120, resizeState.startWidth + e.clientX - resizeState.startX);
+    resizeState.th.style.width = newWidth + 'px';
+    // Update all col-f3 cells
+    document.querySelectorAll('.col-f3').forEach(function(el) {
+        el.style.width = newWidth + 'px';
+    });
+}
+function stopResize() {
+    if (resizeState) {
+        var handle = resizeState.th.querySelector('.resize-handle');
+        if (handle) handle.classList.remove('active');
+    }
+    resizeState = null;
+    document.removeEventListener('mousemove', doResize);
+    document.removeEventListener('mouseup', stopResize);
 }
 
 // Keyboard
