@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID-BOM 数据编辑器</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;height:100vh;display:flex;flex-direction:column}
+        .editor-header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+        .editor-header-left{display:flex;align-items:center;gap:12px}
+        .editor-title{font-size:15px;font-weight:700}.editor-title span{color:#f97316}
+        .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:10px}
+        .editor-header-right{display:flex;gap:8px}
+        .btn{padding:6px 14px;border:none;border-radius:4px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
+        .btn-primary{background:#f97316;color:white}.btn-primary:hover{background:#ea580c}
+        .btn-secondary{background:#3b82f6;color:white}.btn-secondary:hover{background:#2563eb}
+        .btn-danger{background:#ef4444;color:white}.btn-danger:hover{background:#dc2626}
+        .btn-outline{background:white;color:#64748b;border:1px solid #e2e8f0}.btn-outline:hover{border-color:#f97316;color:#f97316}
+        .btn-success{background:#10b981;color:white}.btn-success:hover{background:#059669}
+        .btn-sm{padding:4px 10px;font-size:11px}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .tab-bar{background:white;border-bottom:1px solid #e2e8f0;display:flex;padding:0 20px;flex-shrink:0}
+        .tab{padding:10px 20px;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+        .tab:hover{color:#f97316}.tab.active{color:#f97316;border-bottom-color:#f97316;font-weight:600}
+        .tab-count{background:#f1f5f9;color:#64748b;padding:1px 6px;border-radius:8px;font-size:10px;margin-left:4px}
+        .tab.active .tab-count{background:#fff7ed;color:#f97316}
+        .toolbar{background:white;padding:8px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap}
+        .toolbar-left{display:flex;align-items:center;gap:8px}
+        .toolbar-right{display:flex;align-items:center;gap:8px}
+        .search-box{padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;width:200px}
+        .search-box:focus{outline:none;border-color:#f97316}
+        .stats-bar{font-size:11px;color:#64748b}.stats-bar strong{color:#1e293b}
+        .table-container{flex:1;overflow:auto;background:white}
+        .data-editor-table{border-collapse:collapse;font-size:11px}
+        .data-editor-table th{background:#f8fafc;padding:6px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:10;white-space:nowrap}
+        .data-editor-table td{padding:2px 3px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+        .data-editor-table tr:hover{background:#f8fafc}
+        .data-editor-table tr.editing{background:#eff6ff}
+        /* Sticky columns */
+        .col-fixed{position:sticky;z-index:5;background:#fff}
+        .col-num{left:0;width:36px;min-width:36px}
+        .col-act{left:36px;width:72px;min-width:72px}
+        .col-f1{left:108px;min-width:108px;width:108px}
+        .col-f2{left:216px;min-width:140px;width:140px}
+        .col-f3{left:356px;min-width:240px;width:240px}
+        tr:hover .col-fixed{background:#f8fafc}
+        tr.editing .col-fixed{background:#eff6ff}
+        th.col-fixed{z-index:15;background:#f8fafc}
+        .col-scroll{min-width:72px;max-width:72px;width:72px;white-space:nowrap}
+        .btn-row.del:hover{background:#fee2e2;color:#ef4444}
+        .btn-row{width:20px;height:20px;border:none;background:transparent;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:11px;padding:0}
+        .btn-row:hover{background:#f1f5f9;color:#333}
+        /* Cell inputs */
+        .cell-combo,.cell-input{width:100%;padding:3px 5px;border:1px solid transparent;border-radius:3px;font-size:11px;font-family:inherit;background:transparent;transition:all .15s;box-sizing:border-box;min-width:0}
+        .cell-combo:hover,.cell-input:hover{border-color:#e2e8f0}
+        .cell-combo:focus,.cell-input:focus{outline:none;border-color:#f97316;background:white;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
+        .cell-combo.modified,.cell-input.modified{background:#fef3c7;border-color:#fbbf24}
+        .status-bar{background:#1e293b;color:#94a3b8;padding:4px 20px;font-size:10px;display:flex;justify-content:space-between;flex-shrink:0}
+        .status-bar .unsaved{color:#fbbf24}.status-bar .saved{color:#10b981}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+        .modal-overlay.active{display:flex}
+        .modal{background:white;border-radius:12px;width:520px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .modal-header{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .modal-title{font-size:14px;font-weight:600;color:#1e293b}
+        .modal-close{width:26px;height:26px;border:none;background:#f1f5f9;border-radius:6px;cursor:pointer;font-size:14px;color:#64748b}
+        .modal-close:hover{background:#e2e8f0}
+        .modal-body{padding:18px}
+        .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
+
+        .toast{position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:6px;font-size:12px;color:white;z-index:2000;transform:translateX(120%);transition:transform .3s ease}
+        .toast.show{transform:translateX(0)}.toast.success{background:#10b981}.toast.error{background:#ef4444}.toast.warning{background:#f59e0b}
+        .confirm-dialog{text-align:center}.confirm-dialog p{font-size:13px;color:#64748b;margin-bottom:8px}.confirm-dialog .warn{color:#ef4444;font-weight:600}
+        #csvFileInput{display:none}
+    </style>
+</head>
+<body>
+    <div class="editor-header">
+        <div class="editor-header-left">
+            <div class="editor-title"><span>ID</span> · 数据编辑器</div>
+            <div class="editor-badge">BETA</div>
+        </div>
+        <div class="editor-header-right">
+            <button class="btn btn-outline" onclick="goBack()">← 返回配单工具</button>
+            <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
+            <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
+            <button class="btn btn-success" onclick="saveChanges()" id="btnSave">💾 保存到页面</button>
+        </div>
+    </div>
+    <div class="tab-bar">
+        <div class="tab active" data-tab="camera" onclick="switchTab('camera')">📷 相机数据 <span class="tab-count" id="cameraCount">0</span></div>
+        <div class="tab" data-tab="accessory" onclick="switchTab('accessory')">🔧 配件数据 <span class="tab-count" id="accessoryCount">0</span></div>
+    </div>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索型号、物料代码、描述..." oninput="onSearch()">
+            <button class="btn btn-outline btn-sm" onclick="clearSearch()">清除</button>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-outline btn-sm" onclick="addRow()">➕ 添加行</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 删除选中</button>
+            <div class="stats-bar">显示 <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 行 <span id="modifiedIndicator"></span></div>
+        </div>
+    </div>
+    <div class="table-container" id="tableContainer">
+        <table class="data-editor-table" id="editorTable">
+            <thead id="editorHead"></thead>
+            <tbody id="editorBody"></tbody>
+        </table>
+    </div>
+    <div class="status-bar"><span id="statusLeft">就绪</span><span id="statusRight"></span></div>
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal" style="width:380px">
+            <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
+            <div class="modal-body" style="text-align:center">
+                <div id="importDropzone">
+                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件</button>
+                    <input type="file" id="csvFileInput" accept=".csv,.txt" onchange="onFileSelected(event)" style="display:none">
+                </div>
+                <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmImport()" id="btnImport" disabled>确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="width:380px">
+            <div class="modal-header"><span class="modal-title">确认删除</span><button class="modal-close" onclick="closeDeleteModal()">✕</button></div>
+            <div class="modal-body confirm-dialog"><p>确定要删除选中的 <strong id="deleteCount">0</strong> 行数据吗？</p><p class="warn">此操作不可撤销</p></div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeDeleteModal()">取消</button><button class="btn btn-danger" onclick="confirmDelete()">确认删除</button></div>
+        </div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+<script>
+// ==================== Column Definitions ====================
+var CAMERA_HEADERS = ['数据分类','产品大类','产品系列','具体型号','物料代码','物料描述','备注',
+    '电源','安装板','安装板标识','一体线','一体线标识','IO电源线','IO电源线标识',
+    '网线','网线标识','灯板','灯板标识','镜头罩','镜头罩标识','FA镜头','FA镜头标识','扩展配件','扩展配件标识'];
+var ACCESSORY_HEADERS = ['数据分类','配件类别','产品系列','物料名称','物料代码','物料描述','备注','标签','标识'];
+
+// Columns that should be dropdown (index in respective header array)
+// Camera: 数据分类(0), 产品大类(1), 产品系列(2)
+// Accessory: 数据分类(0), 配件类别(1), 产品系列(2)
+var CAMERA_COMBO_COLS = [0, 1, 2];
+var ACCESSORY_COMBO_COLS = [0, 1, 2];
+
+// ==================== State ====================
+var currentTab = 'camera';
+var cameraData = [];
+var accessoryData = [];
+var filteredIndices = [];
+var selectedRows = {};
+var modifiedCells = {};
+var importData = null;
+var importTarget = '';
+
+// ==================== Init ====================
+function init() {
+    loadDataFromParent();
+    rebuildDropdownCache();
+    renderTable();
+    updateStats();
+    setupDragDrop();
+}
+
+function loadDataFromParent() {
+    var saved = localStorage.getItem('idbom_editor_data');
+    if (saved) {
+        try {
+            var d = JSON.parse(saved);
+            cameraData = d.camera || [];
+            accessoryData = d.accessory || [];
+            return;
+        } catch(e) {}
+    }
+
+    var el = document.getElementById('embeddedData');
+    if (el) {
+        try {
+            JSON.parse(el.textContent).forEach(function(item) {
+                var r = item.value || item;
+                if (r[0] && r[0].trim() === '相机') cameraData.push(r.slice());
+                else if (r[0] && r[0].trim() === '配件') accessoryData.push(r.slice());
+            });
+        } catch(e) {}
+    }
+}
+
+// ==================== Dropdown Cache ====================
+// Stores unique values per column for combobox suggestions
+var cameraDropdownCache = {};   // { colIndex: [val1, val2, ...] }
+var accessoryDropdownCache = {};
+
+function rebuildDropdownCache() {
+    cameraDropdownCache = buildDropdownCache(cameraData, CAMERA_HEADERS.length);
+    accessoryDropdownCache = buildDropdownCache(accessoryData, ACCESSORY_HEADERS.length);
+}
+
+function buildDropdownCache(data, colCount) {
+    var cache = {};
+    for (var c = 0; c < colCount; c++) {
+        var seen = {};
+        var list = [];
+        data.forEach(function(row) {
+            var v = (row[c] || '').toString().trim();
+            if (v && !seen[v]) { seen[v] = true; list.push(v); }
+        });
+        list.sort();
+        cache[c] = list;
+    }
+    return cache;
+}
+
+function getDropdownCache() {
+    return currentTab === 'camera' ? cameraDropdownCache : accessoryDropdownCache;
+}
+
+function getComboCols() {
+    return currentTab === 'camera' ? CAMERA_COMBO_COLS : ACCESSORY_COMBO_COLS;
+}
+
+// Update a single column's dropdown list when a cell changes
+function updateDropdownValue(colIdx, newVal) {
+    var cache = getDropdownCache();
+    if (!cache[colIdx]) cache[colIdx] = [];
+    if (newVal && cache[colIdx].indexOf(newVal) < 0) {
+        cache[colIdx].push(newVal);
+        cache[colIdx].sort();
+    }
+}
+
+// ==================== Tab ====================
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === tab);
+    });
+    selectedRows = {};
+    modifiedCells = {};
+    document.getElementById('searchBox').value = '';
+    renderTable();
+    updateStats();
+}
+
+// ==================== Render ====================
+function getHeaders() { return currentTab === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS; }
+function getData() { return currentTab === 'camera' ? cameraData : accessoryData; }
+
+function renderTable() {
+    var headers = getHeaders();
+    var data = getData();
+    var comboCols = getComboCols();
+    var cache = getDropdownCache();
+
+    // Fixed columns (after hiding col 0 数据分类): indices 1-6
+    var fixedCols = [1, 2, 3];
+    var fixedClasses = ['col-f1','col-f2','col-f3'];
+
+    // Search filter (search ALL columns including hidden)
+    var search = document.getElementById('searchBox').value.toLowerCase().trim();
+    filteredIndices = [];
+    for (var i = 0; i < data.length; i++) {
+        if (!search) { filteredIndices.push(i); continue; }
+        for (var j = 0; j < data[i].length; j++) {
+            if (data[i][j] && String(data[i][j]).toLowerCase().indexOf(search) >= 0) {
+                filteredIndices.push(i); break;
+            }
+        }
+    }
+
+    // Header: skip col 0
+    var th = '<tr>';
+    th += '<th class="col-fixed col-num">#</th>';
+    th += '<th class="col-fixed col-act"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>';
+    for (var c = 1; c < headers.length; c++) {
+        var isFixed = fixedCols.indexOf(c) >= 0;
+        var cls = isFixed ? ' col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : ' col-scroll';
+        th += '<th class="' + cls + '">' + headers[c] + '</th>';
+    }
+    th += '</tr>';
+    document.getElementById('editorHead').innerHTML = th;
+
+    // Build datalists for combo columns
+    var datalists = '';
+    comboCols.forEach(function(ci) {
+        var items = cache[ci] || [];
+        datalists += '<datalist id="dl_' + ci + '">';
+        items.forEach(function(v) { datalists += '<option value="' + escH(v) + '">'; });
+        datalists += '</datalist>';
+    });
+
+    // Body: skip col 0
+    var bhtml = '';
+    filteredIndices.forEach(function(idx) {
+        var row = data[idx];
+        var chk = selectedRows[idx] ? 'checked' : '';
+        bhtml += '<tr data-idx="' + idx + '">';
+        bhtml += '<td class="col-fixed col-num">' + (idx + 1) + '</td>';
+        bhtml += '<td class="col-fixed col-act">';
+        bhtml += '<input type="checkbox" ' + chk + ' onchange="toggleRow(' + idx + ')">';
+        bhtml += '<button class="btn-row" onclick="copyRow(' + idx + ')" title="复制此行">📋</button>';
+        bhtml += '<button class="btn-row del" onclick="deleteSingleRow(' + idx + ')" title="删除">✕</button>';
+        bhtml += '</td>';
+        for (var c = 1; c < headers.length; c++) {
+            var val = (row[c] || '').toString().trim();
+            var ck = idx + '_' + c;
+            var mc = modifiedCells[ck] ? ' modified' : '';
+            var isFixed = fixedCols.indexOf(c) >= 0;
+            var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-scroll';
+            if (comboCols.indexOf(c) >= 0) {
+                bhtml += '<td class="' + cls + '"><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+            } else {
+                bhtml += '<td class="' + cls + '"><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+            }
+        }
+        bhtml += '</tr>';
+    });
+    document.getElementById('editorBody').innerHTML = datalists + bhtml;
+    document.getElementById('visibleCount').textContent = filteredIndices.length;
+    document.getElementById('totalCount').textContent = data.length;
+    document.getElementById('cameraCount').textContent = cameraData.length;
+    document.getElementById('accessoryCount').textContent = accessoryData.length;
+}
+
+function updateStats() {
+    var n = Object.keys(modifiedCells).length;
+    var el = document.getElementById('modifiedIndicator');
+    el.innerHTML = n > 0
+        ? ' · <span class="unsaved">' + n + ' 处未保存修改</span>'
+        : ' · <span class="saved">无未保存修改</span>';
+}
+
+// ==================== Cell Edit ====================
+function onCellChange(rowIdx, colIdx, input) {
+    var data = getData();
+    var oldV = (data[rowIdx][colIdx] || '').toString().trim();
+    var newV = input.value.trim();
+    var ck = rowIdx + '_' + colIdx;
+    if (oldV !== newV) {
+        data[rowIdx][colIdx] = newV;
+        modifiedCells[ck] = true;
+        input.classList.add('modified');
+        updateDropdownValue(colIdx, newV);
+    } else {
+        delete modifiedCells[ck];
+        input.classList.remove('modified');
+    }
+    updateStats();
+}
+
+// ==================== Selection ====================
+function toggleRow(idx) { selectedRows[idx] ? delete selectedRows[idx] : (selectedRows[idx] = true); }
+function toggleSelectAll() {
+    var chk = document.getElementById('selectAll').checked;
+    filteredIndices.forEach(function(i) { chk ? (selectedRows[i] = true) : delete selectedRows[i]; });
+    document.querySelectorAll('#editorBody input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = !!selectedRows[parseInt(cb.closest('tr').dataset.idx)];
+    });
+}
+
+// ==================== Add / Copy / Delete ====================
+function addRow() {
+    var data = getData();
+    var headers = getHeaders();
+    var newRow = headers.map(function(_, i) { return i === 0 ? (currentTab === 'camera' ? '相机' : '配件') : ''; });
+    data.push(newRow);
+    rebuildDropdownCache();
+    renderTable();
+    var ct = document.getElementById('tableContainer');
+    ct.scrollTop = ct.scrollHeight;
+    showToast('已添加新行', 'success');
+}
+
+function copyRow(idx) {
+    var data = getData();
+    var src = data[idx];
+    var newRow = src.map(function(v) { return (v || '').toString(); });
+    data.splice(idx + 1, 0, newRow);
+    // Update selectedRows indices
+    var newSel = {};
+    Object.keys(selectedRows).forEach(function(k) {
+        var n = parseInt(k);
+        newSel[n >= idx + 1 ? n + 1 : n] = true;
+    });
+    selectedRows = newSel;
+    // Update modifiedCells keys
+    var newMod = {};
+    Object.keys(modifiedCells).forEach(function(k) {
+        var parts = k.split('_');
+        var r = parseInt(parts[0]), c = parseInt(parts[1]);
+        if (r >= idx + 1) newMod[(r + 1) + '_' + c] = true;
+        else newMod[k] = true;
+    });
+    modifiedCells = newMod;
+    rebuildDropdownCache();
+    renderTable();
+    showToast('已复制第 ' + (idx + 1) + ' 行', 'success');
+}
+
+function deleteSingleRow(idx) {
+    selectedRows = {};
+    selectedRows[idx] = true;
+    document.getElementById('deleteCount').textContent = '1';
+    document.getElementById('deleteModal').classList.add('active');
+}
+
+function deleteSelected() {
+    var count = Object.keys(selectedRows).length;
+    if (!count) { showToast('请先选择要删除的行', 'warning'); return; }
+    document.getElementById('deleteCount').textContent = count;
+    document.getElementById('deleteModal').classList.add('active');
+}
+
+function confirmDelete() {
+    var data = getData();
+    var indices = Object.keys(selectedRows).map(Number).sort(function(a, b) { return b - a; });
+    indices.forEach(function(i) { data.splice(i, 1); });
+    selectedRows = {};
+    modifiedCells = {};
+    closeDeleteModal();
+    rebuildDropdownCache();
+    renderTable();
+    updateStats();
+    showToast('已删除 ' + indices.length + ' 行', 'success');
+}
+
+function cleanKeysAfterDelete(deletedIdx) {
+    var nm = {}, ns = {};
+    Object.keys(modifiedCells).forEach(function(k) {
+        var parts = k.split('_'), r = parseInt(parts[0]);
+        if (r < deletedIdx) nm[k] = true;
+        else if (r > deletedIdx) nm[(r - 1) + '_' + parts[1]] = true;
+    });
+    Object.keys(selectedRows).forEach(function(k) {
+        var r = parseInt(k);
+        if (r < deletedIdx) ns[k] = true;
+        else if (r > deletedIdx) ns[r - 1] = true;
+    });
+    modifiedCells = nm; selectedRows = ns;
+}
+
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
+
+// ==================== Search ====================
+function onSearch() { renderTable(); }
+function clearSearch() { document.getElementById('searchBox').value = ''; renderTable(); }
+
+// ==================== CSV Import ====================
+function showImportModal() {
+    importData = null;
+    lastImportFile = null;
+    document.getElementById('importInfo').style.display = 'none';
+    document.getElementById('btnImport').disabled = true;
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importModal').classList.add('active');
+}
+function closeImportModal() { document.getElementById('importModal').classList.remove('active'); importData = null; }
+
+function setupDragDrop() {}
+
+var lastImportFile = null;
+
+function onFileSelected(e) { if (e.target.files.length) processFile(e.target.files[0]); }
+
+function processFile(file) {
+    lastImportFile = file;
+    var fname = (file.name || '').toLowerCase();
+    // Try UTF-8 first, then GBK
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var text = e.target.result;
+        var hasGarbage = /\ufffd/.test(text.substring(0, 500));
+        if (hasGarbage) {
+            // Try GBK
+            var reader2 = new FileReader();
+            reader2.onload = function(e2) { processFileContent(e2.target.result, file.name, fname, 'gbk'); };
+            reader2.onerror = function() { processFileContent(text, file.name, fname, 'utf-8'); };
+            reader2.readAsText(file, 'gbk');
+        } else {
+            processFileContent(text, file.name, fname, 'utf-8');
+        }
+    };
+    reader.readAsText(file, 'utf-8');
+}
+
+function showImportError(msg) {
+    var info = document.getElementById('importInfo');
+    info.textContent = '❌ ' + msg;
+    info.style.display = 'block';
+    info.style.color = '#991b1b';
+    document.getElementById('btnImport').disabled = true;
+}
+
+function processFileContent(text, origName, fname, encoding) {
+    var rows = parseCSV(text);
+    if (!rows.length) { showImportError('CSV文件为空'); return; }
+
+    var target = '';
+    if (fname.indexOf('camera') >= 0) target = 'camera';
+    else if (fname.indexOf('accessory') >= 0) target = 'accessory';
+
+    var first = rows[0];
+    var hasHeader = false;
+    if (first.length > 0) {
+        var fc = first[0].toLowerCase().replace(/^\ufeff/, '');
+        if (fc.indexOf('数据分类') >= 0 || fc.indexOf('产品大类') >= 0 || fc.indexOf('配件类别') >= 0) {
+            hasHeader = true;
+            rows = rows.slice(1);
+        }
+    }
+
+    if (!target) {
+        for (var i = 0; i < Math.min(10, rows.length); i++) {
+            if (rows[i][0] && rows[i][0].trim() === '相机') { target = 'camera'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '配件') { target = 'accessory'; break; }
+        }
+    }
+    if (!target) target = (first.length >= 20) ? 'camera' : 'accessory';
+
+    var headers = target === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS;
+    var expectedCols = headers.length;
+
+    var normalized = rows.map(function(r) {
+        var nr = [];
+        for (var i = 0; i < expectedCols; i++) nr.push((r[i] || '').toString().trim());
+        return nr;
+    }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
+
+    if (normalized.length === 0) { showImportError('未解析到有效数据行'); return; }
+
+    importData = normalized;
+    importTarget = target;
+
+    var info = document.getElementById('importInfo');
+    info.textContent = (target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + normalized.length + ' 行';
+    info.style.display = 'block';
+    info.style.color = '#166534';
+    document.getElementById('btnImport').disabled = false;
+}
+
+function confirmImport() {
+    if (!importData) return;
+    var count = importData.length;
+    var target = importTarget;
+    if (target === 'camera') cameraData = importData; else accessoryData = importData;
+    modifiedCells = {}; selectedRows = {};
+    rebuildDropdownCache();
+    closeImportModal();
+    switchTab(target);
+    showToast('成功导入 ' + count + ' 行', 'success');
+}
+
+// ==================== CSV Export ====================
+function exportCurrentCSV() {
+    var headers = getHeaders();
+    var data = getData();
+    var csv = '\uFEFF' + headers.map(csvEsc).join(',') + '\n';
+    data.forEach(function(row) {
+        var line = [];
+        for (var i = 0; i < headers.length; i++) line.push(csvEsc((row[i] || '').toString().trim()));
+        csv += line.join(',') + '\n';
+    });
+    var ts = fmtDate();
+    var fname = (currentTab === 'camera' ? 'camera_data' : 'accessory_data') + '_' + ts + '.csv';
+    dl(csv, fname, 'text/csv;charset=utf-8;');
+    showToast('已导出 ' + data.length + ' 行', 'success');
+}
+
+// ==================== Save ====================
+function saveChanges() {
+    // Flush any pending cell edits that haven't fired onchange yet
+    flushPendingEdits();
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+    modifiedCells = {};
+    renderTable();
+    updateStats();
+    showToast('数据已保存！', 'success');
+}
+
+function flushPendingEdits() {
+    var data = getData();
+    document.querySelectorAll('#editorBody input').forEach(function(input) {
+        var tr = input.closest('tr');
+        if (!tr) return;
+        var td = input.closest('td');
+        if (!td) return;
+        var rowIdx = parseInt(tr.dataset.idx);
+        // Find column index by counting td position (skip # and actions)
+        var cells = Array.from(tr.children);
+        var colOffset = cells.indexOf(td) - 2; // subtract num and actions columns
+        // Map visible column index back to data column index (visible starts at col 1)
+        var dataColIdx = colOffset + 1;
+        if (isNaN(rowIdx) || dataColIdx < 1 || dataColIdx >= data[rowIdx].length) return;
+        var currentVal = (data[rowIdx][dataColIdx] || '').toString().trim();
+        var inputVal = input.value.trim();
+        if (currentVal !== inputVal) {
+            data[rowIdx][dataColIdx] = inputVal;
+            var ck = rowIdx + '_' + dataColIdx;
+            modifiedCells[ck] = true;
+            updateDropdownValue(dataColIdx, inputVal);
+        }
+    });
+}
+
+// ==================== Navigation ====================
+function goBack() {
+    // Auto-save before leaving
+    flushPendingEdits();
+    if (Object.keys(modifiedCells).length) {
+        saveChanges();
+    }
+    window.location.href = 'index.html';
+}
+
+// ==================== Utilities ====================
+function csvEsc(s) { if (s == null) s = ''; s = String(s); return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function escH(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function fmtDate() { var n = new Date(); return n.getFullYear() + ('0'+(n.getMonth()+1)).slice(-2) + ('0'+n.getDate()).slice(-2); }
+function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
+function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type||'success'); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},3000); }
+
+function parseCSV(text) {
+    var rows = [], cur = [], field = '', inQ = false;
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        if (inQ) {
+            if (ch === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQ = false; }
+            else field += ch;
+        } else {
+            if (ch === '"') inQ = true;
+            else if (ch === ',') { cur.push(field); field = ''; }
+            else if (ch === '\n' || ch === '\r') {
+                if (ch === '\r' && text[i+1] === '\n') i++;
+                cur.push(field); field = '';
+                if (cur.length && !(cur.length === 1 && cur[0] === '')) rows.push(cur);
+                cur = [];
+            } else field += ch;
+        }
+    }
+    if (field || cur.length) { cur.push(field); if (cur.length && !(cur.length === 1 && cur[0] === '')) rows.push(cur); }
+    return rows;
+}
+
+// Keyboard
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveChanges(); }
+    if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('searchBox').focus(); }
+    if (e.key === 'Escape') { closeImportModal(); closeDeleteModal(); }
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
