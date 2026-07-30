@@ -579,15 +579,21 @@ function exportCurrentCSV() {
 
 // ==================== Save ====================
 function saveChanges() {
-    // Flush any pending cell edits that haven't fired onchange yet
     flushPendingEdits();
     localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
     modifiedCells = {};
     renderTable();
     updateStats();
-    showToast('数据已保存并同步！', 'success');
-    // Auto-sync: trigger storage event for index.html
-    try { localStorage.setItem('idbom_sync_ts', Date.now().toString()); } catch(e) {}
+    fetch('http://127.0.0.1:18088', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ camera: cameraData, accessory: accessoryData })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.ok) showToast('数据已同步到CSV和index.html！', 'success');
+        else showToast('同步失败', 'error');
+    }).catch(function() {
+        showToast('数据已保存到浏览器（同步服务未启动）', 'warning');
+    });
 }
 
 function flushPendingEdits() {
