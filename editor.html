@@ -23,6 +23,16 @@
         .editor-title{font-size:15px;font-weight:700}.editor-title span{color:#f97316}
         .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:10px}
         .editor-header-right{display:flex;gap:8px}
+        .announce-edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1001;align-items:center;justify-content:center}
+        .announce-edit-overlay.active{display:flex}
+        .announce-edit-box{background:white;border-radius:12px;width:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        .announce-edit-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0}
+        .announce-edit-title{font-size:14px;font-weight:600;color:#1e293b}
+        .announce-edit-body{padding:18px}
+        .announce-edit-body label{font-size:12px;color:#64748b;display:block;margin-bottom:6px}
+        .announce-edit-body textarea{width:100%;height:150px;padding:10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box}
+        .announce-edit-body textarea:focus{outline:none;border-color:#f97316}
+        .announce-edit-footer{padding:12px 18px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e2e8f0}
         .btn{padding:6px 14px;border:none;border-radius:4px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
         .btn-primary{background:#f97316;color:white}.btn-primary:hover{background:#ea580c}
         .btn-secondary{background:#3b82f6;color:white}.btn-secondary:hover{background:#2563eb}
@@ -99,6 +109,7 @@
             <button class="btn btn-outline" onclick="goBack()">← 返回配单工具</button>
             <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
             <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
+            <button class="btn btn-outline" onclick="showAnnounceEditor()">📢 编辑公告</button>
             <button class="btn btn-success" onclick="saveChanges()" id="btnSave">💾 保存到页面</button>
         </div>
     </div>
@@ -223,6 +234,19 @@ var importData = null;
 var importTarget = '';
 
 // ==================== Init ====================
+function showAnnounceEditor(){
+    var content='';
+    try{var s=localStorage.getItem('announce_content');if(s){var a=JSON.parse(s);content=a.content||'';}}catch(e){}
+    document.getElementById('announceEditText').value=content;
+    document.getElementById('announceEditOverlay').classList.add('active');
+}
+function closeAnnounceEditor(){document.getElementById('announceEditOverlay').classList.remove('active');}
+function saveAnnounce(){
+    var text=document.getElementById('announceEditText').value.trim();
+    localStorage.setItem('announce_content',JSON.stringify({content:text,date:new Date().toISOString().slice(0,10)}));
+    closeAnnounceEditor();
+    showToast('公告已保存','success');
+}
 function init() {
     loadDataFromParent();
     rebuildDropdownCache();
@@ -776,5 +800,21 @@ document.addEventListener('keydown', function(e) {
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+    <div id="announceEditOverlay" class="announce-edit-overlay">
+        <div class="announce-edit-box">
+            <div class="announce-edit-header">
+                <span class="announce-edit-title">📢 编辑公告内容</span>
+                <button class="modal-close" onclick="closeAnnounceEditor()">✕</button>
+            </div>
+            <div class="announce-edit-body">
+                <label>公告内容</label>
+                <textarea id="announceEditText" placeholder="输入公告内容..."></textarea>
+            </div>
+            <div class="announce-edit-footer">
+                <button class="btn btn-outline" onclick="closeAnnounceEditor()">取消</button>
+                <button class="btn btn-primary" onclick="saveAnnounce()">保存公告</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
