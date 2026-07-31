@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ID产品配单表</title>
+    <script>
+    (function(){
+        var dpr=window.devicePixelRatio||1;
+        var targetDpr=1.5;
+        if(dpr<targetDpr){
+            var s=document.createElement('style');
+            s.innerHTML='html{zoom:'+(targetDpr/dpr)+'; -moz-transform:scale('+(targetDpr/dpr)+'); -moz-transform-origin:top left; -moz-transform-origin:0 0;}';
+            document.head.appendChild(s);
+        }
+    })();
+    </script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
@@ -204,6 +215,23 @@
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeModal()">取消</button>
                 <button class="btn-confirm" onclick="confirmAccessories()">确定</button>
+            </div>
+        </div>
+    </div>
+    <div id="loginModal" class="modal-overlay" onclick="closeLogin()">
+        <div class="modal" style="width:320px" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">🔐 访问验证</span>
+                <button class="modal-close" onclick="closeLogin()">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <label style="font-size:12px;color:#64748b;display:block;margin-bottom:6px">请输入访问密码</label>
+                <input type="password" id="loginPassword" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:13px;box-sizing:border-box" placeholder="密码" onkeydown="if(event.key==='Enter')doLogin()">
+                <div id="loginError" style="display:none;margin-top:8px;font-size:11px;color:#ef4444">密码错误，请重试</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeLogin()">取消</button>
+                <button class="btn-confirm" onclick="doLogin()">确认</button>
             </div>
         </div>
     </div>
@@ -729,12 +757,12 @@
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000PB/13SR/05RN/UC(国内中性)/套包","313202650","1.3MP，4.9mm焦距，标准距离，配备红/白/蓝三色光源，蓝牙无线型号，带USB充电底座套包","标准距离，蓝牙无线，U口套包；单读码器物料：313202647","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2N","1"]},
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000PB/13NR/05RN/UC(国内标配)/套包","313202572","1.3MP，4.9mm焦距，近距离，配备红/白/蓝三色光源，蓝牙无线型号，带USB充电底座套包","近距离，蓝牙无线，U口套包；单读码器物料：313202567","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2H","1"]},
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000PB/13NR/05RN/UC(国内中性)/套包","313202571","1.3MP，4.9mm焦距，近距离，配备红/白/蓝三色光源，蓝牙无线型号，带USB充电底座套包","近距离，蓝牙无线，U口套包；单读码器物料：313202568","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2N","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/03SR/03WN/UC(国内标配)/套包","313201765","0.3MP，3.1mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","0.3MP，标准距离，RF无线，U口套包；单读码器物料：313201347","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/03SR/03WN/UC(国内中性)/套包","313201801","0.3MP，3.1mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","0.3MP，标准距离，RF无线，U口套包；单读码器物料：313201442","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13SR/05WN/UC(国内标配)/套包","313201766","1.3MP，4.9mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，标准距离，RF无线，U口套包；单读码器物料：313201434","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13SR/05WN/UC(国内中性)/套包","313201800","1.3MP，4.9mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，标准距离，RF无线，U口套包；单读码器物料：313201507","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13NR/05WN/UC(国内标配)/套包","313201767","1.3MP，4.9mm焦距，近距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，近距离，RF无线，U口套包；单读码器物料：313201433","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
-{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13NR/05WN/UC(国内中性)/套包","313201799","1.3MP，4.9mm焦距，近距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，近距离，RF无线，U口套包；单读码器物料：313201508","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/03SR/03WN/UC(国内标配)/套包","313201765","0.3MP，3.1mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","0.3MP，标准距离，RF无线，U口套包；单读码器物料：313201347","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/03SR/03WN/UC(国内中性)/套包","313201801","0.3MP，3.1mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","0.3MP，标准距离，RF无线，U口套包；单读码器物料：313201442","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13SR/05WN/UC(国内标配)/套包","313201766","1.3MP，4.9mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，标准距离，RF无线，U口套包；单读码器物料：313201434","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13SR/05WN/UC(国内中性)/套包","313201800","1.3MP，4.9mm焦距，标准距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，标准距离，RF无线，U口套包；单读码器物料：313201507","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13NR/05WN/UC(国内标配)/套包","313201767","1.3MP，4.9mm焦距，近距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，近距离，RF无线，U口套包；单读码器物料：313201433","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2H","1"]},
+{"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000RF/13NR/05WN/UC(国内中性)/套包","313201799","1.3MP，4.9mm焦距，近距离，配备白色光源，RF无线型号，带USB充电底座和线缆","1.3MP，近距离，RF无线，U口套包；单读码器物料：313201508","RF2.4G","1","","","H20B-U","1","","","","","","","","","LIB-2","1","CBRF2N","1"]},
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000B/03SR/03WN/UC(国内标配)/套包","313201955","0.3MP，3.1mm焦距，标准距离，配备白色光源，蓝牙无线型号，带USB充电底座和线缆","0.3MP，标准距离，蓝牙无线，U口套包；单读码器物料：313201761","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2H","1"]},
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000B/03SR/03WN/UC(国内中性)/套包","313202071","0.3MP，3.1mm焦距，标准距离，配备白色光源，蓝牙无线型号，带USB充电底座和线缆","0.3MP，标准距离，蓝牙无线，U口套包；单读码器物料：313201947","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2H","1"]},
 {"Count":25,"value":["相机","IDH手持式系列","IDH2000无线款","MV-IDH2000B/13SR/05WN/UC(国内标配)/套包","313202070","1.3MP，4.9mm焦距，标准距离，配备白色光源，蓝牙无线型号，带USB充电底座和线缆","1.3MP，标准距离，蓝牙无线，U口套包；单读码器物料：313201762","","","","","H20B-U","1","","","","","","","","","LIB-2","1","CBB2H","1"]},
@@ -1044,6 +1072,7 @@
 {"Count":9,"value":["配件","镜头罩","全透镜头罩-14灯珠","MV-IDA-C-Y-62-62-T(国内中性)","310100788","ID3013PM/ID3050PM/ID5050M全透镜头罩","若出货配置为透明镜头罩，订单中备注：删除：202402547，添加：202402542","C-Y-62-14","0"]},
 {"Count":9,"value":["配件","镜头罩","扩散镜头罩-14灯珠","MV-IDA-C-Y-62-62-K(国内中性)","310101825","ID3013PM/ID3050PM/ID5050M扩散镜头罩","若出货配置为扩散镜头罩，订单中备注：删除：202402547，添加：202404885","C-Y-62-14","0"]},
 {"Count":9,"value":["配件","镜头罩","长波通镜头罩-14灯珠","MV-IDA-C-Y-62-62-IR775(国内中性)","310102605","ID3013PM/ID3050PM/ID5050M长波通镜头罩，775nm长波通，用于屏蔽工厂内部环境光干扰，通常搭配红外灯板使用","若出货配置为红外长波镜头罩，订单中备注：删除：202402547，添加：202407776","C-Y-62-14","0"]},
+{"Count":9,"value":["配件","镜头罩","紫外T565镜头罩-14灯珠","MV-IDA-C-Y-62-62-T565nm(国内中性)","310103225","ID3013PM/ID3050PM/ID5050M紫外T565镜头罩，过滤565nm以下波段光源，通常搭配紫外灯板使用，用于提升隐形码的对比度","若出货配置为紫外T565镜头罩，订单中备注：删除：202402547，添加：202409870","C-Y-62-14","0"]},
 {"Count":9,"value":["配件","镜头罩","极小码配件1-14灯珠","MV-IDA-C-Y-62-62-M1","310101674","ID3013PM/ID3050PM/ID5050M极小码配件1，对焦距离34~47mm，读码精度可达0.012mm，建议采用倾斜8°-15°的架设方式","若出货配置为极小码配件一，订单中备注：删除：202402547，添加：202404355","C-Y-62-14","0"]},
 {"Count":9,"value":["配件","镜头罩","极小码配件2-14灯珠","MV-IDA-C-Y-62-62-M2","310101675","ID3013PM/ID3050PM/ID5050M极小码配件2，对焦距离42~76mm，读码精度可达0.016mm，建议采用倾斜8°-15°的架设方式","若出货配置为极小码配件二，订单中备注：删除：202402547，添加：202404356","C-Y-62-14","0"]},
 {"Count":9,"value":["配件","镜头罩","全透镜头罩-8灯珠","MV-IDA-C-N-62-62-T(国内中性)","190214704","ID3013PM-8/ID3016PM透明镜头罩","半成品物料：190214704（下配置订单请备注半成品物料号）","C-Y-62-8","1"]},
@@ -1164,7 +1193,8 @@
 {"Count":9,"value":["配件","泡棉","EPE","泡棉EPE-ID5000XM-00C","194410472","203X172X105,机器人SC5000X C智能相机EPE，适配ID5000XM-00C系列","","",""]},
 {"Count":9,"value":["配件","螺丝","螺丝包","螺丝包M3×6","193100773","螺丝包(3_PSF0M3×6-SUS、绿色PE袋)，适配ID800/ID2013EM/ID2000XM/ID3000XM系列","","",""]},
 {"Count":9,"value":["配件","螺丝","螺丝包","螺丝包M2×6","193102445","螺丝包(4_PSF0M2×6、绿色PE袋)，适配ID2000M系列","","",""]},
-{"Count":9,"value":["配件","螺丝","螺丝包","螺丝包M4×8","193100772","螺丝包(4_HSCSM4×8NL-SUS、绿色PE袋)，适配ID3000PM/ID5000M/ID5000XM系列","","",""]}
+{"Count":9,"value":["配件","螺丝","螺丝包","螺丝包M4×8","193100772","螺丝包(4_HSCSM4×8NL-SUS、绿色PE袋)，适配ID3000PM/ID5000M/ID5000XM系列","","",""]},
+{"Count":9,"value":["配件","无线模块","RF无线模块","RF2.4GHz无线模块USB端","102902700","USB DONGLE,私有组网,HJ-USB_DONGLE_CUS","","RF2.4G","1"]}
 ]
     </script>
     <script>
@@ -1355,7 +1385,7 @@ function rt(){
         return;
     }
     if(!currentMatch){ct();return;}
-    var items=[];items.push({type:'host',typeName:'\u4e3b\u673a',name:currentMatch[3]||'-',desc:currentMatch[5]||'-',code:currentMatch[4]||'-',remark:currentMatch[6]||''});var sorted=selectedAccessories.slice().sort(function(a,b){if(a.type==='optional'&&b.type!=='optional')return -1;if(a.type!=='optional'&&b.type==='optional')return 1;return 0;});sorted.forEach(function(a){items.push({type:a.type,typeName:a.type==='standard'?'\u6807\u914d':'\u9009\u914d',name:a.name,desc:a.value,code:a.code||'-',remark:a.remark||''});});document.getElementById('statTotal').textContent=items.length;document.getElementById('statHost').textContent=1;document.getElementById('statAccessory').textContent=items.length-1;var h='<table class="data-table"><thead><tr><th style="width:60px">\u7c7b\u578b</th><th style="width:200px">\u7269\u6599\u540d\u79f0</th><th style="width:280px">\u63cf\u8ff0</th><th style="width:80px">\u7269\u6599\u4ee3\u7801</th><th style="width:180px">\u5907\u6ce8</th><th style="width:50px">\u64cd\u4f5c</th></tr></thead><tbody>';items.forEach(function(item,idx){var removeBtn=item.type==='optional'?'<button class="btn-remove" onclick="ri(\''+item.name.replace(/'/g,"\\'")+'\')">\u2715</button>':'';h+='<tr><td><span class="type-badge '+item.type+'">'+item.typeName+'</span></td><td class="material-name">'+item.name+'</td><td class="material-desc">'+item.desc+'</td><td class="material-code">'+item.code+'</td><td>'+item.remark+'</td><td>'+removeBtn+'</td></tr>';});h+='</tbody></table><div class="table-footer"><span>\u5171 '+items.length+' \u884c</span></div>';document.getElementById('tableArea').innerHTML=h;}
+    var items=[];items.push({type:'host',typeName:'\u4e3b\u673a',name:currentMatch[3]||'-',desc:currentMatch[5]||'-',code:currentMatch[4]||'-',remark:currentMatch[6]||''});var cableKeys={'一体线':true,'IO线':true,'网线':true};var cableIsStd={};Object.keys(cableKeys).forEach(function(k){var cfg=accessoryColumns[k];if(cfg&&cfg.flagCol)cableIsStd[k]=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();}).some(function(f){return f==='1';});});var sorted=selectedAccessories.slice().sort(function(a,b){if(a.type==='optional'&&b.type!=='optional')return -1;if(a.type!=='optional'&&b.type==='optional')return 1;return 0;});sorted.forEach(function(a){var remark=a.remark||'';if(a.type==='optional'&&cableKeys[a.key]&&!cableIsStd[a.key])remark='';items.push({type:a.type,typeName:a.type==='standard'?'标配':'选配',name:a.name,desc:a.value,code:a.code||'-',remark:remark});});document.getElementById('statTotal').textContent=items.length;document.getElementById('statHost').textContent=1;document.getElementById('statAccessory').textContent=items.length-1;var h='<table class="data-table"><thead><tr><th style="width:60px">\u7c7b\u578b</th><th style="width:200px">\u7269\u6599\u540d\u79f0</th><th style="width:280px">\u63cf\u8ff0</th><th style="width:80px">\u7269\u6599\u4ee3\u7801</th><th style="width:180px">\u5907\u6ce8</th><th style="width:50px">\u64cd\u4f5c</th></tr></thead><tbody>';items.forEach(function(item,idx){var removeBtn=item.type==='optional'?'<button class="btn-remove" onclick="ri(\''+item.name.replace(/'/g,"\\'")+'\')">\u2715</button>':'';h+='<tr><td><span class="type-badge '+item.type+'">'+item.typeName+'</span></td><td class="material-name">'+item.name+'</td><td class="material-desc">'+item.desc+'</td><td class="material-code">'+item.code+'</td><td>'+item.remark+'</td><td>'+removeBtn+'</td></tr>';});h+='</tbody></table><div class="table-footer"><span>\u5171 '+items.length+' \u884c</span></div>';document.getElementById('tableArea').innerHTML=h;}
         function ri(name){
     var idx=selectedAccessories.findIndex(function(a){return a.name===name;});
     if(idx===-1)return;
@@ -1371,7 +1401,7 @@ function rt(){
         function resetConfig(){if(currentMatch){gc();rac();}}
 function clearAll(){selectedAccessories=[];currentMatch=null;standardCache={};document.getElementById('categorySelect').selectedIndex=0;document.getElementById('seriesSelect').innerHTML='<option value="">\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u5927\u7c7b</option>';document.getElementById('seriesSelect').disabled=true;document.getElementById('modelSelect').innerHTML='<option value="">\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u7cfb\u5217</option>';document.getElementById('modelSelect').disabled=true;document.getElementById('accessoryCategories').innerHTML='';document.getElementById('quickSearchInput').value='';document.getElementById('quickSearchResults').style.display='none';ct();}
         function csvEscape(s){if(s==null)s='';s=String(s);if(s.indexOf(',')>=0||s.indexOf('"')>=0||s.indexOf('\n')>=0||s.indexOf('\r')>=0){return'"'+s.replace(/"/g,'""')+'"';}return s;}
-function exportCSV(){if(!currentMatch){alert('\u8bf7\u5148\u751f\u6210\u914d\u5355');return;}var now=new Date();var ts=now.getFullYear()+''+('0'+(now.getMonth()+1)).slice(-2)+''+('0'+now.getDate()).slice(-2)+'_'+('0'+now.getHours()).slice(-2)+''+('0'+now.getMinutes()).slice(-2)+''+('0'+now.getSeconds()).slice(-2);var csv='\uFEFF\u7c7b\u578b,\u7269\u6599\u540d\u79f0,\u63cf\u8ff0,\u7269\u6599\u4ee3\u7801,\u5907\u6ce8\n';csv+='\u4e3b\u673a,'+csvEscape(currentMatch[3]||'-')+','+csvEscape(currentMatch[5]||'-')+','+csvEscape(currentMatch[4]||'-')+','+csvEscape(currentMatch[6]||'')+'\n';selectedAccessories.forEach(function(a){if(a.type==='optional'){csv+='\u9009\u914d,'+csvEscape(a.name)+','+csvEscape(a.value)+','+csvEscape(a.code||'-')+','+csvEscape(a.remark||'')+'\n';}});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='ID\u4ea7\u54df\u914d\u5355\u8868_'+ts+'.csv';l.click();}
+function exportCSV(){if(!currentMatch){alert('\u8bf7\u5148\u751f\u6210\u914d\u5355');return;}var csv='\uFEFF\u7c7b\u578b,\u7269\u6599\u540d\u79f0,\u63cf\u8ff0,\u7269\u6599\u4ee3\u7801,\u5907\u6ce8\n';csv+='\u4e3b\u673a,'+csvEscape(currentMatch[3]||'-')+','+csvEscape(currentMatch[5]||'-')+','+csvEscape(currentMatch[4]||'-')+','+csvEscape(currentMatch[6]||'')+'\n';selectedAccessories.forEach(function(a){if(a.type==='optional'){csv+='\u9009\u914d,'+csvEscape(a.name)+','+csvEscape(a.value)+','+csvEscape(a.code||'-')+','+csvEscape(a.remark||'')+'\n';}});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='ID\u4ea7\u54df\u914d\u5355\u8868.csv';l.click();}
 function onQuickSearch(){
     var q=document.getElementById('quickSearchInput').value.trim().toLowerCase();
     var el=document.getElementById('quickSearchResults');
@@ -1446,9 +1476,21 @@ function selectQuickSearch(idx){
             else if(logoClickCount===2){hint.textContent='再点击1次进入编辑器';}
             else if(logoClickCount>=3){
                 clearTimeout(logoClickTimer);logoClickCount=0;hint.classList.remove('show');
-                window.location.href='editor.html';
+                document.getElementById('loginModal').classList.add('active');
+                document.getElementById('loginPassword').value='';
+                document.getElementById('loginError').style.display='none';
+                setTimeout(function(){document.getElementById('loginPassword').focus();},100);
             }
         }
+        function doLogin(){
+            if(document.getElementById('loginPassword').value==='swsw15014'){
+                document.getElementById('loginModal').classList.remove('active');
+                window.location.href='editor.html';
+            }else{
+                document.getElementById('loginError').style.display='block';
+            }
+        }
+        function closeLogin(){document.getElementById('loginModal').classList.remove('active');}
         document.addEventListener('DOMContentLoaded',loadData);
         window.addEventListener('storage',function(e){if(e.key==='idbom_editor_data'){loadData();}});
     </script>

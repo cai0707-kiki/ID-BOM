@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ID-BOM 数据编辑器</title>
+    <script>
+    (function(){
+        var dpr=window.devicePixelRatio||1;
+        var targetDpr=1.5;
+        if(dpr<targetDpr){
+            var s=document.createElement('style');
+            s.innerHTML='html{zoom:'+(targetDpr/dpr)+'; -moz-transform:scale('+(targetDpr/dpr)+'); -moz-transform-origin:top left; -moz-transform-origin:0 0;}';
+            document.head.appendChild(s);
+        }
+    })();
+    </script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;height:100vh;display:flex;flex-direction:column}
@@ -32,7 +43,7 @@
         .search-box:focus{outline:none;border-color:#f97316}
         .stats-bar{font-size:11px;color:#64748b}.stats-bar strong{color:#1e293b}
         .table-container{flex:1;overflow:auto;background:white}
-        .data-editor-table{border-collapse:collapse;font-size:11px}
+        .data-editor-table{border-collapse:collapse;font-size:11px;table-layout:fixed}
         .data-editor-table th{background:#f8fafc;padding:6px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:10;white-space:nowrap}
         .data-editor-table td{padding:2px 3px;border-bottom:1px solid #f1f5f9;vertical-align:top}
         .data-editor-table tr:hover{background:#f8fafc}
@@ -41,16 +52,17 @@
         .col-fixed{position:sticky;z-index:5;background:#fff}
         .col-num{left:0;width:36px;min-width:36px}
         .col-act{left:36px;width:72px;min-width:72px}
-        .col-f1{left:108px;min-width:110px;width:110px}
-        .col-f2{left:218px;min-width:140px;width:140px}
-        .col-f3{left:358px;min-width:200px;width:200px}
-        .col-f3 th, .col-f3 td{position:relative}
-        .resize-handle{position:absolute;right:0;top:0;bottom:0;width:4px;cursor:col-resize;user-select:none;z-index:20}
-        .resize-handle:hover,.resize-handle.active{background:#f97316}
+        .col-f1{left:108px;white-space:nowrap}
+        .col-f2{white-space:nowrap}
+        .col-f3{white-space:nowrap}
         tr:hover .col-fixed{background:#f8fafc}
         tr.editing .col-fixed{background:#eff6ff}
         th.col-fixed{z-index:15;background:#f8fafc}
-        .col-scroll{min-width:120px;max-width:200px;width:140px;white-space:nowrap}
+        .col-auto{white-space:nowrap}
+        .col-resize{position:relative}
+        .col-resize .resize-handle{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;user-select:none;z-index:20}
+        .col-resize .resize-handle:hover,.col-resize .resize-handle.active{background:#f97316}
+        .col-resize input{width:100%;min-width:0}
         .btn-row.del:hover{background:#fee2e2;color:#ef4444}
         .btn-row{width:20px;height:20px;border:none;background:transparent;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:11px;padding:0}
         .btn-row:hover{background:#f1f5f9;color:#333}
@@ -147,6 +159,52 @@ var CAMERA_HEADERS = ['数据分类','产品大类','产品系列','具体型号
     '电源','电源标识','安装板','安装板标识','一体线','一体线标识','IO电源线','IO电源线标识',
     '网线','网线标识','灯板','灯板标识','镜头罩','镜头罩标识','FA镜头','FA镜头标识','扩展配件','扩展配件标识'];
 var ACCESSORY_HEADERS = ['数据分类','配件类别','产品系列','物料名称','物料代码','物料描述','备注','标签','标识'];
+
+// 列宽配置（按数据内容长度设置，索引对应CSV列号）
+// 标记 'auto' 的列为可拉伸列，其他为固定像素宽度
+var COL_WIDTHS = {
+    camera: {
+        1: 104,   // 产品大类
+        2: 128,   // 产品系列
+        3: 256,   // 具体型号
+        4: 92,    // 物料代码
+        5: 'auto', // 物料描述（可拉伸）
+        6: 'auto', // 备注（可拉伸）
+        7: 100,   // 电源
+        8: 40,    // 电源标识
+        9: 84,    // 安装板
+        10: 40,   // 安装板标识
+        11: 108,  // 一体线
+        12: 40,   // 一体线标识
+        13: 76,   // IO电源线
+        14: 40,   // IO电源线标识
+        15: 60,   // 网线
+        16: 40,   // 网线标识
+        17: 76,   // 灯板
+        18: 40,   // 灯板标识
+        19: 60,   // 镜头罩
+        20: 60,   // 镜头罩标识
+        21: 60,   // FA镜头
+        22: 40,   // FA镜头标识
+        23: 108,  // 扩展配件
+        24: 40    // 扩展配件标识
+    },
+    accessory: {
+        1: 80,    // 配件类别
+        2: 180,   // 产品系列
+        3: 256,   // 物料名称
+        4: 80,    // 物料代码
+        5: 'auto', // 物料描述（可拉伸）
+        6: 'auto', // 备注（可拉伸）
+        7: 108,   // 标签
+        8: 40     // 标识
+    }
+};
+// 可拉伸列最小宽度
+var COL_MIN_WIDTH = {
+    camera: { 5: 256, 6: 128 },
+    accessory: { 5: 256, 6: 128 }
+};
 
 // Columns that should be dropdown (index in respective header array)
 // Camera: 数据分类(0), 产品大类(1), 产品系列(2)
@@ -281,11 +339,20 @@ function renderTable() {
     var th = '<tr>';
     th += '<th class="col-fixed col-num">#</th>';
     th += '<th class="col-fixed col-act"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>';
+    var cw = COL_WIDTHS[currentTab] || {};
     for (var c = 1; c < headers.length; c++) {
         var isFixed = fixedCols.indexOf(c) >= 0;
-        var cls = isFixed ? ' col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : ' col-scroll';
-        var resizeHtml = (c === 3) ? '<div class="resize-handle" onmousedown="startResize(event)"></div>' : '';
-        th += '<th class="' + cls + '">' + headers[c] + resizeHtml + '</th>';
+        var w = cw[c];
+        var isAuto = (w === 'auto');
+        var cls = '';
+        if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
+        else if (isAuto) cls = 'col-resize';
+        else cls = 'col-auto';
+        var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+        var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
+        var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
+        var resizeHtml = isAuto ? '<div class="resize-handle" onmousedown="startResize(event)"></div>' : '';
+        th += '<th class="' + cls + '"' + style + autoStyle + '>' + headers[c] + resizeHtml + '</th>';
     }
     th += '</tr>';
     document.getElementById('editorHead').innerHTML = th;
@@ -316,11 +383,19 @@ function renderTable() {
             var ck = idx + '_' + c;
             var mc = modifiedCells[ck] ? ' modified' : '';
             var isFixed = fixedCols.indexOf(c) >= 0;
-            var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-scroll';
+            var w = cw[c];
+            var isAuto = (w === 'auto');
+            var cls = '';
+            if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
+            else if (isAuto) cls = 'col-resize';
+            else cls = 'col-auto';
+            var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+            var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
+            var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
             if (comboCols.indexOf(c) >= 0) {
-                bhtml += '<td class="' + cls + '"><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + autoStyle + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             } else {
-                bhtml += '<td class="' + cls + '"><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             }
         }
         bhtml += '</tr>';
@@ -571,8 +646,7 @@ function exportCurrentCSV() {
         for (var i = 0; i < headers.length; i++) line.push(csvEsc((row[i] || '').toString().trim()));
         csv += line.join(',') + '\n';
     });
-    var ts = fmtDate();
-    var fname = (currentTab === 'camera' ? 'camera_data' : 'accessory_data') + '_' + ts + '.csv';
+    var fname = (currentTab === 'camera' ? 'camera_data.csv' : 'accessory_data.csv');
     dl(csv, fname, 'text/csv;charset=utf-8;');
     showToast('已导出 ' + data.length + ' 行', 'success');
 }
@@ -666,18 +740,21 @@ var resizeState = null;
 function startResize(e) {
     e.preventDefault();
     var th = e.target.parentElement;
-    resizeState = { startX: e.clientX, startWidth: th.offsetWidth, th: th };
+    var colIdx = Array.from(th.parentElement.children).indexOf(th);
+    resizeState = { startX: e.clientX, startWidth: th.offsetWidth, th: th, colIdx: colIdx };
     e.target.classList.add('active');
     document.addEventListener('mousemove', doResize);
     document.addEventListener('mouseup', stopResize);
 }
 function doResize(e) {
     if (!resizeState) return;
-    var newWidth = Math.max(120, resizeState.startWidth + e.clientX - resizeState.startX);
+    var newWidth = Math.max(60, resizeState.startWidth + e.clientX - resizeState.startX);
     resizeState.th.style.width = newWidth + 'px';
-    // Update all col-f3 cells
-    document.querySelectorAll('.col-f3').forEach(function(el) {
-        el.style.width = newWidth + 'px';
+    resizeState.th.style.minWidth = newWidth + 'px';
+    var colIdx = resizeState.colIdx;
+    document.querySelectorAll('#editorBody tr').forEach(function(tr) {
+        var td = tr.children[colIdx];
+        if (td) { td.style.width = newWidth + 'px'; td.style.minWidth = newWidth + 'px'; }
     });
 }
 function stopResize() {
