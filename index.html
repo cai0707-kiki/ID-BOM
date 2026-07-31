@@ -104,6 +104,7 @@
         .empty-state-icon{font-size:36px;margin-bottom:10px}
         .empty-state h3{font-size:13px;color:#64748b;margin-bottom:4px}
         .empty-state p{font-size:11px}
+        .version-bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);padding:6px 20px;background:#1e293b;border:1px solid #f97316;border-radius:20px;color:white;font-size:12px;z-index:99;white-space:nowrap}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:1000;align-items:center;justify-content:center;transition:background 0.3s ease}
         .modal-overlay.active{display:flex;background:rgba(0,0,0,0.5)}
         .modal{background:white;border-radius:12px;width:750px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
@@ -141,7 +142,7 @@
     <div class="header">
         <div class="header-left">
             <div class="header-logo"><span>ID</span> · <span class="logo-text" id="logoText" onclick="onLogoClick(event)">读码器配单工具<span class="click-hint" id="clickHint"></span></span></div>
-            <button class="btn-contact">联系我们</button>
+            <div class="header-logo" style="font-size:10px;color:#94a3b8">版本：V1.0</div>
         </div>
         <div class="header-right">计算结果仅供参考，建议实测验证</div>
     </div>
@@ -199,6 +200,7 @@
             </div>
         </div>
     </div>
+    <div class="version-bar">有问题和错误请及时联系蔡修钢</div>
     <div id="accessoryModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
