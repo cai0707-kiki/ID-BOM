@@ -1221,11 +1221,11 @@
 {"content":"ID产品配单表V1.0发布啦！！后续ID产品配单表均更新到此网址，请及时收藏避免遗忘！网址：https://cai0707-kiki.github.io/ID-BOM/","date":"2026-07-31"}
     </script>
     <script>
-        var accessoryColumns={'\u7535\u6e90':{name:'\u7535\u6e90',icon:'\u26a1',col:7,flagCol:8,accCol:7,accFlagCol:8},'\u5b89\u88c5\u677f':{name:'\u5b89\u88c5\u677f',icon:'\ud83d\udd27',col:9,flagCol:10,accCol:7,accFlagCol:8},'\u4e00\u4f53\u7ebf':{name:'\u4e00\u4f53\u7ebf',icon:'\ud83d\udd0c',col:11,flagCol:12,accCol:7,accFlagCol:8},'IO\u7ebf':{name:'IO\u7535\u6e90\u7ebf',icon:'\ud83d\udd17',col:13,flagCol:14,accCol:7,accFlagCol:8},'\u7f51\u7ebf':{name:'\u7f51\u7ebf',icon:'\ud83c\udf10',col:15,flagCol:16,accCol:7,accFlagCol:8},'\u706f\u677f':{name:'\u706f\u677f',icon:'\ud83d\udca1',col:17,flagCol:18,accCol:7,accFlagCol:8},'\u955c\u5934\u7f69':{name:'\u955c\u5934\u7f69',icon:'\ud83d\udcf7',col:19,flagCol:20,accCol:7,accFlagCol:8},'FA\u955c\u5934':{name:'FA\u955c\u5934',icon:'\ud83d\udd2d',col:21,flagCol:22,accCol:7,accFlagCol:8},'\u6269\u5c55\u914d\u4ef6':{name:'\u6269\u5c55\u914d\u4ef6',icon:'\ud83d\udce6',col:23,flagCol:24,accCol:7,accFlagCol:8}};
-        var cableCategories={'\u4e00\u4f53\u7ebf':{materials:['\u666e\u901a','\u9ad8\u67d4','\u8d85\u67d4']},'IO\u7ebf':{materials:['\u666e\u901a','\u9ad8\u67d4','\u8d85\u67d4']},'\u7f51\u7ebf':{materials:['\u666e\u901a','\u9ad8\u67d4','\u8d85\u67d4','\u5f2f\u5934']}};
+        var accessoryColumns={'电源':{name:'电源',icon:'⚡',col:7,flagCol:8,accCol:7,accFlagCol:8},'安装板':{name:'安装板',icon:'🔧',col:9,flagCol:10,accCol:7,accFlagCol:8},'一体线':{name:'一体线',icon:'🔌',col:11,flagCol:12,accCol:7,accFlagCol:8},'IO线':{name:'IO电源线',icon:'🔗',col:13,flagCol:14,accCol:7,accFlagCol:8},'网线':{name:'网线',icon:'🌐',col:15,flagCol:16,accCol:7,accFlagCol:8},'灯板':{name:'灯板',icon:'💡',col:17,flagCol:18,accCol:7,accFlagCol:8},'镜头罩':{name:'镜头罩',icon:'📷',col:19,flagCol:20,accCol:7,accFlagCol:8},'FA镜头':{name:'FA镜头',icon:'🔭',col:21,flagCol:22,accCol:7,accFlagCol:8},'扩展配件':{name:'扩展配件',icon:'📦',col:23,flagCol:24,accCol:7,accFlagCol:8}};
+        var cableCategories={'一体线':{materials:['普通','高柔','超柔']},'IO线':{materials:['普通','高柔','超柔']},'网线':{materials:['普通','高柔','超柔','弯头']}};
         var allRows=[],currentMatch=null,selectedAccessories=[],currentAccessoryKey='',currentAccessoryItems=[],tempSelectedItems=[],standardCache={};
         var cableFilterState={length:'all',material:'all'},currentCableFilteredItems=[];
-        function isAccessory(r){return r&&r[0]&&r[0].trim()==='\u914d\u4ef6';}
+        function isAccessory(r){return r&&r[0]&&r[0].trim()==='配件';}
         function getAccCol(r,cfg){return isAccessory(r)?cfg.accCol:cfg.col;}
         function getAccFlagCol(r,cfg){return isAccessory(r)?cfg.accFlagCol:cfg.flagCol;}
         function loadData(){
@@ -1246,7 +1246,7 @@
                 setTimeout(function(){
                     var n=document.createElement('div');
                     n.style.cssText='position:fixed;top:10px;right:10px;background:#10b981;color:white;padding:10px 18px;border-radius:6px;font-size:12px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15)';
-                    n.textContent='\u2705 数据已自动更新至最新版本';
+                    n.textContent='✅ 数据已自动更新至最新版本';
                     document.body.appendChild(n);
                     setTimeout(function(){n.remove();},3000);
                 },500);
@@ -1259,12 +1259,12 @@
     }
     if(ls){allRows=ls;init();}
 }
-        function init(){var allowed=['ID800','ID2013EM','ID2000M','ID2000XM','ID3000PM','ID3000XM','ID3000RM','ID5000M','ID5000XM'];var cats={};allRows.forEach(function(r){if(r.length>1&&r[1]&&r[0]&&r[0].trim()==='\u76f8\u673a')cats[r[1].trim()]=true;});var sel=document.getElementById('categorySelect');Object.keys(cats).sort(function(a,b){var ia=-1,ib=-1;for(var i=0;i<allowed.length;i++){if(a.indexOf(allowed[i])===0)ia=i;if(b.indexOf(allowed[i])===0)ib=i;}if(ia===-1&&ib===-1)return a.localeCompare(b);if(ia===-1)return 1;if(ib===-1)return 1;return ia-ib;}).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});}
-        function onCategoryChange(){var cat=document.getElementById('categorySelect').value,ss=document.getElementById('seriesSelect'),ms=document.getElementById('modelSelect');ss.innerHTML='<option value="">\u8bf7\u9009\u62e9\u4ea7\u54c1\u7cfb\u5217</option>';ss.disabled=true;ms.innerHTML='<option value="">\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u5927\u7c7b</option>';ms.disabled=true;us(ss);us(ms);us(document.getElementById('categorySelect'));ca();ct();if(!cat)return;var s={};allRows.forEach(function(r){if(r.length>2&&r[1]&&r[1].trim()===cat&&r[2]&&r[0]&&r[0].trim()==='\u76f8\u673a')s[r[2].trim()]=true;});Object.keys(s).sort().forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;ss.appendChild(o);});ss.disabled=false;}
-        function onSeriesChange(){var cat=document.getElementById('categorySelect').value,series=document.getElementById('seriesSelect').value,ms=document.getElementById('modelSelect');ms.innerHTML='<option value="">\u8bf7\u9009\u62e9\u5177\u4f53\u578b\u53f7</option>';ms.disabled=true;us(ms);us(document.getElementById('seriesSelect'));ca();ct();if(!series)return;var m={};allRows.forEach(function(r){if(r.length>4&&r[1]&&r[1].trim()===cat&&r[2]&&r[2].trim()===series&&r[3]&&r[4]&&r[0]&&r[0].trim()==='\u76f8\u673a')if(!m[r[3].trim()])m[r[3].trim()]=r[4].trim();});Object.keys(m).sort().forEach(function(mdl){var o=document.createElement('option');o.value=mdl;o.textContent=mdl;ms.appendChild(o);});ms.disabled=false;}
+        function init(){var allowed=['ID800','ID2013EM','ID2000M','ID2000XM','ID3000PM','ID3000XM','ID3000RM','ID5000M','ID5000XM'];var cats={};allRows.forEach(function(r){if(r.length>1&&r[1]&&r[0]&&r[0].trim()==='相机')cats[r[1].trim()]=true;});var sel=document.getElementById('categorySelect');Object.keys(cats).sort(function(a,b){var ia=-1,ib=-1;for(var i=0;i<allowed.length;i++){if(a.indexOf(allowed[i])===0)ia=i;if(b.indexOf(allowed[i])===0)ib=i;}if(ia===-1&&ib===-1)return a.localeCompare(b);if(ia===-1)return 1;if(ib===-1)return 1;return ia-ib;}).forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});}
+        function onCategoryChange(){var cat=document.getElementById('categorySelect').value,ss=document.getElementById('seriesSelect'),ms=document.getElementById('modelSelect');ss.innerHTML='<option value="">请选择产品系列</option>';ss.disabled=true;ms.innerHTML='<option value="">请先选择产品大类</option>';ms.disabled=true;us(ss);us(ms);us(document.getElementById('categorySelect'));ca();ct();if(!cat)return;var s={};allRows.forEach(function(r){if(r.length>2&&r[1]&&r[1].trim()===cat&&r[2]&&r[0]&&r[0].trim()==='相机')s[r[2].trim()]=true;});Object.keys(s).sort().forEach(function(v){var o=document.createElement('option');o.value=v;o.textContent=v;ss.appendChild(o);});ss.disabled=false;}
+        function onSeriesChange(){var cat=document.getElementById('categorySelect').value,series=document.getElementById('seriesSelect').value,ms=document.getElementById('modelSelect');ms.innerHTML='<option value="">请选择具体型号</option>';ms.disabled=true;us(ms);us(document.getElementById('seriesSelect'));ca();ct();if(!series)return;var m={};allRows.forEach(function(r){if(r.length>4&&r[1]&&r[1].trim()===cat&&r[2]&&r[2].trim()===series&&r[3]&&r[4]&&r[0]&&r[0].trim()==='相机')if(!m[r[3].trim()])m[r[3].trim()]=r[4].trim();});Object.keys(m).sort().forEach(function(mdl){var o=document.createElement('option');o.value=mdl;o.textContent=mdl;ms.appendChild(o);});ms.disabled=false;}
         function onModelChange(){var cat=document.getElementById('categorySelect').value,series=document.getElementById('seriesSelect').value,mdl=document.getElementById('modelSelect').value;us(document.getElementById('modelSelect'));ca();ct();if(!mdl)return;for(var i=0;i<allRows.length;i++){var r=allRows[i];if(r.length>4&&r[1]&&r[1].trim()===cat&&r[2]&&r[2].trim()===series&&r[3]&&r[3].trim()===mdl){currentMatch=r;break;}}if(currentMatch){rac();gc();}}
         function us(s){if(s.value)s.classList.add('has-value');else s.classList.remove('has-value');}
-        function rac(){var c=document.getElementById('accessoryCategories'),h='',keys=Object.keys(accessoryColumns);for(var i=0;i<keys.length;i++){var cfg=accessoryColumns[keys[i]],val=currentMatch[cfg.col]||'';if(!val)continue;var flag=cfg.flagCol?currentMatch[cfg.flagCol]:'';if(flag==='1'||!cfg.flagCol){var refTags=val.split(";").map(function(s){return s.trim().toLowerCase();}).filter(function(s){return s.length>0;});var refFlags=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();});var camStdTags={};refTags.forEach(function(t,i){if(refFlags[i]==='1')camStdTags[t]=true;});var matchCount=0;var stdCount=0;allRows.forEach(function(r){var accCol=getAccCol(r,cfg);if(r.length>accCol&&r[1]&&r[1].trim()===cfg.name){var accFlagCol=getAccFlagCol(r,cfg);var accTag=(r[accCol]||"").toLowerCase();var accFlag=accFlagCol>=0?(r[accFlagCol]||''):'';var accParts=accTag.split(';').map(function(s){return s.trim();});for(var k=0;k<refTags.length;k++){for(var p=0;p<accParts.length;p++){if(accParts[p]===refTags[k]){matchCount++;if(camStdTags[refTags[k]]&&accFlag==='1')stdCount++;return;}}}}});if(matchCount===stdCount)continue;}var cnt=selectedAccessories.filter(function(a){return a.key===keys[i];}).length;var txt=cnt>0?cnt+' \u4e2a\u5df2\u9009':'\u70b9\u51fb\u9009\u62e9';h+='<div class="accessory-category" onclick="openAccessoryModal(\''+keys[i]+'\')"><div class="accessory-category-left"><div class="accessory-icon">'+cfg.icon+'</div><div><div class="accessory-category-name">'+cfg.name+'</div><div class="accessory-category-count">'+txt+'</div></div></div><div class="accessory-arrow">\u203a</div></div>';}c.innerHTML=h||'<div style="text-align:center;color:#94a3b8;font-size:11px;padding:12px;">\u6682\u65e0\u914d\u4ef6</div>';}
+        function rac(){var c=document.getElementById('accessoryCategories'),h='',keys=Object.keys(accessoryColumns);for(var i=0;i<keys.length;i++){var cfg=accessoryColumns[keys[i]],val=currentMatch[cfg.col]||'';if(!val)continue;var flag=cfg.flagCol?currentMatch[cfg.flagCol]:'';if(flag==='1'||!cfg.flagCol){var refTags=val.split(";").map(function(s){return s.trim().toLowerCase();}).filter(function(s){return s.length>0;});var refFlags=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();});var camStdTags={};refTags.forEach(function(t,i){if(refFlags[i]==='1')camStdTags[t]=true;});var matchCount=0;var stdCount=0;allRows.forEach(function(r){var accCol=getAccCol(r,cfg);if(r.length>accCol&&r[1]&&r[1].trim()===cfg.name){var accFlagCol=getAccFlagCol(r,cfg);var accTag=(r[accCol]||"").toLowerCase();var accFlag=accFlagCol>=0?(r[accFlagCol]||''):'';var accParts=accTag.split(';').map(function(s){return s.trim();});for(var k=0;k<refTags.length;k++){for(var p=0;p<accParts.length;p++){if(accParts[p]===refTags[k]){matchCount++;if(camStdTags[refTags[k]]&&accFlag==='1')stdCount++;return;}}}}});if(matchCount===stdCount)continue;}var cnt=selectedAccessories.filter(function(a){return a.key===keys[i];}).length;var txt=cnt>0?cnt+' 个已选':'点击选择';h+='<div class="accessory-category" onclick="openAccessoryModal(\''+keys[i]+'\')"><div class="accessory-category-left"><div class="accessory-icon">'+cfg.icon+'</div><div><div class="accessory-category-name">'+cfg.name+'</div><div class="accessory-category-count">'+txt+'</div></div></div><div class="accessory-arrow">›</div></div>';}c.innerHTML=h||'<div style="text-align:center;color:#94a3b8;font-size:11px;padding:12px;">暂无配件</div>';}
         function openAccessoryModal(key){
     currentAccessoryKey=key;
     var cfg=accessoryColumns[key],catName=cfg.name,refVal=currentMatch[cfg.col]||'';
@@ -1287,7 +1287,7 @@
             }
             if(matchTag||refTags.length===0){
                 var series=currentMatch[1]||'';
-                if(key==='\u4e00\u4f53\u7ebf'&&series.indexOf('ID2000XM')>=0&&(r[4]||'')==='101515363')return;
+                if(key==='一体线'&&series.indexOf('ID2000XM')>=0&&(r[4]||'')==='101515363')return;
                 var bothStd=camStdTags[matchTag]&&accFlag==='1';
                 _tmpItems.push({series:r[2]||'',name:r[3]||'',desc:r[5]||'',code:r[4]||'',remark:r[6]||'',isStd:bothStd});
             }
@@ -1295,7 +1295,7 @@
     });
     var hasOptional=_tmpItems.some(function(x){return !x.isStd;});
     _tmpItems.forEach(function(x){if(!hasOptional||!x.isStd)currentAccessoryItems.push({series:x.series,name:x.name,desc:x.desc,code:x.code,remark:x.remark});});
-    document.getElementById('modalTitle').textContent=catName+' - \u9009\u62e9\u914d\u4ef6';
+    document.getElementById('modalTitle').textContent=catName+' - 选择配件';
     tempSelectedItems=selectedAccessories.filter(function(a){return a.key===key;}).map(function(a){return a.name;});
     if(cableCategories[key]){
         cableFilterState={length:'all',material:'all'};
@@ -1306,7 +1306,14 @@
         renderCableFilteredItems();
     }
     document.getElementById('accessoryModal').classList.add('active');
-}function closeModal(){document.getElementById('accessoryModal').classList.remove('active');currentAccessoryKey='';currentAccessoryItems=[];tempSelectedItems=[];document.getElementById('cableFilterArea').innerHTML='';}
+}
+function closeModal(){
+    document.getElementById('accessoryModal').classList.remove('active');
+    currentAccessoryKey='';
+    currentAccessoryItems=[];
+    tempSelectedItems=[];
+    document.getElementById('cableFilterArea').innerHTML='';
+}
 function extractCableLengths(){
     var lengths={};
     currentAccessoryItems.forEach(function(item){
@@ -1329,14 +1336,14 @@ function extractCableMaterials(key){
 function renderCableFilterArea(){
     var fa=document.getElementById('cableFilterArea'),lengths=extractCableLengths(),materials=extractCableMaterials(currentAccessoryKey);
     var h='<div class="cable-filter">';
-    h+='<div class="cable-warn"><em>\u26a0\ufe0f 7m\u7ebf\u7f06\u65e0\u6cd5\u914d\u7f6e\u4e0b\u5355\uff0c\u987b\u8ba2\u5355\u5907\u6ce8\u5220\u9664\u6807\u914d\u7ebf\u7f06\uff0c\u518d\u989d\u5916\u4e0b\u5355\uff01</em></div>';
-    h+='<div class="cable-filter-row"><span class="cable-filter-label">\u957f\u5ea6</span><div class="cable-filter-btns">';
-    h+='<button class="cable-filter-btn active" onclick="setCableFilter(\'length\',\'all\',this)">\u5168\u90e8</button>';
+    h+='<div class="cable-warn"><em>⚠️ 7m线缆无法配置下单，须订单备注删除标配线缆，再额外下单！</em></div>';
+    h+='<div class="cable-filter-row"><span class="cable-filter-label">长度</span><div class="cable-filter-btns">';
+    h+='<button class="cable-filter-btn active" onclick="setCableFilter(\'length\',\'all\',this)">全部</button>';
     lengths.forEach(function(l){h+='<button class="cable-filter-btn" onclick="setCableFilter(\'length\',\''+l+'\',this)">'+l+'</button>';});
     h+='</div></div>';
     if(materials.length>0){
-        h+='<div class="cable-filter-row"><span class="cable-filter-label">\u6750\u8d28</span><div class="cable-filter-btns">';
-        h+='<button class="cable-filter-btn active" onclick="setCableFilter(\'material\',\'all\',this)">\u5168\u90e8</button>';
+        h+='<div class="cable-filter-row"><span class="cable-filter-label">材质</span><div class="cable-filter-btns">';
+        h+='<button class="cable-filter-btn active" onclick="setCableFilter(\'material\',\'all\',this)">全部</button>';
         materials.forEach(function(m){h+='<button class="cable-filter-btn" onclick="setCableFilter(\'material\',\''+m+'\',this)">'+m+'</button>';});
         h+='</div></div>';
     }
@@ -1372,7 +1379,7 @@ function renderCableFilteredItems(){
     });
     currentCableFilteredItems=filtered;
     if(filtered.length===0){
-        tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px;">\u65e0\u5339\u914d\u7684\u914d\u4ef6</td></tr>';
+        tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px;">无匹配的配件</td></tr>';
     }else{
         var h='';
         filtered.forEach(function(item){
@@ -1383,10 +1390,10 @@ function renderCableFilteredItems(){
         tb.innerHTML=h;
     }
 }
-        function toggleTempItem(idx){var item=currentAccessoryItems[idx],cb=document.getElementById('acc_'+idx),key=currentAccessoryKey;if(cb.checked){if(key!=='\u6269\u5c55\u914d\u4ef6'){tempSelectedItems=[];currentAccessoryItems.forEach(function(_,i){var c=document.getElementById('acc_'+i);if(c)c.checked=false;});cb.checked=true;}if(tempSelectedItems.indexOf(item.name)<0)tempSelectedItems.push(item.name);if(key==='\u7535\u6e90'){var ms=item.series;if(ms==='\u7535\u6e90\u9002\u914d\u5668'){var b=currentAccessoryItems.find(function(x){return x.series==='\u7535\u6e90\u9002\u914d\u5668\u7ebf\u7f06';});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms==='\u7535\u6e90\u9002\u914d\u5668\u7ebf\u7f06'){var b=currentAccessoryItems.find(function(x){return x.series==='\u7535\u6e90\u9002\u914d\u5668';});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms.indexOf('\u5f00\u5173\u7535\u6e90')===0&&ms.indexOf('\u7ebf\u7f06')<0){var b=currentAccessoryItems.find(function(x){return x.series.indexOf('\u5f00\u5173\u7535\u6e90\u7ebf\u7f06')>=0;});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms.indexOf('\u5f00\u5173\u7535\u6e90\u7ebf\u7f06')>=0){var b=currentAccessoryItems.find(function(x){return x.series.indexOf('\u5f00\u5173\u7535\u6e90')===0&&x.series.indexOf('\u7ebf\u7f06')<0;});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}}}else{tempSelectedItems=tempSelectedItems.filter(function(n){return n!==item.name;});if(key==='\u7535\u6e90'){var ms=item.series;if(ms==='\u7535\u6e90\u9002\u914d\u5668'||ms==='\u7535\u6e90\u9002\u914d\u5668\u7ebf\u7f06'){var bs=ms==='\u7535\u6e90\u9002\u914d\u5668'?'\u7535\u6e90\u9002\u914d\u5668\u7ebf\u7f06':'\u7535\u6e90\u9002\u914d\u5668';var b=currentAccessoryItems.find(function(x){return x.series===bs;});if(b){tempSelectedItems=tempSelectedItems.filter(function(n){return n!==b.name;});var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=false;}}else if(ms.indexOf('\u5f00\u5173\u7535\u6e90')===0){var bs=ms.indexOf('\u5f00\u5173\u7535\u6e90\u7ebf\u7f06')>=0?'\u5f00\u5173\u7535\u6e90':'\u5f00\u5173\u7535\u6e90\u7ebf\u7f06';var b=currentAccessoryItems.find(function(x){return x.series.indexOf(bs)===0;});if(b){tempSelectedItems=tempSelectedItems.filter(function(n){return n!==b.name;});var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=false;}}}}}
+        function toggleTempItem(idx){var item=currentAccessoryItems[idx],cb=document.getElementById('acc_'+idx),key=currentAccessoryKey;if(cb.checked){if(key!=='扩展配件'){tempSelectedItems=[];currentAccessoryItems.forEach(function(_,i){var c=document.getElementById('acc_'+i);if(c)c.checked=false;});cb.checked=true;}if(tempSelectedItems.indexOf(item.name)<0)tempSelectedItems.push(item.name);if(key==='电源'){var ms=item.series;if(ms==='电源适配器'){var b=currentAccessoryItems.find(function(x){return x.series==='电源适配器线缆';});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms==='电源适配器线缆'){var b=currentAccessoryItems.find(function(x){return x.series==='电源适配器';});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms.indexOf('开关电源')===0&&ms.indexOf('线缆')<0){var b=currentAccessoryItems.find(function(x){return x.series.indexOf('开关电源线缆')>=0;});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}else if(ms.indexOf('开关电源线缆')>=0){var b=currentAccessoryItems.find(function(x){return x.series.indexOf('开关电源')===0&&x.series.indexOf('线缆')<0;});if(b&&tempSelectedItems.indexOf(b.name)<0){tempSelectedItems.push(b.name);var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=true;}}}}else{tempSelectedItems=tempSelectedItems.filter(function(n){return n!==item.name;});if(key==='电源'){var ms=item.series;if(ms==='电源适配器'||ms==='电源适配器线缆'){var bs=ms==='电源适配器'?'电源适配器线缆':'电源适配器';var b=currentAccessoryItems.find(function(x){return x.series===bs;});if(b){tempSelectedItems=tempSelectedItems.filter(function(n){return n!==b.name;});var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=false;}}else if(ms.indexOf('开关电源')===0){var bs=ms.indexOf('开关电源线缆')>=0?'开关电源':'开关电源线缆';var b=currentAccessoryItems.find(function(x){return x.series.indexOf(bs)===0;});if(b){tempSelectedItems=tempSelectedItems.filter(function(n){return n!==b.name;});var bi=currentAccessoryItems.indexOf(b);var bc=document.getElementById('acc_'+bi);if(bc)bc.checked=false;}}}}}
         function confirmAccessories(){var key=currentAccessoryKey;selectedAccessories=selectedAccessories.filter(function(a){return a.key!==key;});tempSelectedItems.forEach(function(name){var item=currentAccessoryItems.find(function(i){return i.name===name;});if(item)selectedAccessories.push({key:key,name:item.name,value:item.desc,code:item.code,remark:item.remark,type:'optional'});});closeModal();rt();rac();}
         function gc(){
-    if(!currentMatch){alert('\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u578b\u53f7');return;}
+    if(!currentMatch){alert('请先选择产品型号');return;}
     selectedAccessories=[];
     standardCache={};
     var keys=Object.keys(accessoryColumns);
@@ -1429,16 +1436,16 @@ function rt(){
         document.getElementById('statTotal').textContent=selectedAccessories.length;
         document.getElementById('statHost').textContent=0;
         document.getElementById('statAccessory').textContent=selectedAccessories.length;
-        var h='<table class="data-table"><thead><tr><th style="width:60px">\u7c7b\u578b</th><th style="width:200px">\u7269\u6599\u540d\u79f0</th><th style="width:280px">\u63cf\u8ff0</th><th style="width:80px">\u7269\u6599\u4ee3\u7801</th><th style="width:180px">\u5907\u6ce8</th><th style="width:50px">\u64cd\u4f5c</th></tr></thead><tbody>';
+        var h='<table class="data-table"><thead><tr><th style="width:60px">类型</th><th style="width:200px">物料名称</th><th style="width:280px">描述</th><th style="width:80px">物料代码</th><th style="width:180px">备注</th><th style="width:50px">操作</th></tr></thead><tbody>';
         selectedAccessories.forEach(function(a){
-            h+='<tr><td><span class="type-badge optional">\u9009\u914d</span></td><td class="material-name">'+a.name+'</td><td class="material-desc">'+a.value+'</td><td class="material-code">'+(a.code||'-')+'</td><td>'+(a.remark||'')+'</td><td><button class="btn-remove" onclick="ri(\''+a.name.replace(/'/g,"\\'")+'\')">\u2715</button></td></tr>';
+            h+='<tr><td><span class="type-badge optional">选配</span></td><td class="material-name">'+a.name+'</td><td class="material-desc">'+a.value+'</td><td class="material-code">'+(a.code||'-')+'</td><td>'+(a.remark||'')+'</td><td><button class="btn-remove" onclick="ri(\''+a.name.replace(/'/g,"\\'")+'\')">✕</button></td></tr>';
         });
-        h+='</tbody></table><div class="table-footer"><span>\u5171 '+selectedAccessories.length+' \u884c</span></div>';
+        h+='</tbody></table><div class="table-footer"><span>共 '+selectedAccessories.length+' 行</span></div>';
         document.getElementById('tableArea').innerHTML=h;
         return;
     }
     if(!currentMatch){ct();return;}
-    var items=[];items.push({type:'host',typeName:'\u4e3b\u673a',name:currentMatch[3]||'-',desc:currentMatch[5]||'-',code:currentMatch[4]||'-',remark:currentMatch[6]||''});var cableKeys={'一体线':true,'IO线':true,'网线':true};var cableIsStd={};Object.keys(cableKeys).forEach(function(k){var cfg=accessoryColumns[k];if(cfg&&cfg.flagCol)cableIsStd[k]=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();}).some(function(f){return f==='1';});});var sorted=selectedAccessories.slice().sort(function(a,b){if(a.type==='optional'&&b.type!=='optional')return -1;if(a.type!=='optional'&&b.type==='optional')return 1;return 0;});sorted.forEach(function(a){var remark=a.remark||'';if(a.type==='optional'&&cableKeys[a.key]&&!cableIsStd[a.key])remark='';items.push({type:a.type,typeName:a.type==='standard'?'标配':'选配',name:a.name,desc:a.value,code:a.code||'-',remark:remark});});document.getElementById('statTotal').textContent=items.length;document.getElementById('statHost').textContent=1;document.getElementById('statAccessory').textContent=items.length-1;var h='<table class="data-table"><thead><tr><th style="width:60px">\u7c7b\u578b</th><th style="width:200px">\u7269\u6599\u540d\u79f0</th><th style="width:280px">\u63cf\u8ff0</th><th style="width:80px">\u7269\u6599\u4ee3\u7801</th><th style="width:180px">\u5907\u6ce8</th><th style="width:50px">\u64cd\u4f5c</th></tr></thead><tbody>';items.forEach(function(item,idx){var removeBtn=item.type==='optional'?'<button class="btn-remove" onclick="ri(\''+item.name.replace(/'/g,"\\'")+'\')">\u2715</button>':'';h+='<tr><td><span class="type-badge '+item.type+'">'+item.typeName+'</span></td><td class="material-name">'+item.name+'</td><td class="material-desc">'+item.desc+'</td><td class="material-code">'+item.code+'</td><td>'+item.remark+'</td><td>'+removeBtn+'</td></tr>';});h+='</tbody></table><div class="table-footer"><span>\u5171 '+items.length+' \u884c</span></div>';document.getElementById('tableArea').innerHTML=h;}
+    var items=[];items.push({type:'host',typeName:'主机',name:currentMatch[3]||'-',desc:currentMatch[5]||'-',code:currentMatch[4]||'-',remark:currentMatch[6]||''});var cableKeys={'一体线':true,'IO线':true,'网线':true};var cableIsStd={};Object.keys(cableKeys).forEach(function(k){var cfg=accessoryColumns[k];if(cfg&&cfg.flagCol)cableIsStd[k]=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();}).some(function(f){return f==='1';});});var sorted=selectedAccessories.slice().sort(function(a,b){if(a.type==='optional'&&b.type!=='optional')return -1;if(a.type!=='optional'&&b.type==='optional')return 1;return 0;});sorted.forEach(function(a){var remark=a.remark||'';if(a.type==='optional'&&cableKeys[a.key]&&!cableIsStd[a.key])remark='';items.push({type:a.type,typeName:a.type==='standard'?'标配':'选配',name:a.name,desc:a.value,code:a.code||'-',remark:remark});});document.getElementById('statTotal').textContent=items.length;document.getElementById('statHost').textContent=1;document.getElementById('statAccessory').textContent=items.length-1;var h='<table class="data-table"><thead><tr><th style="width:60px">类型</th><th style="width:200px">物料名称</th><th style="width:280px">描述</th><th style="width:80px">物料代码</th><th style="width:180px">备注</th><th style="width:50px">操作</th></tr></thead><tbody>';items.forEach(function(item,idx){var removeBtn=item.type==='optional'?'<button class="btn-remove" onclick="ri(\''+item.name.replace(/'/g,"\\'")+'\')">✕</button>':'';h+='<tr><td><span class="type-badge '+item.type+'">'+item.typeName+'</span></td><td class="material-name">'+item.name+'</td><td class="material-desc">'+item.desc+'</td><td class="material-code">'+item.code+'</td><td>'+item.remark+'</td><td>'+removeBtn+'</td></tr>';});h+='</tbody></table><div class="table-footer"><span>共 '+items.length+' 行</span></div>';document.getElementById('tableArea').innerHTML=h;}
         function ri(name){
     var idx=selectedAccessories.findIndex(function(a){return a.name===name;});
     if(idx===-1)return;
@@ -1449,12 +1456,68 @@ function rt(){
     }
     rt();
     rac();
-}function ca(){document.getElementById('accessoryCategories').innerHTML='';selectedAccessories=[];currentMatch=null;}
-        function ct(){document.getElementById('tableArea').innerHTML='<div class="empty-state"><div class="empty-state-icon">\ud83d\udce6</div><h3>\u8bf7\u9009\u62e9\u4ea7\u54c1\u914d\u7f6e</h3><p>\u5728\u5de6\u4fa7\u9009\u62e9\u4ea7\u54c1\u540e\uff0c\u81ea\u52a8\u751f\u6210\u914d\u5355</p></div>';document.getElementById('statTotal').textContent='0';document.getElementById('statHost').textContent='0';document.getElementById('statAccessory').textContent='0';}
-        function resetConfig(){if(currentMatch){gc();rac();}}
-function clearAll(){selectedAccessories=[];currentMatch=null;standardCache={};document.getElementById('categorySelect').selectedIndex=0;document.getElementById('seriesSelect').innerHTML='<option value="">\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u5927\u7c7b</option>';document.getElementById('seriesSelect').disabled=true;document.getElementById('modelSelect').innerHTML='<option value="">\u8bf7\u5148\u9009\u62e9\u4ea7\u54c1\u7cfb\u5217</option>';document.getElementById('modelSelect').disabled=true;document.getElementById('accessoryCategories').innerHTML='';document.getElementById('quickSearchInput').value='';document.getElementById('quickSearchResults').style.display='none';ct();}
-        function csvEscape(s){if(s==null)s='';s=String(s);if(s.indexOf(',')>=0||s.indexOf('"')>=0||s.indexOf('\n')>=0||s.indexOf('\r')>=0){return'"'+s.replace(/"/g,'""')+'"';}return s;}
-function exportCSV(){if(!currentMatch){alert('\u8bf7\u5148\u751f\u6210\u914d\u5355');return;}var csv='\uFEFF\u7c7b\u578b,\u7269\u6599\u540d\u79f0,\u63cf\u8ff0,\u7269\u6599\u4ee3\u7801,\u5907\u6ce8\n';csv+='\u4e3b\u673a,'+csvEscape(currentMatch[3]||'-')+','+csvEscape(currentMatch[5]||'-')+','+csvEscape(currentMatch[4]||'-')+','+csvEscape(currentMatch[6]||'')+'\n';selectedAccessories.forEach(function(a){if(a.type==='optional'){csv+='\u9009\u914d,'+csvEscape(a.name)+','+csvEscape(a.value)+','+csvEscape(a.code||'-')+','+csvEscape(a.remark||'')+'\n';}});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='ID\u4ea7\u54df\u914d\u5355\u8868.csv';l.click();}
+}
+function ca(){
+    document.getElementById('accessoryCategories').innerHTML='';
+    selectedAccessories=[];
+    currentMatch=null;
+}
+function ct(){
+    document.getElementById('tableArea').innerHTML='<div class="empty-state"><div class="empty-state-icon">📦</div><h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div>';
+    document.getElementById('statTotal').textContent='0';
+    document.getElementById('statHost').textContent='0';
+    document.getElementById('statAccessory').textContent='0';
+}
+function resetConfig(){
+    if(currentMatch){
+        gc();rac();
+    }
+}
+function clearAll(){
+    selectedAccessories=[];
+    currentMatch=null;
+    standardCache={};
+    document.getElementById('categorySelect').selectedIndex=0;
+    document.getElementById('seriesSelect').innerHTML='<option value="">请先选择产品大类</option>';
+    document.getElementById('seriesSelect').disabled=true;
+    document.getElementById('modelSelect').innerHTML='<option value="">请先选择产品系列</option>';
+    document.getElementById('modelSelect').disabled=true;
+    document.getElementById('accessoryCategories').innerHTML='';
+    document.getElementById('quickSearchInput').value='';
+    document.getElementById('quickSearchResults').style.display='none';ct();
+}
+function csvEscape(s){
+    if(s==null)s='';
+    s=String(s);
+    if(s.indexOf(',')>=0||s.indexOf('"')>=0||s.indexOf('\n')>=0||s.indexOf('\r')>=0){
+        return'"'+s.replace(/"/g,'""')+'"';
+    }
+    return s;
+}
+function exportCSV(){
+    if(!currentMatch){ alert('请先生成配单'); return; }
+    var csv = '\uFEFF类型,物料名称,描述,物料代码,备注\n';
+    csv += '主机,' + csvEscape(currentMatch[3]||'-') + ',' + csvEscape(currentMatch[5]||'-') + ',' + csvEscape(currentMatch[4]||'-') + ',' + csvEscape(currentMatch[6]||'') + '\n';
+    selectedAccessories.forEach(function(a){
+        if(a.type === 'optional'){
+            csv += '选配,' + csvEscape(a.name) + ',' + csvEscape(a.value) + ',' + csvEscape(a.code||'-') + ',' + csvEscape(a.remark||'') + '\n';
+        }
+    });
+    var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var l = document.createElement('a');
+    l.href = URL.createObjectURL(b);
+    // ---------- 以下为新增时间戳 ----------
+    var now = new Date();
+    var ts = now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + '_' +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0');
+    l.download = 'ID产品配单表_' + ts + '.csv';
+    // -------------------------------------
+    l.click();
+}
 function onQuickSearch(){
     var q=document.getElementById('quickSearchInput').value.trim().toLowerCase();
     var el=document.getElementById('quickSearchResults');
@@ -1516,7 +1579,7 @@ function selectQuickSearch(idx){
         var name=r[3]||'';
         var exists=selectedAccessories.some(function(a){return a.name===name;});
         if(!exists){
-            selectedAccessories.push({key:'\u9009\u914d',name:name,value:r[5]||'',code:r[4]||'',remark:r[6]||'',type:'optional'});
+            selectedAccessories.push({key:'选配',name:name,value:r[5]||'',code:r[4]||'',remark:r[6]||'',type:'optional'});
             rt();
         }
     }
