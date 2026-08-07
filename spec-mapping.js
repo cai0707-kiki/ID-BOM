@@ -326,7 +326,6 @@
     "MV-IDH9000B/13HHD/16RP/US/套包": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13273",
     "MV-IDM-B08": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13338",
     "MV-IDM-C08": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12542",
-    "MV-IDM-E": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12934",
     "MV-IDM-E10(V2.0)": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12934",
     "MV-IDS006M-12C-C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10452",
     "MV-IDS012M-16C-C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10451",
