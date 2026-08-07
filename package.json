@@ -1,0 +1,21 @@
+{
+  "name": "id-bom",
+  "version": "1.0.0",
+  "description": "海康机器人产品 BOM 配单工具 — 将 CSV 数据源构建为可离线使用的单页配单应用",
+  "main": "import_csv.js",
+  "scripts": {
+    "build": "node import_csv.js"
+  },
+  "keywords": [
+    "hikrobotics",
+    "bom",
+    "machine-vision",
+    "industrial-camera"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  }
+}

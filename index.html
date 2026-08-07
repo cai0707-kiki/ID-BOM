@@ -124,14 +124,14 @@
         .version-bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);padding:6px 20px;background:#1e293b;border:1px solid #f97316;border-radius:20px;color:white;font-size:12px;z-index:99;white-space:nowrap}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:1000;align-items:center;justify-content:center;transition:background 0.3s ease}
         .modal-overlay.active{display:flex;background:rgba(0,0,0,0.5)}
-        .modal{background:white;border-radius:12px;width:750px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
+        .modal{background:white;border-radius:12px;width:750px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease;overflow:hidden}
         .modal-overlay.active .modal{transform:scale(1);opacity:1}
         .modal-header{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
         .modal-title{font-size:14px;font-weight:600;color:#1e293b}
         .modal-close{width:26px;height:26px;border:none;background:#f1f5f9;border-radius:6px;cursor:pointer;font-size:14px;color:#64748b}
         .modal-close:hover{background:#e2e8f0}
-        .modal-body{padding:14px 18px;max-height:60vh;overflow-y:auto}
-        .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
+        .modal-body{padding:14px 18px;flex:1;overflow-y:auto;overflow-x:auto;min-height:0}
+        .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
         .btn-cancel{padding:6px 14px;border:1px solid #e2e8f0;border-radius:4px;background:white;color:#64748b;font-size:12px;cursor:pointer}
         .btn-confirm{padding:6px 14px;border:none;border-radius:4px;background:#f97316;color:white;font-size:12px;cursor:pointer}
         .accessory-table{width:100%;border-collapse:collapse;font-size:10px}
@@ -153,7 +153,91 @@
         .cable-filter-btn.active{border-color:#f97316;background:#f97316;color:white}
         .cable-warn{padding:8px 12px;border:1px solid #fcd34d;border-radius:6px;background:#fffbeb;color:#b45309;font-size:11px;margin-bottom:12px;line-height:1.5}
         .cable-warn em{font-style:normal;color:#f97316}
-        @media(max-width:1024px){.container{flex-direction:column}.sidebar{width:100%}}
+        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageBom{flex-direction:column}}
+        /* ====== 响应式：移动端 — 配单配置自适应 + 明细横向滑动 ====== */
+        @media(max-width:768px){
+            html,body{overflow-x:hidden}
+            .header{padding:10px 14px;flex-wrap:wrap;gap:6px;position:sticky;top:0;z-index:100}
+            .header-logo{font-size:15px}
+            .header-right{display:none}
+            .container{
+                padding:0;
+                gap:0;
+                flex-direction:column;
+            }
+            .nav-sidebar{
+                width:100%;
+                flex-direction:row;
+                border-radius:0;
+                overflow-x:auto;
+                -webkit-overflow-scrolling:touch;
+                padding:0 10px;
+            }
+            .nav-item{
+                flex-direction:row;
+                gap:4px;
+                padding:10px 16px;
+                border-left:none;
+                border-bottom:2px solid transparent;
+                white-space:nowrap;
+                font-size:12px;
+            }
+            .nav-item.active{
+                border-left:none;
+                border-bottom-color:#f97316;
+            }
+            #pageBom{
+                flex-direction:column;
+                gap:0;
+            }
+            /* 配单配置：自适应高度，sticky固定 */
+            .sidebar{
+                width:100%;
+                height:auto;
+                position:sticky;
+                top:0;
+                z-index:5;
+                background:#f0f2f5;
+            }
+            .panel{padding:12px}
+            .panel-title{font-size:13px;margin-bottom:8px}
+            .step-section{margin-bottom:5px}
+            .step-label{font-size:12px;margin-bottom:2px}
+            .step-select{font-size:15px;padding:10px 8px}
+            .accessory-title{font-size:13px;margin-top:8px;margin-bottom:6px}
+            .accessory-category{padding:8px 10px}
+            .accessory-category-name{font-size:12px}
+            .quick-search-input{font-size:14px;padding:10px 10px 10px 32px}
+            /* 配单明细：紧跟配置下方，表格横向滑动 */
+            .content{padding:10px;width:100%}
+            .content-header{padding:8px 10px}
+            .content-title{font-size:13px}
+            .content-toolbar{flex-wrap:wrap;gap:8px}
+            .legend{font-size:11px;gap:10px}
+            .stats{gap:12px}
+            .stat-value{font-size:16px}
+            #tableArea{overflow-x:auto;-webkit-overflow-scrolling:touch}
+            .data-table{font-size:11px;min-width:600px}
+            .data-table th,.data-table td{padding:5px 6px}
+            .version-bar{display:none}
+            /* 弹窗：全宽 + 内部横向滑动 */
+            .modal{width:96vw;max-width:none;max-height:92vh;border-radius:8px}
+            .modal-body{padding:10px;-webkit-overflow-scrolling:touch}
+            .accessory-table{min-width:600px}
+            .accessory-table .col-series{min-width:80px}
+            .accessory-table .col-name{min-width:140px}
+            .accessory-table .col-desc{min-width:180px;white-space:normal;word-break:break-all}
+            .accessory-table .col-code{min-width:100px}
+            .announce-box{width:95vw}
+            .cmp-search-bar{padding:10px 14px;flex-direction:column;gap:8px}
+            .cmp-filter-bar{padding:8px 14px}
+            .cmp-table th,.cmp-table td{padding:6px 8px;font-size:11px;white-space:nowrap;overflow:visible;text-overflow:unset}
+            .cmp-table{table-layout:auto;min-width:700px}
+            .cmp-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+            .cmp-table .col-num{width:30px;min-width:30px}
+            .cmp-table .col-base,.cmp-table .col-dist{width:auto;min-width:130px}
+            .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
+        }
         /* 对照表 */
 
         .cmp-search-bar{padding:12px 20px;background:white;border-bottom:1px solid #e2e8f0;display:flex;gap:12px;align-items:center}
@@ -170,11 +254,11 @@
         .cmp-table th{background:#f8fafc;padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:#64748b;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .cmp-table td{padding:10px 16px;border-bottom:1px solid #f1f5f9;font-size:12px;font-weight:500;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .cmp-table tr:hover{background:#fff7ed}
-        .cmp-table .col-num{width:50px;text-align:center;color:#94a3b8;font-size:11px}
-        .cmp-table .col-base{width:30%}
-        .cmp-table .col-basecode{width:12%}
-        .cmp-table .col-dist{width:30%}
-        .cmp-table .col-distcode{width:12%}
+        .cmp-table .col-num{width:36px;text-align:center;color:#94a3b8;font-size:11px}
+        .cmp-table .col-base{width:28%}
+        .cmp-table .col-basecode{width:18%}
+        .cmp-table .col-dist{width:28%}
+        .cmp-table .col-distcode{width:18%}
         .cmp-table .col-model{font-size:11px;font-weight:400}
         .cmp-table .col-code{font-size:11px;font-weight:400;color:#3b82f6}
         .cmp-footer{padding:10px 20px;background:white;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
@@ -1953,7 +2037,7 @@ function renderCableFilteredItems(){
         filtered.forEach(function(item){
             var origIdx=currentAccessoryItems.indexOf(item);
             var chk=tempSelectedItems.indexOf(item.name)>=0?'checked':'';
-            h+='<tr class="'+(chk?'acc-selected':'')+'" style="cursor:pointer" onclick="var cb=document.getElementById(\'acc_'+origIdx+'\');cb.checked=!cb.checked;toggleTempItem('+origIdx+')"><td><input type="checkbox" id="acc_'+origIdx+'" '+chk+' onclick="event.stopPropagation();toggleTempItem('+origIdx+')"></td><td class="col-series">'+item.series+'</td><td class="col-name">'+item.name+'</td><td class="col-desc">'+item.desc+'</td><td class="col-code">'+item.code+'</td></tr>';
+            h+='<tr class="'+(chk?'acc-selected':'')+'" style="cursor:pointer" onclick="var cb=document.getElementById(\'acc_'+origIdx+'\');cb.checked=!cb.checked;toggleTempItem('+origIdx+')" ondblclick="event.preventDefault();event.stopPropagation();var cb=document.getElementById(\'acc_'+origIdx+'\');if(!cb.checked){cb.checked=true;toggleTempItem('+origIdx+');}confirmAccessories()"><td><input type="checkbox" id="acc_'+origIdx+'" '+chk+' onclick="event.stopPropagation();toggleTempItem('+origIdx+')"></td><td class="col-series">'+item.series+'</td><td class="col-name">'+item.name+'</td><td class="col-desc">'+item.desc+'</td><td class="col-code">'+item.code+'</td></tr>';
         });
         tb.innerHTML=h;
     }
