@@ -335,7 +335,19 @@
     "MV-PD010003-06M-12C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9134",
     "MV-PD010003-06M-16C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9888",
     "MV-PD010003-12C-8C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9801",
-    "MV-PD010003-12M-16C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9138"
+    "MV-IDP3204/64G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12881",
+    "MV-IDP3204/A/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12880",
+    "MV-IDP3204/32G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10227",
+    "MV-IDP4104/4&64/DP/05NR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12550",
+    "MV-IDP5102/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12886",
+    "MV-IDP5104/AI4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12006",
+    "MV-IDP5114/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12577",
+    "MV-IDP5204/3&32": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10230",
+    "MV-IDP5204/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10229",
+    "MV-IDP5204/4&64/07ER": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12896",
+    "MV-IDP5006/5G/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12027",
+    "MV-IDP5006/5G/4&64/05FR/H": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12096",
+    "MV-IDP5006/5G/A/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12028"
   };
 
   // ==================== 对外接口 ====================
