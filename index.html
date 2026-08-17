@@ -1993,8 +1993,63 @@
         function onSeriesChange(){var cat=document.getElementById('categorySelect').value,series=document.getElementById('seriesSelect').value,ms=document.getElementById('modelSelect');ms.innerHTML='<option value="">请选择具体型号</option>';ms.disabled=true;us(ms);us(document.getElementById('seriesSelect'));ca();ct();if(!series)return;var seen={};var modelList=[];allRows.forEach(function(r){if(r.length>4&&r[1]&&r[1].trim()===cat&&r[2]&&r[2].trim()===series&&r[3]&&r[4]&&r[0]&&r[0].trim()==='相机'){var m=r[3].trim();if(!seen[m]){seen[m]=true;modelList.push(m);}}});modelList.forEach(function(mdl){var o=document.createElement('option');o.value=mdl;o.textContent=mdl;ms.appendChild(o);});ms.disabled=false;}
         function onModelChange(){var cat=document.getElementById('categorySelect').value,series=document.getElementById('seriesSelect').value,mdl=document.getElementById('modelSelect').value;us(document.getElementById('modelSelect'));ca();ct();if(!mdl)return;for(var i=0;i<allRows.length;i++){var r=allRows[i];if(r.length>4&&r[1]&&r[1].trim()===cat&&r[2]&&r[2].trim()===series&&r[3]&&r[3].trim()===mdl){currentMatch=r;break;}}if(currentMatch){rac();gc();}}
         function us(s){if(s.value)s.classList.add('has-value');else s.classList.remove('has-value');}
-        function rac(){var c=document.getElementById('accessoryCategories'),h='',keys=Object.keys(accessoryColumns);for(var i=0;i<keys.length;i++){var cfg=accessoryColumns[keys[i]],val=currentMatch[cfg.col]||'';if(!val)continue;var flag=cfg.flagCol?currentMatch[cfg.flagCol]:'';if(flag==='1'||!cfg.flagCol){var refTags=val.split(";").map(function(s){return s.trim().toLowerCase();}).filter(function(s){return s.length>0;});var refFlags=(currentMatch[cfg.flagCol]||'').split(';').map(function(s){return s.trim();});var camStdTags={};refTags.forEach(function(t,i){if(refFlags[i]==='1')camStdTags[t]=true;});var matchCount=0;var stdCount=0;allRows.forEach(function(r){var accCol=getAccCol(r,cfg);if(r.length>accCol&&r[1]&&r[1].trim()===cfg.name){var accFlagCol=getAccFlagCol(r,cfg);var accTag=(r[accCol]||"").toLowerCase();var accFlag=accFlagCol>=0?(r[accFlagCol]||''):'';var accParts=accTag.split(';').map(function(s){return s.trim();});for(var k=0;k<refTags.length;k++){for(var p=0;p<accParts.length;p++){if(accParts[p]===refTags[k]){matchCount++;if(camStdTags[refTags[k]]&&accFlag==='1')stdCount++;return;}}}}});if(matchCount===stdCount)continue;}var cnt=selectedAccessories.filter(function(a){return a.key===keys[i];}).length;var txt=cnt>0?cnt+' 个已选':'点击选择';h+='<div class="accessory-category" onclick="openAccessoryModal(\''+keys[i]+'\')"><div class="accessory-category-left"><div class="accessory-icon">'+cfg.icon+'</div><div><div class="accessory-category-name">'+cfg.name+'</div><div class="accessory-category-count">'+txt+'</div></div></div><div class="accessory-arrow">›</div></div>';}c.innerHTML=h||'<div style="text-align:center;color:#94a3b8;font-size:11px;padding:12px;">暂无配件</div>';}
-        function resizeModalBody(){
+        function rac() {
+    var c = document.getElementById('accessoryCategories');
+    var h = '';
+    var keys = Object.keys(accessoryColumns);
+    for (var i = 0; i < keys.length; i++) {
+        var cfg = accessoryColumns[keys[i]];
+        var val = currentMatch[cfg.col] || '';
+        if (!val) continue; // 当前型号没有引用该分类的配件
+
+        // 解析标签和标志
+        var refTags = val.split(';').map(function(s) { return s.trim().toLowerCase(); }).filter(function(s) { return s.length > 0; });
+        var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) { return s.trim(); });
+
+        // 统计匹配到的配件总数和其中标配数
+        var matchCount = 0;
+        var stdCount = 0;
+        allRows.forEach(function(r) {
+            var accCol = getAccCol(r, cfg);
+            if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
+                var accFlagCol = getAccFlagCol(r, cfg);
+                var accTag = (r[accCol] || '').toLowerCase();
+                var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
+                var accParts = accTag.split(';').map(function(s) { return s.trim(); });
+                for (var k = 0; k < refTags.length; k++) {
+                    for (var p = 0; p < accParts.length; p++) {
+                        if (accParts[p] === refTags[k]) {
+                            matchCount++;
+                            // 如果该配件是标配（标志为 '1'），则计入 stdCount
+                            if (accFlag === '1') stdCount++;
+                            return; // 一个配件可能匹配多个 tag，但只计一次
+                        }
+                    }
+                }
+            }
+        });
+
+        // 如果没有匹配到任何配件，则跳过（理论上不会发生）
+        if (matchCount === 0) continue;
+
+        // 如果所有匹配到的配件都是标配，则隐藏该分类（不渲染）
+        if (matchCount === stdCount) continue;
+
+        // 否则显示该分类按钮，计数显示已选配件（包括标配和选配）
+        var cnt = selectedAccessories.filter(function(a) { return a.key === keys[i]; }).length;
+        var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
+        h += '<div class="accessory-category" onclick="openAccessoryModal(\'' + keys[i] + '\')">' +
+             '<div class="accessory-category-left">' +
+             '<div class="accessory-icon">' + cfg.icon + '</div>' +
+             '<div>' +
+             '<div class="accessory-category-name">' + cfg.name + '</div>' +
+             '<div class="accessory-category-count">' + txt + '</div>' +
+             '</div></div>' +
+             '<div class="accessory-arrow">›</div></div>';
+    }
+    c.innerHTML = h || '<div style="text-align:center;color:#94a3b8;font-size:11px;padding:12px;">暂无配件</div>';
+}
+    function resizeModalBody(){
     var modal=document.querySelector('#accessoryModal .modal');
     var body=document.querySelector('#accessoryModal .modal-body');
     var header=document.querySelector('#accessoryModal .modal-header');
