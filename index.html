@@ -9,19 +9,18 @@
         var dpr = window.devicePixelRatio || 1;
         var target = 1.5;
         if (dpr < target) {
-         var scale = target / dpr;
-         var style = document.createElement('style');
-         // 只使用 transform，并加上兼容前缀
-            style.textContent = 'html{ ' +
-                '-webkit-transform: scale(' + scale + '); ' +
-                '-webkit-transform-origin: 0 0; ' +
-                'transform: scale(' + scale + '); ' +
-                'transform-origin: 0 0; ' +
-                '}';
+            var scale = target / dpr;
+            var style = document.createElement('style');
+            // Chrome/Edge/Safari 使用 zoom 属性（同步缩放，事件坐标自动适配）
+            var css = 'html { zoom: ' + scale + '; ';
+            // Firefox 后备：使用 transform（可能有轻微点击偏移，但视觉一致）
+            css += '-moz-transform: scale(' + scale + '); -moz-transform-origin: 0 0; ';
+            css += '}';
+            style.textContent = css;
             document.head.appendChild(style);
         }
     })();
-    </script>
+</script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
