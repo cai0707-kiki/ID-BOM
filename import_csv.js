@@ -158,27 +158,27 @@ function main() {
     // 转换为JSON格式
     const jsonData = [];
 
-    // 相机数据（25列格式）
+    // 相机数据（26列格式）
     cameraData.forEach(row => {
-        // 确保每行有25个字段
-        while (row.length < 25) {
+        // 确保每行有26个字段
+        while (row.length < 26) {
             row.push('');
         }
         jsonData.push({
-            Count: 25,
-            value: row.slice(0, 25)
+            Count: 26,
+            value: row.slice(0, 26)
         });
     });
 
     // 配件数据（9列格式）
     accessoryData.forEach(row => {
         // 确保每行有9个字段
-        while (row.length < 9) {
+        while (row.length < 10) {
             row.push('');
         }
         jsonData.push({
-            Count: 9,
-            value: row.slice(0, 9)
+            Count: 10,
+            value: row.slice(0, 10)
         });
     });
 
