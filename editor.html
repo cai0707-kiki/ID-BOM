@@ -23,16 +23,6 @@
         .editor-title{font-size:15px;font-weight:700}.editor-title span{color:#f97316}
         .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:10px}
         .editor-header-right{display:flex;gap:8px}
-        .announce-edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1001;align-items:center;justify-content:center}
-        .announce-edit-overlay.active{display:flex}
-        .announce-edit-box{background:white;border-radius:12px;width:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-        .announce-edit-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0}
-        .announce-edit-title{font-size:14px;font-weight:600;color:#1e293b}
-        .announce-edit-body{padding:18px}
-        .announce-edit-body label{font-size:12px;color:#64748b;display:block;margin-bottom:6px}
-        .announce-edit-body textarea{width:100%;height:150px;padding:10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:inherit;resize:vertical;box-sizing:border-box}
-        .announce-edit-body textarea:focus{outline:none;border-color:#f97316}
-        .announce-edit-footer{padding:12px 18px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e2e8f0}
         .btn{padding:6px 14px;border:none;border-radius:4px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
         .btn-primary{background:#f97316;color:white}.btn-primary:hover{background:#ea580c}
         .btn-secondary{background:#3b82f6;color:white}.btn-secondary:hover{background:#2563eb}
@@ -83,6 +73,7 @@
         .cell-combo.modified,.cell-input.modified{background:#fef3c7;border-color:#fbbf24}
         .status-bar{background:#1e293b;color:#94a3b8;padding:4px 20px;font-size:10px;display:flex;justify-content:space-between;flex-shrink:0}
         .status-bar .unsaved{color:#fbbf24}.status-bar .saved{color:#10b981}
+
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
         .modal-overlay.active{display:flex}
         .modal{background:white;border-radius:12px;width:520px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -109,7 +100,6 @@
             <button class="btn btn-outline" onclick="goBack()">← 返回配单工具</button>
             <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
             <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
-            <button class="btn btn-outline" onclick="showAnnounceEditor()">📢 编辑公告</button>
             <button class="btn btn-success" onclick="saveChanges()" id="btnSave">💾 保存到页面</button>
         </div>
     </div>
@@ -134,7 +124,7 @@
             <tbody id="editorBody"></tbody>
         </table>
     </div>
-    <div class="status-bar"><span id="statusLeft">就绪</span><span id="statusRight"></span></div>
+    <div class="status-bar"><span id="statusLeft">就绪</span></div>
 
     <!-- Import Modal -->
     <div class="modal-overlay" id="importModal">
@@ -230,23 +220,8 @@ var accessoryData = [];
 var filteredIndices = [];
 var selectedRows = {};
 var modifiedCells = {};
-var importData = null;
-var importTarget = '';
 
 // ==================== Init ====================
-function showAnnounceEditor(){
-    var content='';
-    try{var s=localStorage.getItem('announce_content');if(s){var a=JSON.parse(s);content=a.content||'';}}catch(e){}
-    document.getElementById('announceEditText').value=content;
-    document.getElementById('announceEditOverlay').classList.add('active');
-}
-function closeAnnounceEditor(){document.getElementById('announceEditOverlay').classList.remove('active');}
-function saveAnnounce(){
-    var text=document.getElementById('announceEditText').value.trim();
-    localStorage.setItem('announce_content',JSON.stringify({content:text,date:new Date().toISOString().slice(0,10)}));
-    closeAnnounceEditor();
-    showToast('公告已保存','success');
-}
 function init() {
     loadDataFromParent();
     rebuildDropdownCache();
@@ -255,16 +230,6 @@ function init() {
 }
 
 function loadDataFromParent() {
-    var saved = localStorage.getItem('idbom_editor_data');
-    if (saved) {
-        try {
-            var d = JSON.parse(saved);
-            cameraData = d.camera || [];
-            accessoryData = d.accessory || [];
-            return;
-        } catch(e) {}
-    }
-
     var el = document.getElementById('embeddedData');
     if (el) {
         try {
@@ -431,13 +396,7 @@ function renderTable() {
     document.getElementById('accessoryCount').textContent = accessoryData.length;
 }
 
-function updateStats() {
-    var n = Object.keys(modifiedCells).length;
-    var el = document.getElementById('modifiedIndicator');
-    el.innerHTML = n > 0
-        ? ' · <span class="unsaved">' + n + ' 处未保存修改</span>'
-        : ' · <span class="saved">无未保存修改</span>';
-}
+
 
 // ==================== Cell Edit ====================
 function onCellChange(rowIdx, colIdx, input) {
@@ -533,21 +492,6 @@ function confirmDelete() {
     showToast('已删除 ' + indices.length + ' 行', 'success');
 }
 
-function cleanKeysAfterDelete(deletedIdx) {
-    var nm = {}, ns = {};
-    Object.keys(modifiedCells).forEach(function(k) {
-        var parts = k.split('_'), r = parseInt(parts[0]);
-        if (r < deletedIdx) nm[k] = true;
-        else if (r > deletedIdx) nm[(r - 1) + '_' + parts[1]] = true;
-    });
-    Object.keys(selectedRows).forEach(function(k) {
-        var r = parseInt(k);
-        if (r < deletedIdx) ns[k] = true;
-        else if (r > deletedIdx) ns[r - 1] = true;
-    });
-    modifiedCells = nm; selectedRows = ns;
-}
-
 function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
 
 // ==================== Search ====================
@@ -556,14 +500,13 @@ function clearSearch() { document.getElementById('searchBox').value = ''; render
 
 // ==================== CSV Import ====================
 function showImportModal() {
-    importData = null;
     pendingImports = {camera: null, accessory: null};
     document.getElementById('importInfo').style.display = 'none';
     document.getElementById('btnImport').disabled = true;
     document.getElementById('csvFileInput').value = '';
     document.getElementById('importModal').classList.add('active');
 }
-function closeImportModal() { document.getElementById('importModal').classList.remove('active'); importData = null; }
+function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
 
 
 
@@ -675,23 +618,15 @@ function exportCurrentCSV() {
     showToast('已导出 ' + data.length + ' 行', 'success');
 }
 
+
+
 // ==================== Save ====================
-function saveChanges() {
-    flushPendingEdits();
-    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
-    modifiedCells = {};
-    renderTable();
-    updateStats();
-    fetch('http://127.0.0.1:18088', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ camera: cameraData, accessory: accessoryData })
-    }).then(function(r) { return r.json(); }).then(function(d) {
-        if (d.ok) showToast('数据已同步到CSV和index.html！', 'success');
-        else showToast('同步失败', 'error');
-    }).catch(function() {
-        showToast('数据已保存到浏览器（同步服务未启动）', 'warning');
-    });
+function updateStats() {
+    var n = Object.keys(modifiedCells).length;
+    var el = document.getElementById('modifiedIndicator');
+    el.innerHTML = n > 0
+        ? ' · <span class="unsaved">' + n + ' 处未保存修改</span>'
+        : ' · <span class="saved">无未保存修改</span>';
 }
 
 function flushPendingEdits() {
@@ -702,10 +637,8 @@ function flushPendingEdits() {
         var td = input.closest('td');
         if (!td) return;
         var rowIdx = parseInt(tr.dataset.idx);
-        // Find column index by counting td position (skip # and actions)
         var cells = Array.from(tr.children);
-        var colOffset = cells.indexOf(td) - 2; // subtract num and actions columns
-        // Map visible column index back to data column index (visible starts at col 1)
+        var colOffset = cells.indexOf(td) - 2;
         var dataColIdx = colOffset + 1;
         if (isNaN(rowIdx) || dataColIdx < 1 || dataColIdx >= data[rowIdx].length) return;
         var currentVal = (data[rowIdx][dataColIdx] || '').toString().trim();
@@ -719,9 +652,17 @@ function flushPendingEdits() {
     });
 }
 
+function saveChanges() {
+    flushPendingEdits();
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+    modifiedCells = {};
+    renderTable();
+    updateStats();
+    showToast('数据已保存', 'success');
+}
+
 // ==================== Navigation ====================
 function goBack() {
-    // Auto-save before leaving
     flushPendingEdits();
     if (Object.keys(modifiedCells).length) {
         saveChanges();
@@ -800,21 +741,5 @@ document.addEventListener('keydown', function(e) {
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
-    <div id="announceEditOverlay" class="announce-edit-overlay">
-        <div class="announce-edit-box">
-            <div class="announce-edit-header">
-                <span class="announce-edit-title">📢 编辑公告内容</span>
-                <button class="modal-close" onclick="closeAnnounceEditor()">✕</button>
-            </div>
-            <div class="announce-edit-body">
-                <label>公告内容</label>
-                <textarea id="announceEditText" placeholder="输入公告内容..."></textarea>
-            </div>
-            <div class="announce-edit-footer">
-                <button class="btn btn-outline" onclick="closeAnnounceEditor()">取消</button>
-                <button class="btn btn-primary" onclick="saveAnnounce()">保存公告</button>
-            </div>
-        </div>
-    </div>
 </body>
 </html>

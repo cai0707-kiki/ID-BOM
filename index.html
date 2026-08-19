@@ -284,6 +284,70 @@
         .cmp-table .col-code{font-size:11px;font-weight:400;color:#3b82f6}
         .cmp-footer{padding:10px 20px;background:white;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
         .cmp-empty{text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px}
+            /* ====== 新增：公告浮动按钮 ====== */
+        .announce-float-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            border: 2px solid #f97316;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .announce-float-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.35);
+        }
+        .announce-float-btn:active {
+            transform: scale(0.94);
+        }
+        .announce-float-btn .announce-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 13px;
+            height: 13px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #1e293b;
+            display: none;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        .announce-float-btn .announce-dot.active {
+            display: block;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        /* 移动端适配（放在已有的 @media(max-width:768px) 内部） */
+        .announce-float-btn {
+            bottom: 70px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
+        }
+        .announce-float-btn .announce-dot {
+            width: 10px;
+            height: 10px;
+            top: 3px;
+            right: 3px;
+            border-width: 1.5px;
+        }
     </style>
 </head>
 <body>
@@ -295,10 +359,10 @@
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-{"content":"本次更新内容如下：\n新增图片预览功能，支持点击放大！！！\n\n\n","date":"2026-08-17"}
+    {"content":"本次更新内容如下：\n1、新增图片预览功能，支持点击放大；\n2、新增图片懒加载以及缓存逻辑；\n3、新增公告浮动按钮功能","date":"2026-08-19"}
     </script>
     <!-- ====== /公告配置 ====== -->
-                <div class="container">
+        <div class="container">
         <div class="nav-sidebar">
             <div class="nav-item active" onclick="switchPage('bom')"><span class="nav-icon">📋</span>配单表</div>
             <div class="nav-item" onclick="switchPage('cmp')"><span class="nav-icon">📊</span>对照表</div>
@@ -370,6 +434,11 @@
         </div>
     </div>
     <div class="version-bar">有任何建议和问题请及时联系蔡修钢 · 网址：<a href="https://cai0707-kiki.github.io/ID-BOM/" target="_blank" style="color:#f97316;text-decoration:none">https://cai0707-kiki.github.io/ID-BOM/</a></div>
+    <!-- ====== 新增：公告浮动按钮 ====== -->
+    <div id="announceFloatBtn" class="announce-float-btn" onclick="forceShowAnnounce()" title="查看公告">
+        <span class="announce-bell">🔔</span>
+        <span class="announce-dot" id="announceDot"></span>
+    </div>
     <div id="accessoryModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -2000,7 +2069,6 @@
     var tempSelectedItems = [];
     var standardCache = {};
     var cableFilterState = { length: 'all', material: 'all' };
-    var currentCableFilteredItems = [];
 
     /* ==================== 工具函数 ==================== */
 
@@ -2402,8 +2470,6 @@
             filtered.push(item);
         });
 
-        currentCableFilteredItems = filtered;
-
         if (filtered.length === 0) {
             tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">无匹配的配件</td></tr>';
         } else {
@@ -2414,7 +2480,7 @@
 
                 var imgCell = '';
                 if (item.img) {
-                    imgCell = '<td class="col-img"><img class="img-thumb" src="IMG/' + item.img + '.png" '
+                    imgCell = '<td class="col-img"><img class="img-thumb" src="IMG/' + item.img + '.png" loading="lazy" '
                             + 'alt="' + item.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
                             + 'onclick="event.stopPropagation();showImg(\'' + item.img.replace(/'/g, "\\'") + '\')" '
                             + 'onerror="this.style.display=\'none\'"></td>';
@@ -2635,7 +2701,7 @@
             selectedAccessories.forEach(function(a) {
                 var imgCell2 = '';
                 if (a.img) {
-                    imgCell2 = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + a.img + '.png" '
+                    imgCell2 = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + a.img + '.png" loading="lazy" '
                              + 'alt="' + a.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
                              + 'onclick="showImg(\'' + a.img.replace(/'/g, "\\'") + '\')" '
                              + 'onerror="this.style.display=\'none\'"></td>';
@@ -2717,7 +2783,7 @@
 
             var imgCell = '';
             if (item.img) {
-                imgCell = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + item.img + '.png" '
+                imgCell = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + item.img + '.png" loading="lazy" '
                         + 'alt="' + item.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
                         + 'onclick="showImg(\'' + item.img.replace(/'/g, "\\'") + '\')" '
                         + 'onerror="this.style.display=\'none\'"></td>';
@@ -2943,19 +3009,38 @@
     }
 
     /* ==================== 公告系统 ==================== */
-
     var announceData = { content: '', date: '' };
-
-    function showAnnounce() {
-        var today = new Date().toISOString().slice(0, 10);
-        var dismissed = localStorage.getItem('announce_dismissed');
-        if (dismissed === today) return;
+    // 强制显示公告（不受“已读”缓存影响）
+    function forceShowAnnounce() {
         loadAnnounceData();
-        if (!announceData.content) return;
+        if (!announceData.content) {
+            alert('暂无公告内容。');
+            return;
+        }
         renderAnnounceView();
         document.getElementById('announceOverlay').classList.add('active');
     }
 
+    window.showAnnounce = function() {
+        var today = new Date().toISOString().slice(0, 10);
+        var dismissed = localStorage.getItem('announce_dismissed');
+        // 如果今天未关闭，则显示公告，并显示小红点（默认有内容时就显示）
+        loadAnnounceData();
+        if (!announceData.content) return;
+        
+        if (dismissed !== today) {
+            renderAnnounceView();
+            document.getElementById('announceOverlay').classList.add('active');
+            var dot = document.getElementById('announceDot');
+            if (dot) dot.classList.add('active');
+        }
+    };
+
+    window.closeAnnounce = function() {
+        document.getElementById('announceOverlay').classList.remove('active');
+        localStorage.setItem('announce_dismissed', new Date().toISOString().slice(0, 10));
+        var dot = document.getElementById('announceDot'); if (dot) dot.classList.remove('active');
+    };
     function loadAnnounceData() {
         var content = '', date = '';
         try {
@@ -2978,13 +3063,7 @@
             announceData.date ? '发布日期: ' + announceData.date : '';
     }
 
-    function closeAnnounce() {
-        document.getElementById('announceOverlay').classList.remove('active');
-        localStorage.setItem('announce_dismissed', new Date().toISOString().slice(0, 10));
-    }
-
     /* ==================== 经销基线对照表 ==================== */
-
     var cmpData = [];
     var cmpFiltered = [];
     var cmpActiveSeries = '全部';
@@ -3118,6 +3197,14 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         loadData();
+        // ===== 注册 Service Worker — 图片本地缓存 =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(function(reg) {
+                console.log('[SW] 注册成功，图片将被缓存到本地', reg.scope);
+            }).catch(function(err) {
+                console.log('[SW] 注册失败（不影响正常使用）:', err);
+            });
+        }
         setTimeout(showAnnounce, 500);
     });
     </script>
