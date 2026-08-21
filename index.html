@@ -31,14 +31,15 @@
         .header-logo .logo-text{user-select:none;-webkit-user-select:none}
         .header-right{font-size:11px;color:#94a3b8}
         .container{display:flex;gap:12px;padding:12px;max-width:1400px;margin:0 auto}
-        .nav-sidebar{width:64px;flex-shrink:0;display:flex;flex-direction:column;background:#1e3a5f;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);height:fit-content}
+        .nav-sidebar{width:64px;flex-shrink:0;display:flex;flex-direction:column;background:#1e3a5f;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);height:fit-content;position:sticky;top:52px;align-self:flex-start;}
         .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:10px;font-weight:500;text-align:center;color:rgba(255,255,255,0.6)}
         .nav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.9)}
         .nav-item.active{background:#fff7ed;border-left-color:#f97316;color:#f97316;font-weight:600}
         .nav-icon{font-size:18px;line-height:1}
         #pageBom{display:flex;gap:12px;flex:1;min-width:0}
-        #pageCmp{flex:1;min-width:0;display:none;flex-direction:column}
+        #pageCmp{flex:1;min-width:0;display:none;gap:12px;max-height:none;overflow: visible;height: auto;}
         #pageCmp.active{display:flex}
+        .cmp-content-header{flex-shrink:0}
         .sidebar{width:300px;flex-shrink:0}
         .panel{background:white;border-radius:6px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);margin-bottom:6px}
         .panel-title{font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -75,7 +76,7 @@
         .qs-desc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .qs-row3{font-size:10px;color:#3b82f6;cursor:pointer}
         .qs-row3:hover{color:#1d4ed8}
-        .content{flex:1 1 0%;min-width:0;padding-left:8px;display:flex;flex-direction:column}
+        .content{flex:1 1 0%;min-width:0;padding-left:8px;padding-bottom:80px;display:flex;flex-direction:column}
         .content-panel{background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column}
         .content-header{padding:8px 12px;border-bottom:1px solid #e2e8f0}
         .content-title{font-size:13px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:6px;margin-bottom:4px}
@@ -137,7 +138,24 @@
         .announce-footer{padding:12px 18px;display:flex;align-items:center;justify-content:flex-end;border-top:1px solid #f1f5f9}
         .announce-btn{padding:8px 28px;background:#f97316;color:white;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer}
         .announce-btn:hover{background:#ea580c}
-        .version-bar{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);padding:6px 20px;background:#1e293b;border:1px solid #f97316;border-radius:20px;color:white;font-size:12px;z-index:99;white-space:nowrap}
+        .version-bar{
+            position:fixed;
+            bottom:12px;
+            left:50%;
+            transform:translateX(-50%);
+            padding:6px 20px;
+            background:rgba(30,41,59,0.92);
+            backdrop-filter:blur(8px);
+            -webkit-backdrop-filter:blur(8px);
+            border:1px solid #f97316;
+            border-radius:20px;
+            color:white;
+            font-size:12px;
+            z-index:99;
+            white-space:nowrap;
+            box-shadow:0 4px 16px rgba(0,0,0,0.25);
+        }
+        .version-bar a{color:#f97316;text-decoration:none;}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:1000;align-items:center;justify-content:center;transition:background 0.3s ease}
         .modal-overlay.active{display:flex;background:rgba(0,0,0,0.5)}
         .modal{background:white;border-radius:12px;width:750px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
@@ -172,117 +190,380 @@
         .cable-warn em{font-style:normal;color:#f97316}
         @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageBom{flex-direction:column}}
         /* ====== 响应式：移动端 — 配单配置自适应 + 明细横向滑动 ====== */
-        @media(max-width:768px){
-            html,body{overflow-x:hidden}
-            .header{padding:10px 14px;flex-wrap:wrap;gap:6px;position:sticky;top:0;z-index:100}
-            .header-logo{font-size:15px}
-            .header-right{display:none}
-            .container{
-                padding:0;
-                gap:0;
-                flex-direction:column;
-            }
-            .nav-sidebar{
-                width:100%;
-                flex-direction:row;
-                border-radius:0;
-                overflow-x:auto;
-                -webkit-overflow-scrolling:touch;
-                padding:0 10px;
-            }
-            .nav-item{
-                flex-direction:row;
-                gap:4px;
-                padding:10px 16px;
-                border-left:none;
-                border-bottom:2px solid transparent;
-                white-space:nowrap;
-                font-size:12px;
-            }
-            .nav-item.active{
-                border-left:none;
-                border-bottom-color:#f97316;
-            }
-            #pageBom{
-                flex-direction:column;
-                gap:0;
-            }
-            /* 配单配置：自适应高度，sticky固定 */
-            .sidebar{
-                width:100%;
-                height:auto;
-                position:sticky;
-                top:0;
-                z-index:5;
-                background:#f0f2f5;
-            }
-            .panel{padding:12px}
-            .panel-title{font-size:13px;margin-bottom:8px}
-            .step-section{margin-bottom:5px}
-            .step-label{font-size:12px;margin-bottom:2px}
-            .step-select{font-size:15px;padding:10px 8px}
-            .accessory-title{font-size:13px;margin-top:8px;margin-bottom:6px}
-            .accessory-category{padding:8px 10px}
-            .accessory-category-name{font-size:12px}
-            .quick-search-input{font-size:14px;padding:10px 10px 10px 32px}
-            /* 配单明细：紧跟配置下方，表格横向滑动 */
-            .content{padding:10px;width:100%}
-            .content-header{padding:8px 10px}
-            .content-title{font-size:13px}
-            .content-toolbar{flex-wrap:wrap;gap:8px}
-            .legend{font-size:11px;gap:10px}
-            .stats{gap:12px}
-            .stat-value{font-size:16px}
-            #tableArea{overflow-x:auto;-webkit-overflow-scrolling:touch}
-            .data-table{font-size:11px;min-width:700px}
-            .data-table th,.data-table td{padding:5px 6px}
-            .version-bar{display:none}
-            /* 弹窗：全宽 + 内部横向滑动 */
-            .modal{width:96vw;max-width:none;max-height:92vh;border-radius:8px}
-            .modal-body{padding:10px;max-height:calc(92vh - 100px);-webkit-overflow-scrolling:touch}
-            .accessory-table{min-width:700px}
-            .accessory-table .col-series{min-width:80px}
-            .accessory-table .col-img{min-width:55px}
-            .accessory-table .col-name{min-width:140px}
-            .accessory-table .col-desc{min-width:180px;white-space:normal;word-break:break-all}
-            .accessory-table .col-code{min-width:100px}
-            .announce-box{width:95vw}
-            .img-preview-box{padding:6px;max-width:98vw;max-height:95vh;border-radius:6px}
-            .img-preview-box img{max-width:95vw;max-height:88vh}
-            .img-preview-close{width:36px;height:36px;font-size:18px;top:6px;right:6px}
-            .cmp-search-bar{padding:10px 14px;flex-direction:column;gap:8px}
-            .cmp-filter-bar{padding:8px 14px}
-            .cmp-table th,.cmp-table td{padding:6px 8px;font-size:11px;white-space:nowrap;overflow:visible;text-overflow:unset}
-            .cmp-table{table-layout:auto;min-width:700px}
-            .cmp-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
-            .cmp-table .col-num{width:30px;min-width:30px}
-            .cmp-table .col-base,.cmp-table .col-dist{width:auto;min-width:130px}
-            .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
-        }
-        /* 对照表 */
+        
+@media(max-width:768px){
+    /* ====== 基础重置 ====== */
+    html,body{overflow-x:hidden;overflow-y:auto;height:auto;min-height:100vh}
+    .header{padding:10px 14px;flex-wrap:wrap;gap:6px}
+    .header-logo{font-size:15px}
+    .header-right{display:none}
 
-        .cmp-search-bar{padding:12px 20px;background:white;border-bottom:1px solid #e2e8f0;display:flex;gap:12px;align-items:center}
-        .cmp-search-bar input{flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px}
-        .cmp-search-bar input:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
-        .cmp-search-bar .search-label{font-size:13px;color:#64748b;white-space:nowrap}
-        .cmp-filter-bar{padding:10px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-        .cmp-filter-label{font-size:12px;color:#64748b;margin-right:4px}
-        .cmp-filter-btn{padding:5px 14px;border:1px solid #e2e8f0;border-radius:20px;font-size:12px;color:#333;background:white;cursor:pointer;transition:all .2s}
-        .cmp-filter-btn:hover{border-color:#f97316;color:#f97316}
-        .cmp-filter-btn.active{background:#f97316;border-color:#f97316;color:white}
-        .cmp-body{padding:0;flex:1;overflow:auto}
+    /* ====== 容器 ====== */
+    .container{
+        padding:0;
+        gap:0;
+        flex-direction:column;
+        min-height:0;
+        height:auto;
+        overflow:visible;
+    }
+
+    /* ====== 导航栏 ====== */
+    .nav-sidebar{
+        width:100%;
+        flex-direction:row;
+        border-radius:0;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        padding:0 10px;
+        position:sticky;
+        top:0;
+        z-index:50;
+        background:#1e3a5f;
+        margin-bottom:0;
+    }
+    .nav-item{
+        flex-direction:row;
+        gap:4px;
+        padding:10px 16px;
+        border-left:none;
+        border-bottom:2px solid transparent;
+        white-space:nowrap;
+        font-size:12px;
+    }
+    .nav-item.active{
+        border-left:none;
+        border-bottom-color:#f97316;
+    }
+    .back-to-top {
+        bottom: 96px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+        border-width: 2px;
+    }
+    /* ====== 页面容器 ====== */
+    #pageBom,
+    #pageCmp,
+    #pageOverview {
+        flex-direction:column;
+        gap:0;
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+
+    /* ====== 配单配置侧边栏 ====== */
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:#f0f2f5;
+    }
+
+    /* ====== 内容区 ====== */
+    .content{
+        padding:10px;
+        width:100%;
+        flex:1 1 0%;
+        min-height:200px;
+        display:flex;
+        flex-direction:column;
+    }
+
+    /* ====== 对照表 ====== */
+    #pageCmp{flex-direction:column;max-height:none;overflow:visible;height:auto}
+    .cmp-sidebar{
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        flex-shrink:0 !important;
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:#f0f2f5;
+        padding:8px 12px !important;
+        margin-bottom:4px;
+        border-radius:0;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+    .cmp-search-wrap{width:100%;margin-bottom:6px}
+    .cmp-search-input{width:100%;font-size:14px;padding:8px 10px;box-sizing:border-box}
+    .cmp-filter-title{font-size:12px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+    .cmp-filter-all{font-size:11px;padding:3px 12px;flex-shrink:0}
+    .cmp-filter-list{
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        gap:5px !important;
+        max-height:none !important;
+        overflow-y:visible !important;
+        padding:2px 0 4px 0;
+        width:100%;
+    }
+    .cmp-filter-btn{
+        display:inline-block !important;
+        width:auto !important;
+        padding:4px 12px !important;
+        border-radius:14px !important;
+        font-size:11px !important;
+        white-space:nowrap;
+        flex-shrink:0;
+        border:1px solid #e2e8f0;
+        background:white;
+        color:#333;
+        cursor:pointer;
+        transition:all 0.2s;
+    }
+    .cmp-filter-btn.active{
+        border-color:#f97316;
+        background:#fff7ed;
+        color:#f97316;
+        font-weight:600;
+    }
+    .cmp-content{
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        overflow:visible !important;
+        max-height:none !important;
+        padding:0 10px;
+    }
+    .cmp-body{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        padding:0 10px 60px 10px !important;   /* 底部留白 */
+    }
+    .cmp-table{
+        font-size:10px;
+        min-width:700px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .cmp-table th,.cmp-table td{
+        padding:5px 8px;
+        font-size:10px;
+        white-space:nowrap;
+        overflow:visible;
+        text-overflow:unset;
+    }
+    .cmp-table .col-num{width:30px;min-width:30px}
+    .cmp-table .col-base,.cmp-table .col-dist{width:auto;min-width:130px}
+    .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
+
+    /* ====== 系列总览 ====== */
+    #pageOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
+    .series-sidebar{
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        flex-shrink:0 !important;
+        border-radius:0;
+        padding:6px 12px !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        -webkit-overflow-scrolling:touch;
+        position:sticky !important;
+        top:52px !important;
+        z-index:10;
+        background:#f0f2f5;
+        margin-bottom:4px;
+        max-height:none !important;
+        border-bottom:1px solid #e2e8f0;
+    }
+    .series-list{
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        gap:5px !important;
+        padding:4px 0 !important;
+        width:100%;
+    }
+    .series-item{
+        display:inline-block !important;
+        width:auto !important;
+        padding:4px 12px !important;
+        font-size:11px !important;
+        border-left:none !important;
+        border-bottom:2px solid transparent !important;
+        border-radius:14px !important;
+        white-space:nowrap !important;
+        flex-shrink:0;
+        background:#f8fafc;
+        color:#64748b;
+        cursor:pointer;
+        transition:all 0.2s;
+        border:1px solid #e2e8f0;
+        text-align:center;
+    }
+    .series-item.active{
+        border-left:none !important;
+        border-bottom:2px solid transparent !important;
+        border-color:#f97316 !important;
+        background:#fff7ed !important;
+        color:#f97316 !important;
+        font-weight:600;
+    }
+    .series-item:hover{background:#f1f5f9}
+    .overview-content{
+        overflow:visible;
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        padding:0 10px !important;
+    }
+    .overview-title{font-size:12px}
+    .overview-count{font-size:10px}
+    .overview-table-wrap{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        width:100% !important;
+        padding:0 0 60px 0 !important;         /* 底部留白 */
+        -webkit-overflow-scrolling:touch;
+    }
+    .overview-table-wrap .data-table{
+        font-size:11px;
+        min-width:600px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .overview-table-wrap .data-table td{padding:4px 6px}
+    .overview-table-wrap .data-table .img-thumb{width:32px;height:32px}
+
+    /* ====== 配单明细 ====== */
+    .content-header{padding:8px 10px}
+    .content-title{font-size:13px}
+    .content-toolbar{flex-wrap:wrap;gap:8px}
+    .legend{font-size:11px;gap:10px}
+    .stats{gap:12px}
+    .stat-value{font-size:16px}
+
+    #tableArea{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        padding:0 4px 60px 4px !important;     /* 底部留白 */
+        -webkit-overflow-scrolling:touch;
+    }
+    .data-table{
+        font-size:11px;
+        min-width:700px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .data-table th,.data-table td{padding:5px 6px}
+
+    /* ====== 面板/表单 ====== */
+    .panel{padding:12px}
+    .panel-title{font-size:13px;margin-bottom:8px}
+    .step-section{margin-bottom:5px}
+    .step-label{font-size:12px;margin-bottom:2px}
+    .step-select{font-size:15px;padding:10px 8px}
+    .accessory-title{font-size:13px;margin-top:8px;margin-bottom:6px}
+    .accessory-category{padding:8px 10px}
+    .accessory-category-name{font-size:12px}
+    .quick-search-input{font-size:14px;padding:10px 10px 10px 32px}
+
+    /* ====== 弹窗 ====== */
+    .modal{width:96vw;max-width:none;max-height:92vh;border-radius:8px}
+    .modal-body{padding:10px;max-height:calc(92vh - 100px);-webkit-overflow-scrolling:touch;overflow-x:auto}
+    .accessory-table{min-width:700px;width:100%;display:table}
+    .accessory-table .col-series{min-width:80px}
+    .accessory-table .col-img{min-width:55px}
+    .accessory-table .col-name{min-width:140px}
+    .accessory-table .col-desc{min-width:180px;white-space:normal;word-break:break-all}
+    .accessory-table .col-code{min-width:100px}
+
+    /* ====== 图片预览 ====== */
+    .img-preview-box{padding:6px;max-width:98vw;max-height:95vh;border-radius:6px}
+    .img-preview-box img{max-width:95vw;max-height:88vh}
+    .img-preview-close{width:36px;height:36px;font-size:18px;top:6px;right:6px}
+
+    /* ====== 公告 ====== */
+    .announce-box{width:95vw}
+    .announce-float-btn{bottom:70px;right:14px;width:44px;height:44px;font-size:20px}
+    .announce-float-btn .announce-dot{width:10px;height:10px;top:3px;right:3px;border-width:1.5px}
+
+    /* ====== 版本条（移动端优化：半透明毛玻璃 + 底部固定） ====== */
+    .version-bar{
+        display:block !important;
+        position:fixed;
+        bottom:8px;
+        left:50%;
+        transform:translateX(-50%);
+        padding:5px 14px;
+        font-size:10px;
+        white-space:nowrap;
+        background:rgba(30,41,59,0.92);
+        backdrop-filter:blur(8px);
+        -webkit-backdrop-filter:blur(8px);
+        border:1px solid #f97316;
+        border-radius:20px;
+        color:white;
+        z-index:99;
+        box-shadow:0 4px 16px rgba(0,0,0,0.25);
+        max-width:95vw;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+    .version-bar a{
+        color:#f97316 !important;
+        text-decoration:none;
+    }
+}
+
+        /* 对照表 */
+        .cmp-sidebar{width:200px;flex-shrink:0;position: sticky;top: 52px;align-self: flex-start;max-height: calc(100vh - 52px);overflow-y: auto;}
+        .cmp-search-wrap{margin-bottom:10px}
+        .cmp-search-input{width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;box-sizing:border-box}
+        .cmp-search-input:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
+        .cmp-filter-title{font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+        .cmp-filter-list{display:flex;flex-direction:column;gap:3px;max-height:calc(100vh - 280px);overflow-y:auto}
+        .cmp-filter-all{padding:2px 10px;border:1px solid #e2e8f0;border-radius:10px;font-size:10px;color:#64748b;background:white;cursor:pointer;transition:all .2s;margin-left:auto}
+        .cmp-filter-all:hover{border-color:#f97316;color:#f97316}
+        .cmp-filter-all.active{border-color:#f97316;background:#fff7ed;color:#f97316;font-weight:600}
+        .cmp-filter-btn{display:block;width:100%;padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;color:#333;background:white;cursor:pointer;transition:all .2s;text-align:left}
+        .cmp-filter-btn:hover{border-color:#f97316;background:#fffbeb}
+        .cmp-filter-btn.active{border-color:#f97316;background:#fff7ed;color:#f97316;font-weight:600}
+        .cmp-content{flex:1;min-width:0;display:flex;flex-direction:column;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:visible;height:auto;padding-bottom:80px;}
+        .cmp-content-header{padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .cmp-stats{font-size:10px;color:#94a3b8}
+        .cmp-body{flex:1;overflow:visible;padding:0;height: auto;}
         .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed}
-        .cmp-table th{background:#f8fafc;padding:10px 16px;text-align:left;font-size:12px;font-weight:600;color:#64748b;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .cmp-table td{padding:10px 16px;border-bottom:1px solid #f1f5f9;font-size:12px;font-weight:500;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .cmp-table tr:hover{background:#fff7ed}
-        .cmp-table .col-num{width:36px;text-align:center;color:#94a3b8;font-size:11px}
+        .cmp-table th{background:#f8fafc;padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .cmp-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;font-size:10px;font-weight:500;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .cmp-table tr:hover{background:#f8fafc}
+        .cmp-table .col-num{width:36px;text-align:center;color:#94a3b8;font-size:10px}
         .cmp-table .col-base{width:28%}
         .cmp-table .col-basecode{width:18%}
         .cmp-table .col-dist{width:28%}
         .cmp-table .col-distcode{width:18%}
-        .cmp-table .col-model{font-size:11px;font-weight:400}
-        .cmp-table .col-code{font-size:11px;font-weight:400;color:#3b82f6}
-        .cmp-footer{padding:10px 20px;background:white;border-top:1px solid #e2e8f0;font-size:12px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
+        .cmp-table .col-model{font-size:10px;font-weight:400}
+        .cmp-table .col-code{font-size:10px;font-weight:400;color:#3b82f6}
+        .cmp-table .cmp-empty{text-align:center;color:#94a3b8;padding:30px}
         .cmp-empty{text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px}
             /* ====== 新增：公告浮动按钮 ====== */
         .announce-float-btn {
@@ -333,7 +614,6 @@
             50% { transform: scale(1.3); opacity: 0.7; }
         }
 
-        /* 移动端适配（放在已有的 @media(max-width:768px) 内部） */
         .announce-float-btn {
             bottom: 70px;
             right: 14px;
@@ -348,24 +628,162 @@
             right: 3px;
             border-width: 1.5px;
         }
+        /* ====== 系列总览 ====== */
+        #pageOverview {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+            max-height: auto;
+        }
+        .series-sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            position: sticky;
+            top: 52px;
+            align-self: flex-start;
+            max-height: calc(100vh - 52px);
+        }
+        .series-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .series-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #64748b;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .series-item:hover {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        .series-item.active {
+            background: #fff7ed;
+            border-left-color: #f97316;
+            color: #f97316;
+            font-weight: 600;
+        }
+        .row-accessory td {
+            background: #eff6ff;
+        }
+        .row-accessory:hover td {
+            background: #dbeafe;
+        }
+        .overview-content {
+            flex: 1;
+            padding: 0 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: visible;
+        }
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .overview-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .overview-count {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        .overview-table-wrap {
+            flex: 1;
+            overflow: visible;
+        }
+        .overview-table-wrap .data-table {
+            font-size: 10px;
+        }
+        .overview-table-wrap .data-table th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .overview-table-wrap .data-table td {
+            padding: 4px 8px;
+            vertical-align: middle;
+        }
+        .overview-table-wrap .data-table .img-thumb-cell {
+            width: 60px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .overview-table-wrap .data-table .img-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        /* ====== 返回顶部按钮 ====== */
+        .back-to-top {
+            position: fixed;
+            bottom: 120px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            border: 2px solid #f97316;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: none;          /* 默认隐藏，滚动后显示 */
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 999;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .back-to-top.show {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+        .back-to-top:hover {
+            transform: scale(1.10);
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.35);
+        }
+        .back-to-top:active {
+            transform: scale(0.92);
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-left">
             <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
-            <div class="header-logo" style="font-size:10px;color:#94a3b8">版本：V1.2</div>
+            <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.3</div>
+            <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
         </div>
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新内容如下：\n1、新增图片预览功能，支持点击放大；\n2、新增图片懒加载以及缓存逻辑；\n3、新增公告浮动按钮功能","date":"2026-08-19"}
+    {"content":"本次更新内容如下：\n1、新增系列表，方便浏览系列型号及配件；\n2、新增返回顶部按钮，点击即可返回到页面顶部；\n3、调整配单明细配件名称显示","date":"2026-08-21"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
         <div class="nav-sidebar">
-            <div class="nav-item active" onclick="switchPage('bom')"><span class="nav-icon">📋</span>配单表</div>
-            <div class="nav-item" onclick="switchPage('cmp')"><span class="nav-icon">📊</span>对照表</div>
+            <div class="nav-item active" onclick="switchPage('bom', event)"><span class="nav-icon">📋</span>配单表</div>
+            <div class="nav-item" onclick="switchPage('cmp', event)"><span class="nav-icon">📊</span>对照表</div>
+            <div class="nav-item" onclick="switchPage('overview', event)"><span class="nav-icon">📦</span>系列表</div>
         </div>
         <div id="pageBom">
             <div class="sidebar">
@@ -420,20 +838,55 @@
             </div>
         </div>
         <div id="pageCmp" style="display:none">
-
-            <div class="cmp-search-bar">
-                <span class="search-label">搜索：</span>
-                <input type="text" id="cmpSearchInput" placeholder="输入基线型号、经销型号或代码..." oninput="cmpSearch()">
+            <div class="cmp-sidebar">
+                <div class="panel">
+                    <div class="panel-title"><div class="panel-title-icon">🔍</div>搜索筛选</div>
+                    <div class="cmp-search-wrap">
+                        <input type="text" id="cmpSearchInput" class="cmp-search-input" placeholder="输入基线型号、经销型号或代码..." oninput="cmpSearch()">
+                    </div>
+                    <div class="cmp-filter-title">系列筛选 <button class="cmp-filter-all active" id="cmpFilterAll" onclick="filterCmpAll(this)">全部</button></div>
+                    <div id="cmpSeriesFilter" class="cmp-filter-list"></div>
+                </div>
             </div>
-            <div class="cmp-filter-bar" id="cmpSeriesFilter"></div>
-            <div class="cmp-body" id="cmpTableArea"></div>
-            <div class="cmp-footer">
-                <span id="cmpStats">共 0 条</span>
-                <span>数据来源：经销基线对照表</span>
+            <div class="cmp-content">
+                <div class="cmp-content-header">
+                    <div class="content-title"><div class="content-title-icon">📊</div>经销基线对照表</div>
+                    <div class="content-toolbar">
+                        <div class="toolbar-right">
+                            <span id="cmpStats" class="cmp-stats">共 0 条</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="cmpTableArea" class="cmp-body"></div>
             </div>
         </div>
+        <!-- ====== 系列总览 ====== -->
+        <div id="pageOverview" style="display:none; flex:1; min-width:0;">
+            <div class="series-sidebar" id="seriesSidebar">
+                <div class="panel">
+                    <div class="panel-title"><div class="panel-title-icon">📦</div>产品系列</div>
+                    <div id="seriesList" class="series-list"></div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div class="overview-header">
+                    <span class="overview-title" id="overviewTitle">请选择系列</span>
+                    <span class="overview-count" id="overviewCount">共 0 项</span>
+                </div>
+                <div id="overviewTableWrap" class="overview-table-wrap">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>请选择左侧系列</h3>
+                        <p>点击系列名称查看该系列全部物料</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ====== /系列总览 ====== -->
     </div>
+
     <div class="version-bar">有任何建议和问题请及时联系蔡修钢 · 网址：<a href="https://cai0707-kiki.github.io/ID-BOM/" target="_blank" style="color:#f97316;text-decoration:none">https://cai0707-kiki.github.io/ID-BOM/</a></div>
+    <button id="backToTop" class="back-to-top" title="返回顶部">↑</button>
     <!-- ====== 新增：公告浮动按钮 ====== -->
     <div id="announceFloatBtn" class="announce-float-btn" onclick="forceShowAnnounce()" title="查看公告">
         <span class="announce-bell">🔔</span>
@@ -685,110 +1138,110 @@
 {"Count":26,"value":["相机","ID2000M系列","ID2016M基础款U口","MV-ID2016M-06S-BBN-U(国内中性)V2.0","313202317","1.6MP，6.7mm镜头，4颗蓝色LED，工作距离40~120mm，基础款U口","","Power","0","Braket2M","1","M12A17-U","1","","","","","","","","","","","Iso-Braket;BZ2;EPE2;M26","1;1;1;1","ID2000M\r"]},
 {"Count":26,"value":["相机","ID2000M系列","ID2016M基础款U口","MV-ID2016M-06S-WBN-U(国内标配)V2.0","313201574","1.6MP，6.7mm镜头，4颗白色LED，工作距离40~120mm，基础款U口","","Power","0","Braket2M","1","M12A17-U","1","","","","","","","","","","","Iso-Braket;BZ2;EPE2;M26","1;1;1;1","ID2000M\r"]},
 {"Count":26,"value":["相机","ID2000M系列","ID2016M基础款U口","MV-ID2016M-06S-WBN-U(国内中性)V2.0","313201575","1.6MP，6.7mm镜头，4颗白色LED，工作距离40~120mm，基础款U口","","Power","0","Braket2M","1","M12A17-U","1","","","","","","","","","","","Iso-Braket;BZ2;EPE2;M26","1;1;1;1","ID2000M\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-05M-RBN(国内标配)","313203219","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-05M-RBN(国内中性)","313203235","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08M-RBN(国内标配)","313203221","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08M-RBN(国内中性)","313203234","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12M-RBN(国内标配)","313203208","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12M-RBN(国内中性)","313203229","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16M-RBN(国内标配)","313203217","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16M-RBN(国内中性)","313203233","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08L-RBN(国内标配)","313203215","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08L-RBN(国内中性)","313203227","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12L-RBN(国内标配)","313203214","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12L-RBN(国内中性)","313203225","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16L-RBN(国内标配)","313203213","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16L-RBN(国内中性)","313203223","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-05M-RBN-U(国内标配)","313203218","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-05M-RBN-U(国内中性)","313203232","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08M-RBN-U(国内标配)","313203220","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08M-RBN-U(国内中性)","313203231","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12M-RBN-U(国内标配)","313203209","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12M-RBN-U(国内中性)","313203228","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16M-RBN-U(国内标配)","313203216","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16M-RBN-U(国内中性)","313203230","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08L-RBN-U(国内标配)","313203212","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08L-RBN-U(国内中性)","313203226","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12L-RBN-U(国内标配)","313203211","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12L-RBN-U(国内中性)","313203224","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16L-RBN-U(国内标配)","313203210","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16L-RBN-U(国内中性)","313203222","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-05ARH(国内标配)","328500520","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-05ARH(国内中性)","328500517","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08ARH(国内标配)","328500515","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08ARH(国内中性)","328500516","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12ARH(国内标配)","328500527","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12ARH(国内中性)","328500526","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16ARH(国内标配)","328500519","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16ARH(国内中性)","328500523","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08LRH(国内标配)","328500503","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08LRH(国内中性)","328500512","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12LRH(国内标配)","328500508","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12LRH(国内中性)","328500505","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16LRH(国内标配)","328500504","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16LRH(国内中性)","328500506","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-05ARHU(国内标配)","328500514","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-05ARHU(国内中性)","328500513","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08ARHU(国内标配)","328500521","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08ARHU(国内中性)","328500528","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12ARHU(国内标配)","328500522","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12ARHU(国内中性)","328500518","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16ARHU(国内标配)","328500524","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16ARHU(国内中性)","328500525","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08LRHU(国内标配)","328500511","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08LRHU(国内中性)","328500510","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12LRHU(国内标配)","328500509","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12LRHU(国内中性)","328500502","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16LRHU(国内标配)","328500501","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16LRHU(国内中性)","328500507","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-05M-RBN(国内标配)","328500542","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-05M-RBN(国内中性)","328500538","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-08M-RBN(国内标配)","328500544","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-08M-RBN(国内中性)","328500537","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-12M-RBN(国内标配)","328500530","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-12M-RBN(国内中性)","328500532","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-16M-RBN(国内标配)","328500540","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-16M-RBN(国内中性)","328500536","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-25M-RBN(国内标配)","328500585","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-25M-RBN(国内中性)","328500587","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-05M-RBN-U(国内标配)","328500541","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-05M-RBN-U(国内中性)","328500535","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-08M-RBN-U(国内标配)","328500543","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-08M-RBN-U(国内中性)","328500534","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-12M-RBN-U(国内标配)","328500531","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-12M-RBN-U(国内中性)","328500529","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-16M-RBN-U(国内标配)","328500539","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-16M-RBN-U(国内中性)","328500533","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-25M-RBN-U(国内标配)","328500584","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-25M-RBN-U(国内中性)","328500586","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-05M-RBN(国内标配)","313202681","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-05M-RBN(国内中性)","313202792","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08M-RBN(国内标配)","313202342","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08M-RBN(国内中性)","313202793","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12M-RBN(国内标配)","313202827","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12M-RBN(国内中性)","313202824","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16M-RBN(国内标配)","313202683","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16M-RBN(国内中性)","313202794","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08L-RBN(国内标配)","313202754","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08L-RBN(国内中性)","313202920","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12L-RBN(国内标配)","313202755","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12L-RBN(国内中性)","313202928","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16L-RBN(国内标配)","313202756","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16L-RBN(国内中性)","313202930","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-05M-RBN-U(国内标配)","313202682","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-05M-RBN-U(国内中性)","313202795","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08M-RBN-U(国内标配)","313202427","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08M-RBN-U(国内中性)","313202796","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12M-RBN-U(国内标配)","313202826","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12M-RBN-U(国内中性)","313202829","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16M-RBN-U(国内标配)","313202684","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16M-RBN-U(国内中性)","313202797","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08L-RBN-U(国内标配)","313202783","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08L-RBN-U(国内中性)","313202927","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12L-RBN-U(国内标配)","313202785","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12L-RBN-U(国内中性)","313202929","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16L-RBN-U(国内标配)","313202786","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
-{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16L-RBN-U(国内中性)","313202931","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;BZ3;EPE3X;M36","0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-05M-RBN(国内标配)","313203219","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-05M-RBN(国内中性)","313203235","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08M-RBN(国内标配)","313203221","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08M-RBN(国内中性)","313203234","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12M-RBN(国内标配)","313203208","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12M-RBN(国内中性)","313203229","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16M-RBN(国内标配)","313203217","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16M-RBN(国内中性)","313203233","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08L-RBN(国内标配)","313203215","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-08L-RBN(国内中性)","313203227","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12L-RBN(国内标配)","313203214","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-12L-RBN(国内中性)","313203225","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16L-RBN(国内标配)","313203213","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列网口","MV-ID2013XM-16L-RBN(国内中性)","313203223","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-05M-RBN-U(国内标配)","313203218","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-05M-RBN-U(国内中性)","313203232","1.3MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08M-RBN-U(国内标配)","313203220","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08M-RBN-U(国内中性)","313203231","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12M-RBN-U(国内标配)","313203209","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12M-RBN-U(国内中性)","313203228","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16M-RBN-U(国内标配)","313203216","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16M-RBN-U(国内中性)","313203230","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08L-RBN-U(国内标配)","313203212","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-08L-RBN-U(国内中性)","313203226","1.3MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12L-RBN-U(国内标配)","313203211","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-12L-RBN-U(国内中性)","313203224","1.3MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16L-RBN-U(国内标配)","313203210","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2013XM系列U口","MV-ID2013XM-16L-RBN-U(国内中性)","313203222","1.3MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-05ARH(国内标配)","328500520","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-05ARH(国内中性)","328500517","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08ARH(国内标配)","328500515","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08ARH(国内中性)","328500516","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12ARH(国内标配)","328500527","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12ARH(国内中性)","328500526","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16ARH(国内标配)","328500519","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16ARH(国内中性)","328500523","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08LRH(国内标配)","328500503","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-08LRH(国内中性)","328500512","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12LRH(国内标配)","328500508","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-12LRH(国内中性)","328500505","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16LRH(国内标配)","328500504","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列网口","MV-IDBX007X-16LRH(国内中性)","328500506","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-05ARHU(国内标配)","328500514","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-05ARHU(国内中性)","328500513","1.6MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08ARHU(国内标配)","328500521","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08ARHU(国内中性)","328500528","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12ARHU(国内标配)","328500522","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12ARHU(国内中性)","328500518","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16ARHU(国内标配)","328500524","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16ARHU(国内中性)","328500525","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08LRHU(国内标配)","328500511","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-08LRHU(国内中性)","328500510","1.6MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12LRHU(国内标配)","328500509","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-12LRHU(国内中性)","328500502","1.6MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16LRHU(国内标配)","328500501","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2016XM系列U口","MV-IDBX007X-16LRHU(国内中性)","328500507","1.6MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-05M-RBN(国内标配)","328500542","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-05M-RBN(国内中性)","328500538","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-08M-RBN(国内标配)","328500544","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-08M-RBN(国内中性)","328500537","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-12M-RBN(国内标配)","328500530","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-12M-RBN(国内中性)","328500532","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-16M-RBN(国内标配)","328500540","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-16M-RBN(国内中性)","328500536","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-25M-RBN(国内标配)","328500585","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列网口","MV-ID2020RM-25M-RBN(国内中性)","328500587","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","不配线缆，需额外下单","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-05M-RBN-U(国内标配)","328500541","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-05M-RBN-U(国内中性)","328500535","2MP，卷帘快门，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-08M-RBN-U(国内标配)","328500543","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-08M-RBN-U(国内中性)","328500534","2MP，卷帘快门，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-12M-RBN-U(国内标配)","328500531","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-12M-RBN-U(国内中性)","328500529","2MP，卷帘快门，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-16M-RBN-U(国内标配)","328500539","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-16M-RBN-U(国内中性)","328500533","2MP，卷帘快门，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-25M-RBN-U(国内标配)","328500584","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2020RM系列U口","MV-ID2020RM-25M-RBN-U(国内中性)","328500586","2MP，卷帘快门，25mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","不配线缆，需额外下单，U口型号须额外供电","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-05M-RBN(国内标配)","313202681","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-05M-RBN(国内中性)","313202792","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08M-RBN(国内标配)","313202342","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08M-RBN(国内中性)","313202793","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12M-RBN(国内标配)","313202827","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12M-RBN(国内中性)","313202824","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16M-RBN(国内标配)","313202683","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16M-RBN(国内中性)","313202794","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power","0","Braket2X","1","M12A17-L","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08L-RBN(国内标配)","313202754","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-08L-RBN(国内中性)","313202920","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12L-RBN(国内标配)","313202755","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-12L-RBN(国内中性)","313202928","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16L-RBN(国内标配)","313202756","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列网口","MV-ID2023XM-16L-RBN(国内中性)","313202930","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，网口型号","配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power","0","Braket2X","1","M12A17-L","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-05M-RBN-U(国内标配)","313202682","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，网口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-05M-RBN-U(国内中性)","313202795","2.4MP，5mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408231；添加：202408955","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08M-RBN-U(国内标配)","313202427","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08M-RBN-U(国内中性)","313202796","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202407730；添加：202408957","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12M-RBN-U(国内标配)","313202826","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12M-RBN-U(国内中性)","313202829","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408442；添加：202408951","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16M-RBN-U(国内标配)","313202684","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16M-RBN-U(国内中性)","313202797","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，机械调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408230；添加：202408956","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","L-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08L-RBN-U(国内标配)","313202783","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-08L-RBN-U(国内中性)","313202927","2.4MP，8mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408317；添加：202408954","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12L-RBN-U(国内标配)","313202785","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-12L-RBN-U(国内中性)","313202929","2.4MP，12mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408318；添加：202408953","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16L-RBN-U(国内标配)","313202786","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
+{"Count":26,"value":["相机","ID2000XM系列","ID2023XM系列U口","MV-ID2023XM-16L-RBN-U(国内中性)","313202931","2.4MP，16mm镜头，4颗红色LED，半偏镜头罩，液态调焦，U口型号","U口型号须额外供电。配置红外灯板需要删除与添加的前端组件，删除：202408319；添加：202408952","Power;PwID","0","Braket2X","1","M12A17-U","0","","","","","LT-4-46","1","C-Y-51.5","1","","","BCL-A;C-Y-51.5-E;BZ3;EPE3X;M36","0;0;1;1;1","ID2000XM\r"]},
 {"Count":26,"value":["相机","ID3000PM系列","ID3013PM系列","MV-ID3013PM-06M-WBN(国内标配)V2.0","313200851","1.3MP，6mm镜头，14颗白色LED，半偏镜头罩，机械调焦","","Power","0","Braket3P","1","M12A17-L","1","","","","","L-14-55","1","C-Y-62-14","1","","","BZ3;EPE3P;M48","1;1;1","ID3000PM-14\r"]},
 {"Count":26,"value":["相机","ID3000PM系列","ID3013PM系列","MV-ID3013PM-06M-WBN(国内中性)V2.0","313200850","1.3MP，6mm镜头，14颗白色LED，半偏镜头罩，机械调焦","","Power","0","Braket3P","1","M12A17-L","1","","","","","L-14-55","1","C-Y-62-14","1","","","BZ3;EPE3P;M48","1;1;1","ID3000PM-14\r"]},
 {"Count":26,"value":["相机","ID3000PM系列","ID3013PM系列","MV-ID3013PM-12M-WBN(国内标配)V2.0","313200854","1.3MP，12mm镜头，14颗白色LED，半偏镜头罩，机械调焦","","Power","0","Braket3P","1","M12A17-L","1","","","","","L-14-55","1","C-Y-62-14","1","","","BZ3;EPE3P;M48","1;1;1","ID3000PM-14\r"]},
@@ -1411,27 +1864,27 @@
 {"Count":10,"value":["配件","扩展配件","隔离支架","ID2000M隔离支架","190234947","V-读码器035-隔离支架适配ID2000系列基线型号使用，配合安装支架使用，相机孔位M2","","Iso-Braket","0","Iso-Braket\r"]},
 {"Count":10,"value":["配件","扩展配件","IO盒子","MV-IDA-IO-22(国内中性)","310101339","仅适配ID2013EM网口型号使用，6路IO，可直接搭配优化版本线缆绿色端子头使用","","IO-BOX2","0","IO-BOX2\r"]},
 {"Count":10,"value":["配件","扩展配件","IO盒子","MV-IDA-IO-33(国内中性)V2.0","310102404","适配ID2000M系列网口型号使用，内嵌光耦隔离IO，8路IO","单独包装物料：310102379","IO-BOX3","1","IO-BOX3\r"]},
-{"Count":10,"value":["配件","扩展配件","ID3000XM-极小码配件","MV-IDA-C-Y-61-45-M(国内中性)","310102058","极小码配件，小码识别能力：0.006mm","","C-Y-61-M","0","C-Y-61-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID3000XM-YAG防护罩","MV-IDA-C-Y-61-45-YAG(国内中性)","310102059","激光防护罩，防护1064nm激光漫射","","C-Y-61-Y","0","C-Y-61-Y\r"]},
-{"Count":10,"value":["配件","扩展配件","ID3000XM-ESD防护罩","MV-IDA-C-Y-61-45-ESD(国内中性)","310102060","静电防护罩，复合IEC61340-5-1：2016防静电要求","","C-Y-61-E","0","C-Y-61-E\r"]},
-{"Count":10,"value":["配件","扩展配件","ID3000XM-匀光罩","MV-IDA-C-Y-61-45-DOME(国内中性)","310102061","匀光罩，适合金属拉丝反光场景","","C-Y-61-D","0","C-Y-61-D\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM-ESD防护罩","MV-IDA-C-Y-41-56-ESD(国内中性)","310102292","静电防护罩，复合IEC61340-5-1：2016防静电要求","","C-Y-41-E","0","C-Y-41-E\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM红色全透爆闪光源","MV-IDA-SL-16-M-RBN(全球通中性)","310103191","适配M口型号，红色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM红色全偏爆闪光源","MV-IDA-SL-16-M-RBP(全球通中性)","310102928","适配M口型号，红色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM白色全透爆闪光源","MV-IDA-SL-16-M-WBN(全球通中性)","310103032","适配M口型号，白色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM白色全偏爆闪光源","MV-IDA-SL-16-M-WBP(全球通中性)","310103190","适配M口型号，白色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM蓝色全透爆闪光源","MV-IDA-SL-16-M-BBN(全球通中性)","310103192","适配M口型号，蓝色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM蓝色全偏爆闪光源","MV-IDA-SL-16-M-BBP(全球通中性)","310103193","适配M口型号，蓝色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM红色全透爆闪光源","MV-IDA-SL-16-C-RBN(全球通中性)","310103194","适配C口型号，红色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM红色全偏爆闪光源","MV-IDA-SL-16-C-RBP(全球通中性)","310103074","适配C口型号，红色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM白色全透爆闪光源","MV-IDA-SL-16-C-WBN(全球通中性)","310103088","适配C口型号，白色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM白色全偏爆闪光源","MV-IDA-SL-16-C-WBP(全球通中性)","310103195","适配C口型号，白色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM蓝色全透爆闪光源","MV-IDA-SL-16-C-BBN(全球通中性)","310103197","适配C口型号，蓝色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM蓝色全偏爆闪光源","MV-IDA-SL-16-C-BBP(全球通中性)","310103196","适配C口型号，蓝色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM-蓝色微码光源","MV-IDA-LY-02-76C-20B2(全球通中性)","310103150","适配C口型号，蓝色 20 颗补光灯，暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM-红色微码光源","MV-IDA-LY-02-76C-20R2(全球通中性)","310103149","适配C口型号，红色 20 颗补光灯，暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM-蓝色微码光源","MV-IDA-LY-02-76C-61B8(全球通中性)","310103148","适配C口型号，蓝色 61 颗补光灯，明暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
-{"Count":10,"value":["配件","扩展配件","ID5000XM-红色微码光源","MV-IDA-LY-02-76C-61R8(全球通中性)","310103147","适配C口型号，红色 61 颗补光灯，明暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
+{"Count":10,"value":["配件","扩展配件","极小码配件","MV-IDA-C-Y-61-45-M(国内中性)","310102058","极小码配件，小码识别能力：0.006mm","","C-Y-61-M","0","C-Y-61-M\r"]},
+{"Count":10,"value":["配件","扩展配件","YAG防护罩","MV-IDA-C-Y-61-45-YAG(国内中性)","310102059","激光防护罩，防护1064nm激光漫射","","C-Y-61-Y","0","C-Y-61-Y\r"]},
+{"Count":10,"value":["配件","扩展配件","ESD防护罩","MV-IDA-C-Y-61-45-ESD(国内中性)","310102060","静电防护罩，复合IEC61340-5-1：2016防静电要求","","C-Y-61-E","0","C-Y-61-E\r"]},
+{"Count":10,"value":["配件","扩展配件","匀光罩","MV-IDA-C-Y-61-45-DOME(国内中性)","310102061","匀光罩，适合金属拉丝反光场景","","C-Y-61-D","0","C-Y-61-D\r"]},
+{"Count":10,"value":["配件","扩展配件","ESD防护罩","MV-IDA-C-Y-41-56-ESD(国内中性)","310102292","静电防护罩，复合IEC61340-5-1：2016防静电要求","","C-Y-41-E","0","C-Y-41-E\r"]},
+{"Count":10,"value":["配件","扩展配件","红色全透爆闪光源","MV-IDA-SL-16-M-RBN(全球通中性)","310103191","适配M口型号，红色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","红色全偏爆闪光源","MV-IDA-SL-16-M-RBP(全球通中性)","310102928","适配M口型号，红色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","白色全透爆闪光源","MV-IDA-SL-16-M-WBN(全球通中性)","310103032","适配M口型号，白色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","白色全偏爆闪光源","MV-IDA-SL-16-M-WBP(全球通中性)","310103190","适配M口型号，白色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色全透爆闪光源","MV-IDA-SL-16-M-BBN(全球通中性)","310103192","适配M口型号，蓝色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色全偏爆闪光源","MV-IDA-SL-16-M-BBP(全球通中性)","310103193","适配M口型号，蓝色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-M","0","SL-16-M\r"]},
+{"Count":10,"value":["配件","扩展配件","红色全透爆闪光源","MV-IDA-SL-16-C-RBN(全球通中性)","310103194","适配C口型号，红色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","红色全偏爆闪光源","MV-IDA-SL-16-C-RBP(全球通中性)","310103074","适配C口型号，红色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","白色全透爆闪光源","MV-IDA-SL-16-C-WBN(全球通中性)","310103088","适配C口型号，白色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","白色全偏爆闪光源","MV-IDA-SL-16-C-WBP(全球通中性)","310103195","适配C口型号，白色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色全透爆闪光源","MV-IDA-SL-16-C-BBN(全球通中性)","310103197","适配C口型号，蓝色16颗补光灯，全透镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色全偏爆闪光源","MV-IDA-SL-16-C-BBP(全球通中性)","310103196","适配C口型号，蓝色16颗补光灯，全偏镜头罩，亮度最大可达自带光源的3倍以上","","SL-16-C","0","SL-16-C\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色微码光源","MV-IDA-LY-02-76C-20B2(全球通中性)","310103150","适配C口型号，蓝色 20 颗补光灯，暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
+{"Count":10,"value":["配件","扩展配件","红色微码光源","MV-IDA-LY-02-76C-20R2(全球通中性)","310103149","适配C口型号，红色 20 颗补光灯，暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
+{"Count":10,"value":["配件","扩展配件","蓝色微码光源","MV-IDA-LY-02-76C-61B8(全球通中性)","310103148","适配C口型号，蓝色 61 颗补光灯，明暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
+{"Count":10,"value":["配件","扩展配件","红色微码光源","MV-IDA-LY-02-76C-61R8(全球通中性)","310103147","适配C口型号，红色 61 颗补光灯，明暗场光源，工作距离76mm","","LY-02","0","LY-02\r"]},
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-270-140-4030WL-A","310100510","24V,120W, 32LED颗粒,全角40*30°，主推，搭配ID6000系列智能读码器使用","若ID5000C口搭配物流大灯，相机钣金需要调整，订单中备注：删除：190170125，添加：190175190；配合读码器使用时，相机与光源的连接线需要额外配置下单：光源触发线：310102111, 光源触发线,TB2A10P转open,7m,黑；相机触发线：310102110, ,M12A12F转TB2A12S ,50cm,黑","LB-270","0","LB-270\r"]},
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-270-140-4030WL-AP","310101583","基于主推LB270系列外置偏振罩","白光偏振32颗LED灯，需要镜头搭配偏振环使用才有效果。","LB-270","0","LB-270\r"]},
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-270-140-4030WL-A(海康机器人定制)","310100786","透镜板无角度，全发散，配合3D相机使用","白光发散光32颗LED灯，常用于包裹追溯方案。","LB-270","0","LB-270\r"]},
@@ -1441,7 +1894,8 @@
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-HVS-24WL-A","310100614","24V，100W，48LED，全角24°通道门项目建议使用","标配190116266智能相机安装板，换用工业相机需要配置单改为190116382","LB-270","0","LB-200-48\r"]},
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-150-150-40WLS","310100039","24V,36W,24LED颗粒,全角40°","标配190151749智能相机安装板，换用工业相机需要配置单改为190151718","LB-270","0","LB-150-24\r"]},
 {"Count":10,"value":["配件","扩展配件","物流大灯","MV-LB-230-230-4030WL-A","310100025","48V,240W,48LED颗粒,全角40-30°","高速六面读码使用，适配ID6000系列读码器，需单独配大灯，配合高速分拣项目使用","LB-270","0","LB-230-48\r"]},
-{"Count":10,"value":["配件","扩展配件","ID2000XM白色全透爆闪光源","MV-IDA-BCL-A-WHN-TOF(全球通中性)","310103168","白色20颗补光灯，全透镜头罩，亮度最大可达自带光源的2.5倍以上","","BCL-A","0","IDA-BCL\r"]},
+{"Count":10,"value":["配件","扩展配件","白色全透爆闪光源","MV-IDA-BCL-A-WHN-TOF(全球通中性)","310103168","白色20颗补光灯，全透镜头罩，亮度最大可达自带光源的2.5倍以上","","BCL-A","0","IDA-BCL\r"]},
+{"Count":10,"value":["配件","扩展配件","ESD防护罩","MV-IDA-C-Y-51.5-31.5-ESD(国内中性)","310103028","静电防护罩，复合IEC61340-5-1：2016防静电要求","","C-Y-51.5-E","0","C-Y-51.5-E\r"]},
 {"Count":10,"value":["配件","FA镜头","IDH2000电池","U可充电锂离子电池","101900824","3.7V,2700mA*h,带卡扣，适配IDH2000无线款","不可拆卸，不推荐客户更换","LIB-2","1","\r"]},
 {"Count":10,"value":["配件","FA镜头","IDH3000电池","MV-IDH3013B-BATTERY-01","101901181","CMV-IDH3013B-BATTERY-01,3.6V3150mAh,TI，适配IDH2000无线款","不可拆卸，不推荐客户更换","LIB-3","1","\r"]},
 {"Count":10,"value":["配件","FA镜头","IDH7000电池","MV-IDA-H70-BATTERY-01","101900934","CMV-IDA-H70-BATTERY-01,3.6V3150mAh,TI，适配IDH2000无线款","","LIB-7","1","\r"]},
@@ -1699,14 +2153,14 @@
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-WBP(国内中性)V4.0","baseCode":"313202627","distModel":"MV-IDB005X-06WP(国内中性)V4.0","distCode":"328500385"},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-BBN(国内标配)V4.0","baseCode":"313202624","distModel":"无经销型号","distCode":""},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-BBN(国内中性)V4.0","baseCode":"313202628","distModel":"无经销型号","distCode":""},
-{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-RBN-YAG(国内中性)/V4.0","baseCode":"313202630","distModel":"无经销型号","distCode":""},
-{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-RBP-YAG(国内中性)/V4.0","baseCode":"313202631","distModel":"无经销型号","distCode":""},
+{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-RBN-YAG(国内中性)V4.0","baseCode":"313202630","distModel":"无经销型号","distCode":""},
+{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-06S-RBP-YAG(国内中性)V4.0","baseCode":"313202631","distModel":"无经销型号","distCode":""},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-16S-RBN(国内标配)V4.0","baseCode":"313202636","distModel":"MV-IDB005X-16R(国内标配)V4.0","distCode":"328500485"},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-16S-RBN(国内中性)V4.0","baseCode":"313202635","distModel":"MV-IDB005X-16R(国内中性)V4.0","distCode":"328500486"},
-{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-16S-RBN-YAG(国内中性)/V4.0","baseCode":"313202637","distModel":"无经销型号","distCode":""},
+{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-16S-RBN-YAG(国内中性)V4.0","baseCode":"313202637","distModel":"无经销型号","distCode":""},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-25S-RBN(国内标配)V4.0","baseCode":"313202633","distModel":"MV-IDB005X-25R(国内标配)V4.0","distCode":"328500487"},
 {"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-25S-RBN(国内中性)V4.0","baseCode":"313202632","distModel":"MV-IDB005X-25R(国内中性)V4.0","distCode":"328500488"},
-{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-25S-RBN-YAG(国内中性)/V4.0","baseCode":"313202634","distModel":"无经销型号","distCode":""},
+{"series":"ID2013M系列V4.0","baseModel":"MV-ID2013M-25S-RBN-YAG(国内中性)V4.0","baseCode":"313202634","distModel":"无经销型号","distCode":""},
 {"series":"ID2016M系列V4.0","baseModel":"MV-ID2016M-06S-RBN(国内标配)V4.0","baseCode":"313202588","distModel":"MV-IDB007X-06R(国内标配)V4.0","distCode":"328500344"},
 {"series":"ID2016M系列V4.0","baseModel":"MV-ID2016M-06S-RBN(国内中性)V4.0","baseCode":"313202589","distModel":"MV-IDB007X-06R(国内中性)V4.0","distCode":"328500345"},
 {"series":"ID2016M系列V4.0","baseModel":"MV-ID2016M-06S-RBP(国内标配)V4.0","baseCode":"313202591","distModel":"MV-IDB007X-06RP(国内标配)V4.0","distCode":"328500346"},
@@ -2611,8 +3065,14 @@
             var item = currentAccessoryItems.find(function(i) { return i.code === code; });
             if (item) {
                 selectedAccessories.push({
-                    key: key, name: item.name, value: item.desc,
-                    code: item.code, remark: item.remark, img: item.img, type: 'optional'
+                    key: key, 
+                    subCategory: (key === '扩展配件') ? (item.series || '') : '',  // ← 新增
+                    name: item.name, 
+                    value: item.desc,
+                    code: item.code, 
+                    remark: item.remark, 
+                    img: item.img, 
+                    type: 'optional'
                 });
             }
         });
@@ -2665,8 +3125,14 @@
                         }
                         if (exactMatch && camStdTags[refTags[k]] && accFlag === '1') {
                             var item = {
-                                key: keys[i], name: r[3] || cfg.name, value: r[5] || val,
-                                code: r[4] || '', remark: r[6] || '', img: r[9] || '', type: 'standard'
+                                key: keys[i], 
+                                subCategory: (keys[i] === '扩展配件') ? (r[2] || '') : '',  // ← 新增
+                                name: r[3] || cfg.name, 
+                                value: r[5] || val,
+                                code: r[4] || '', 
+                                remark: r[6] || '', 
+                                img: r[9] || '', 
+                                type: 'standard'
                             };
                             selectedAccessories.push(item);
                             standardCache[keys[i]] = item;
@@ -2682,129 +3148,155 @@
     /* ==================== 渲染配单明细表 ==================== */
 
     function rt() {
-        var tblHead = '<thead><tr>'
-            + '<th style="width:50px">类型</th>'
-            + '<th style="width:180px">物料名称</th>'
-            + '<th style="width:70px;text-align:center">图片</th>'
-            + '<th style="width:260px">描述</th>'
-            + '<th style="width:80px">物料代码</th>'
-            + '<th style="width:160px">备注</th>'
-            + '<th style="width:70px">操作</th>'
-            + '</tr></thead>';
+    var tblHead = '<thead><tr>'
+        + '<th style="width:70px">类型</th>'
+        + '<th style="width:180px">物料名称</th>'
+        + '<th style="width:60px;text-align:center">图片</th>'
+        + '<th style="width:260px">描述</th>'
+        + '<th style="width:80px">物料代码</th>'
+        + '<th style="width:160px">备注</th>'
+        + '<th style="width:60px">操作</th>'
+        + '</tr></thead>';
 
-        // 无主机但有选配件的场景
-        if (!currentMatch && selectedAccessories.length > 0) {
-            document.getElementById('statTotal').textContent = selectedAccessories.length;
-            document.getElementById('statHost').textContent = 0;
-            document.getElementById('statAccessory').textContent = selectedAccessories.length;
-            var h = '<table class="data-table">' + tblHead + '<tbody>';
-            selectedAccessories.forEach(function(a) {
-                var imgCell2 = '';
-                if (a.img) {
-                    imgCell2 = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + a.img + '.png" loading="lazy" '
-                             + 'alt="' + a.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
-                             + 'onclick="showImg(\'' + a.img.replace(/'/g, "\\'") + '\')" '
-                             + 'onerror="this.style.display=\'none\'"></td>';
-                } else {
-                    imgCell2 = '<td class="img-thumb-cell"><span class="img-thumb-placeholder">—</span></td>';
-                }
-                h += '<tr>'
-                   + '<td><span class="type-badge optional">选配</span></td>'
-                   + '<td class="material-name">' + a.name + '</td>'
-                   + imgCell2
-                   + '<td class="material-desc">' + a.value + '</td>'
-                   + '<td class="material-code">' + (a.code || '-') + '</td>'
-                   + '<td>' + (a.remark || '') + '</td>'
-                   + '<td><button class="btn-remove" onclick="ri(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
-                   + '</tr>';
-            });
-            h += '</tbody></table><div class="table-footer"><span>共 ' + selectedAccessories.length + ' 行</span></div>';
-            document.getElementById('tableArea').innerHTML = h;
-            return;
-        }
-
-        if (!currentMatch) { ct(); return; }
-
-        var items = [];
-
-        // 主机行
-        items.push({
-            type: 'host', typeName: '主机',
-            name: currentMatch[3] || '-', desc: currentMatch[5] || '-',
-            code: currentMatch[4] || '-', remark: currentMatch[6] || '',
-            img: currentMatch[25] || ''
-        });
-
-        // 线缆标配判断
-        var cableKeys = { '一体线': true, 'IO线': true, '网线': true };
-        var cableIsStd = {};
-        Object.keys(cableKeys).forEach(function(k) {
-            var cfg = accessoryColumns[k];
-            if (cfg && cfg.flagCol) {
-                cableIsStd[k] = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
-                    return s.trim();
-                }).some(function(f) { return f === '1'; });
-            }
-        });
-
-        // 选配排序：选配在前
-        var sorted = selectedAccessories.slice().sort(function(a, b) {
-            if (a.type === 'optional' && b.type !== 'optional') return -1;
-            if (a.type !== 'optional' && b.type === 'optional') return 1;
-            return 0;
-        });
-
-        sorted.forEach(function(a) {
-            var remark = a.remark || '';
-            if (a.type === 'optional' && cableKeys[a.key] && !cableIsStd[a.key]) remark = '';
-            items.push({
-                type: a.type, typeName: a.type === 'standard' ? '标配' : '选配',
-                name: a.name, desc: a.value, code: a.code || '-',
-                remark: remark, img: a.img || ''
-            });
-        });
-
-        document.getElementById('statTotal').textContent = items.length;
-        document.getElementById('statHost').textContent = 1;
-        document.getElementById('statAccessory').textContent = items.length - 1;
-
+    // 无主机但有选配件的场景
+    if (!currentMatch && selectedAccessories.length > 0) {
+        document.getElementById('statTotal').textContent = selectedAccessories.length;
+        document.getElementById('statHost').textContent = 0;
+        document.getElementById('statAccessory').textContent = selectedAccessories.length;
         var h = '<table class="data-table">' + tblHead + '<tbody>';
-
-        items.forEach(function(item, idx) {
-            var actionBtn = '';
-            if (item.type === 'host') {
-                var specUrl = getSpecUrl(item.name);
-                actionBtn = specUrl
-                    ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
-                    : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
-            } else if (item.type === 'optional') {
-                actionBtn = '<button class="btn-remove" onclick="ri(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
-            }
-
-            var imgCell = '';
-            if (item.img) {
-                imgCell = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + item.img + '.png" loading="lazy" '
-                        + 'alt="' + item.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
-                        + 'onclick="showImg(\'' + item.img.replace(/'/g, "\\'") + '\')" '
-                        + 'onerror="this.style.display=\'none\'"></td>';
+        selectedAccessories.forEach(function(a) {
+            var imgCell2 = '';
+            if (a.img) {
+                imgCell2 = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + a.img + '.png" loading="lazy" '
+                         + 'alt="' + a.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
+                         + 'onclick="showImg(\'' + a.img.replace(/'/g, "\\'") + '\')" '
+                         + 'onerror="this.style.display=\'none\'"></td>';
             } else {
-                imgCell = '<td class="img-thumb-cell"><span class="img-thumb-placeholder">—</span></td>';
+                imgCell2 = '<td class="img-thumb-cell"><span class="img-thumb-placeholder">—</span></td>';
             }
-
+            // ★★★ 无主机场景：扩展配件使用 subCategory ★★★
+            var typeLabel;
+            if (a.key === '扩展配件') {
+                typeLabel = a.subCategory || '扩展配件';
+            } else {
+                typeLabel = a.key || '选配';
+            }
             h += '<tr>'
-               + '<td><span class="type-badge ' + item.type + '">' + item.typeName + '</span></td>'
-               + '<td class="material-name">' + item.name + '</td>'
-               + imgCell
-               + '<td class="material-desc">' + item.desc + '</td>'
-               + '<td class="material-code">' + item.code + '</td>'
-               + '<td>' + item.remark + '</td>'
-               + '<td>' + actionBtn + '</td>'
+               + '<td><span class="type-badge optional">' + typeLabel + '</span></td>'
+               + '<td class="material-name">' + a.name + '</td>'
+               + imgCell2
+               + '<td class="material-desc">' + a.desc + '</td>'
+               + '<td class="material-code">' + (a.code || '-') + '</td>'
+               + '<td>' + (a.remark || '') + '</td>'
+               + '<td><button class="btn-remove" onclick="ri(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
                + '</tr>';
         });
-
-        h += '</tbody></table><div class="table-footer"><span>共 ' + items.length + ' 行</span></div>';
+        h += '</tbody></table><div class="table-footer"><span>共 ' + selectedAccessories.length + ' 行</span></div>';
         document.getElementById('tableArea').innerHTML = h;
+        return;
     }
+
+    if (!currentMatch) { ct(); return; }
+
+    var items = [];
+
+    // 主机行
+    items.push({
+        type: 'host', typeName: '主机',
+        name: currentMatch[3] || '-', desc: currentMatch[5] || '-',
+        code: currentMatch[4] || '-', remark: currentMatch[6] || '',
+        img: currentMatch[25] || ''
+    });
+
+    // 线缆标配判断
+    var cableKeys = { '一体线': true, 'IO线': true, '网线': true };
+    var cableIsStd = {};
+    Object.keys(cableKeys).forEach(function(k) {
+        var cfg = accessoryColumns[k];
+        if (cfg && cfg.flagCol) {
+            cableIsStd[k] = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+                return s.trim();
+            }).some(function(f) { return f === '1'; });
+        }
+    });
+
+    // 选配排序：选配在前
+    var sorted = selectedAccessories.slice().sort(function(a, b) {
+        if (a.type === 'optional' && b.type !== 'optional') return -1;
+        if (a.type !== 'optional' && b.type === 'optional') return 1;
+        return 0;
+    });
+
+    sorted.forEach(function(a) {
+        var remark = a.remark || '';
+        if (a.type === 'optional' && cableKeys[a.key] && !cableIsStd[a.key]) remark = '';
+        
+        // ★★★ 确定显示的类型名称 ★★★
+        var displayType;
+        if (a.key === '扩展配件') {
+            // 扩展配件：使用 subCategory（即配件行 row[2] 的值）
+            displayType = a.subCategory || '扩展配件';
+        } else {
+            // 其他配件：使用 key（如"电源"、"安装板"等）
+            displayType = a.key;
+        }
+        
+        items.push({
+            type: a.type,
+            typeName: a.type === 'standard' ? '标配' : '选配',
+            displayType: displayType,   // ← 新增：保存最终显示的类型名称
+            name: a.name,
+            desc: a.value,
+            code: a.code || '-',
+            remark: remark,
+            img: a.img || ''
+        });
+    });
+
+    document.getElementById('statTotal').textContent = items.length;
+    document.getElementById('statHost').textContent = 1;
+    document.getElementById('statAccessory').textContent = items.length - 1;
+
+    var h = '<table class="data-table">' + tblHead + '<tbody>';
+
+    items.forEach(function(item, idx) {
+        var actionBtn = '';
+        if (item.type === 'host') {
+            var specUrl = getSpecUrl(item.name);
+            actionBtn = specUrl
+                ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
+                : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
+        } else if (item.type === 'optional') {
+            actionBtn = '<button class="btn-remove" onclick="ri(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
+        }
+
+        var imgCell = '';
+        if (item.img) {
+            imgCell = '<td class="img-thumb-cell"><img class="img-thumb" src="IMG/' + item.img + '.png" loading="lazy" '
+                    + 'alt="' + item.img.replace(/'/g, "&apos;") + '" title="点击放大查看" '
+                    + 'onclick="showImg(\'' + item.img.replace(/'/g, "\\'") + '\')" '
+                    + 'onerror="this.style.display=\'none\'"></td>';
+        } else {
+            imgCell = '<td class="img-thumb-cell"><span class="img-thumb-placeholder">—</span></td>';
+        }
+
+        // ★★★ 核心修改：主机显示"主机"，配件显示 displayType（子类别名称）★★★
+        var typeLabel = (item.type === 'host') ? '主机' : (item.displayType || item.typeName);
+
+        h += '<tr>'
+           + '<td><span class="type-badge ' + item.type + '">' + typeLabel + '</span></td>'
+           + '<td class="material-name">' + item.name + '</td>'
+           + imgCell
+           + '<td class="material-desc">' + item.desc + '</td>'
+           + '<td class="material-code">' + item.code + '</td>'
+           + '<td>' + item.remark + '</td>'
+           + '<td>' + actionBtn + '</td>'
+           + '</tr>';
+    });
+
+    h += '</tbody></table><div class="table-footer"><span>共 ' + items.length + ' 行</span></div>';
+    document.getElementById('tableArea').innerHTML = h;
+}
 
     /* ==================== 移除选配项 ==================== */
 
@@ -3079,45 +3571,260 @@
         }
     }
 
-    function switchPage(page) {
-        document.querySelectorAll('.nav-item').forEach(function(t) {
-            t.classList.remove('active');
-        });
-        event.currentTarget.classList.add('active');
-        document.getElementById('pageBom').style.display = page === 'bom' ? 'flex' : 'none';
+    /* ==================== 系列总览 ==================== */
 
-        var cmp = document.getElementById('pageCmp');
-        if (page === 'cmp') {
-            cmp.style.display = 'flex';
-            cmp.classList.add('active');
+    // 获取系列分组数据
+    function getSeriesMap() {
+    var map = {};
+    var order = [];
+    allRows.forEach(function(row) {
+        if (row[0] !== '相机') return;
+        var key = row[1];
+        if (!map[key]) {
+            map[key] = [];
+            order.push(key);
+        }
+        map[key].push(row);
+    });
+    // 返回 { map: 系列名→行数组, order: 系列名列表（按首次出现顺序） }
+    return { map: map, order: order };
+    }
+
+    function getAccessoriesForSeries(seriesName) {
+    var accMap = {};
+    // 1. 获取该系列所有相机
+    var cameraRows = allRows.filter(function(r) {
+        return r[0] === '相机' && r[1] === seriesName;
+    });
+    // 2. 收集所有引用标签（相机行的配件列：7,9,11,13,15,17,19,21,23）
+    var refTags = [];
+    cameraRows.forEach(function(r) {
+        for (var i = 7; i <= 23; i += 2) {
+            var val = r[i] || '';
+            if (val) {
+                var tags = val.split(';').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+                tags.forEach(function(t) { refTags.push(t); });
+            }
+        }
+    });
+    refTags = [...new Set(refTags)];
+    // 3. 匹配配件行（配件行的标签在索引7）
+    allRows.forEach(function(row) {
+        if (row[0] !== '配件') return;
+        var accTag = (row[7] || '').toLowerCase();
+        var parts = accTag.split(';').map(function(s) { return s.trim(); });
+        for (var i = 0; i < refTags.length; i++) {
+            if (parts.indexOf(refTags[i]) !== -1) {
+                var code = row[4] || '';
+                if (!accMap[code]) {
+                    accMap[code] = row;
+                }
+                break;
+            }
+        }
+    });
+    // 返回配件行数组（顺序按照遍历 allRows 的顺序，即枚举顺序）
+    return Object.values(accMap);
+    }
+
+    // 渲染左侧系列列表
+    function renderSeriesList() {
+    var result = getSeriesMap();
+    var map = result.map;
+    var seriesNames = result.order;
+    var container = document.getElementById('seriesList');
+    if (!container) return;
+    if (seriesNames.length === 0) {
+        container.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:12px;text-align:center;">暂无数据</div>';
+        return;
+    }
+    var html = '';
+    seriesNames.forEach(function(name, index) {
+        var active = index === 0 ? ' active' : '';
+        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
+    });
+    container.innerHTML = html;
+    var first = container.querySelector('.series-item');
+    if (first) renderOverviewTable(first.getAttribute('data-series'), first);
+    }
+
+    // 渲染右侧表格
+    // 渲染右侧表格
+    // 渲染右侧表格
+    function renderOverviewTable(seriesName, el) {
+    // 高亮切换
+    document.querySelectorAll('.series-item').forEach(function(item) {
+        item.classList.remove('active');
+    });
+    if (el) el.classList.add('active');
+    else {
+        document.querySelectorAll('.series-item').forEach(function(item) {
+            if (item.getAttribute('data-series') === seriesName) {
+                item.classList.add('active');
+            }
+        });
+    }
+
+    // 获取该系列的相机行
+    var cameraRows = allRows.filter(function(r) {
+        return r[0] === '相机' && r[1] === seriesName;
+    });
+    // 获取该系列关联的配件行
+    var accessoryRows = getAccessoriesForSeries(seriesName);
+    // 配件按枚举顺序（allRows 中的索引）排序
+    accessoryRows.sort(function(a, b) {
+        return allRows.indexOf(a) - allRows.indexOf(b);
+    });
+    // 相机在前，配件在后
+    var rows = cameraRows.concat(accessoryRows);
+
+    // 更新标题和计数
+    document.getElementById('overviewTitle').textContent = seriesName;
+    document.getElementById('overviewCount').textContent = '共 ' + rows.length + ' 项';
+
+    if (rows.length === 0) {
+        document.getElementById('overviewTableWrap').innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>该系列暂无数据</h3></div>';
+        // 即使无数据，也重置滚动到顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+    }
+
+    // 构建表格（注意：表头是完整正确的，不是占位符）
+    var html = '<table class="data-table"><thead><tr>'
+        + '<th style="width:50px">序号</th>'
+        + '<th style="width:70px">类型</th>'
+        + '<th style="min-width:200px">物料名称</th>'
+        + '<th style="width:70px;text-align:center">图片</th>'
+        + '<th style="min-width:80px">物料代码</th>'
+        + '<th style="min-width:200px">描述</th>'
+        + '<th style="min-width:100px">备注</th>'
+        + '</tr></thead><tbody>';
+
+    rows.forEach(function(row, index) {
+        var isCamera = row[0] === '相机';
+        var typeLabel;
+        if (isCamera) {
+            typeLabel = '主机';
         } else {
-            cmp.style.display = 'none';
-            cmp.classList.remove('active');
+            // 如果配件类型是"扩展配件"，显示 row[2]（子类别名称）
+            // 否则显示 row[1]（原有类别名称）
+            if (row[1] === '扩展配件') {
+                typeLabel = row[2] || '扩展配件';
+            } else {
+                typeLabel = row[1] || '配件';
+            }
+        }
+        var typeClass = isCamera ? 'host' : 'standard';
+        var trClass = isCamera ? '' : 'row-accessory';
+        var name = row[3] || '';
+        // 相机图片在第25列，配件图片在第9列
+        var img = isCamera ? (row[25] || '') : (row[9] || '');
+        var code = row[4] || '';
+        var desc = row[5] || '';
+        var remark = row[6] || '';
+
+        var imgHtml = '';
+        if (img) {
+            imgHtml = '<img class="img-thumb" src="IMG/' + img + '.png" alt="' + img.replace(/'/g, "&apos;") + '" title="点击放大查看" onclick="event.stopPropagation();showImg(\'' + img.replace(/'/g, "\\'") + '\')" onerror="this.style.display=\'none\'">';
+        } else {
+            imgHtml = '<span class="img-thumb-placeholder">—</span>';
         }
 
-        if (page === 'cmp' && cmpData.length === 0) {
+        html += '<tr class="' + trClass + '">'
+            +  '<td style="text-align:center">' + (index + 1) + '</td>'
+            +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
+            +  '<td>' + name + '</td>'
+            +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
+            +  '<td class="material-code">' + code + '</td>'
+            +  '<td class="material-desc">' + desc + '</td>'
+            +  '<td>' + remark + '</td>'
+            + '</tr>';
+    });
+
+    html += '</tbody></table>';
+    
+    // 更新表格内容
+    var wrap = document.getElementById('overviewTableWrap');
+    wrap.innerHTML = html;
+    
+    // 重置滚动容器到顶部，确保从序号1开始显示
+    wrap.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ==================== /系列总览 ==================== */
+
+    function switchPage(page) {
+    document.querySelectorAll('.nav-item').forEach(function(t) {
+        t.classList.remove('active');
+    });
+    // 根据点击的当前元素激活（需确保事件对象存在）
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    } else {
+        // 若通过其他方式调用，根据page高亮对应导航
+        document.querySelectorAll('.nav-item').forEach(function(t) {
+            if (t.getAttribute('onclick') && t.getAttribute('onclick').indexOf("'" + page + "'") !== -1) {
+                t.classList.add('active');
+            }
+        });
+    }
+
+    // 隐藏所有页面
+    document.getElementById('pageBom').style.display = 'none';
+    var cmp = document.getElementById('pageCmp');
+    cmp.style.display = 'none';
+    cmp.classList.remove('active');
+    var overview = document.getElementById('pageOverview');
+    overview.style.display = 'none';
+    overview.classList.remove('active');
+
+    if (page === 'bom') {
+        document.getElementById('pageBom').style.display = 'flex';
+    } else if (page === 'cmp') {
+        cmp.style.display = 'flex';
+        cmp.classList.add('active');
+        if (cmpData.length === 0) {
             loadCmpData();
             initCmpFilter();
             renderCmpTable();
         }
+    } else if (page === 'overview') {
+        overview.style.display = 'flex';
+        overview.classList.add('active');
+        // 如果系列列表还未渲染，则渲染
+        if (!document.getElementById('seriesList').children.length) {
+            renderSeriesList();
+        }
+    }
     }
 
     function initCmpFilter() {
-        var series = ['全部'];
+        var series = [];
         var seen = {};
         cmpData.forEach(function(r) {
             if (!seen[r.series]) { seen[r.series] = true; series.push(r.series); }
         });
-        var h = '<span class="cmp-filter-label">系列筛选：</span>';
+        var h = '';
         series.forEach(function(s) {
-            h += '<button class="cmp-filter-btn' + (s === '全部' ? ' active' : '')
-               + '" onclick="filterCmpSeries(this,\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
+            h += '<button class="cmp-filter-btn" onclick="filterCmpSeries(this,\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
         });
         document.getElementById('cmpSeriesFilter').innerHTML = h;
     }
 
+    function filterCmpAll(btn) {
+        cmpActiveSeries = '全部';
+        btn.classList.add('active');
+        document.querySelectorAll('.cmp-filter-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
+        cmpSearch();
+    }
+
     function filterCmpSeries(btn, series) {
         cmpActiveSeries = series;
+        document.getElementById('cmpFilterAll').classList.remove('active');
         document.querySelectorAll('.cmp-filter-btn').forEach(function(b) {
             b.classList.remove('active');
         });
@@ -3165,6 +3872,8 @@
         document.getElementById('cmpTableArea').innerHTML = h;
         document.getElementById('cmpStats').textContent =
             '共 ' + cmpFiltered.length + ' / ' + cmpData.length + ' 条';
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function esc(s) {
@@ -3195,17 +3904,75 @@
 
     /* ==================== 页面初始化 ==================== */
 
-    document.addEventListener('DOMContentLoaded', function() {
-        loadData();
-        // ===== 注册 Service Worker — 图片本地缓存 =====
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(function(reg) {
-                console.log('[SW] 注册成功，图片将被缓存到本地', reg.scope);
-            }).catch(function(err) {
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    // ===== 注册 Service Worker — 图片本地缓存（持久化） =====
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(function(reg) {
+                console.log('[SW] 注册成功，图片将被持久化缓存到本地', reg.scope);
+            })
+            .catch(function(err) {
+                // 注册失败不影响正常使用，图片会正常加载
                 console.log('[SW] 注册失败（不影响正常使用）:', err);
             });
-        }
-        setTimeout(showAnnounce, 500);
+    }
+    setTimeout(showAnnounce, 500);
+
+        // ===== 从公告配置读取数据更新日期 =====
+        (function() {
+            try {
+                var ac = document.getElementById('announceConfig');
+                if (ac) {
+                    var acd = JSON.parse(ac.textContent);
+                    var date = acd.date || '';
+                    if (date) {
+                        document.getElementById('dataUpdateDate').textContent = '数据更新日期：' + date;
+                    }
+                }
+            } catch (e) {}
+        })();
+
+        // ===== 返回顶部按钮逻辑 =====
+        (function() {
+            var btn = document.getElementById('backToTop');
+            if (!btn) return;
+
+            // 滚动监听：显示/隐藏按钮
+            var scrollHandler = function() {
+                var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+                if (scrollY > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            };
+
+            // 防抖优化
+            var throttleTimer = null;
+            var throttledScroll = function() {
+                if (throttleTimer) return;
+                throttleTimer = setTimeout(function() {
+                    scrollHandler();
+                    throttleTimer = null;
+                }, 80);
+            };
+
+            window.addEventListener('scroll', throttledScroll, { passive: true });
+            // 页面加载完成时执行一次，确保初始状态正确
+            window.addEventListener('load', function() {
+                scrollHandler();
+            });
+
+            // 点击按钮：平滑回到顶部
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        })();
     });
     </script>
 
