@@ -2729,54 +2729,43 @@ document.addEventListener('DOMContentLoaded', function() {
             var btn = document.getElementById('backToTop');
             if (!btn) return;
 
-            // 滚动监听：显示/隐藏按钮
-            var scrollHandler = function() {
+            // 获取所有可能的滚动位置（兼容 window 滚动和内部容器滚动）
+            function getScrollY() {
                 var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-                // 同时检测内部滚动容器（对照表/系列表页面表格横向滚动时纵向也在容器内滚动）
-                var cmpBody = document.querySelector('#cmpTableArea');
-                var overviewWrap = document.querySelector('#overviewTableWrap');
-                if (cmpBody && cmpBody.scrollHeight > cmpBody.clientHeight) {
-                    scrollY = Math.max(scrollY, cmpBody.scrollTop);
+                var ids = ['cmpTableArea', 'overviewTableWrap'];
+                for (var i = 0; i < ids.length; i++) {
+                    var el = document.getElementById(ids[i]);
+                    if (el && el.scrollTop > scrollY) scrollY = el.scrollTop;
                 }
-                if (overviewWrap && overviewWrap.scrollHeight > overviewWrap.clientHeight) {
-                    scrollY = Math.max(scrollY, overviewWrap.scrollTop);
-                }
-                if (scrollY > 300) {
-                    btn.classList.add('show');
-                } else {
-                    btn.classList.remove('show');
-                }
-            };
+                return scrollY;
+            }
 
-            // 防抖优化
             var throttleTimer = null;
-            var throttledScroll = function() {
+            function throttledCheck() {
                 if (throttleTimer) return;
                 throttleTimer = setTimeout(function() {
-                    scrollHandler();
                     throttleTimer = null;
+                    if (getScrollY() > 300) {
+                        btn.classList.add('show');
+                    } else {
+                        btn.classList.remove('show');
+                    }
                 }, 80);
-            };
+            }
 
-            window.addEventListener('scroll', throttledScroll, { passive: true });
-            // 同时监听内部滚动容器
-            ['cmpTableArea', 'overviewTableWrap'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.addEventListener('scroll', throttledScroll, { passive: true });
-            });
-            // 页面加载完成时执行一次，确保初始状态正确
-            window.addEventListener('load', function() {
-                scrollHandler();
-            });
+            // 用 capture 模式监听 document 上的 scroll 事件，捕获所有子元素的滚动
+            document.addEventListener('scroll', throttledCheck, true);
+            window.addEventListener('scroll', throttledCheck, { passive: true });
+            window.addEventListener('load', throttledCheck);
 
-            // 点击按钮：平滑回到顶部（同时回到内部容器顶部）
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                var cmpBody = document.getElementById('cmpTableArea');
-                var overviewWrap = document.getElementById('overviewTableWrap');
-                if (cmpBody) cmpBody.scrollTop = 0;
-                if (overviewWrap) overviewWrap.scrollTop = 0;
+                var ids = ['cmpTableArea', 'overviewTableWrap'];
+                for (var i = 0; i < ids.length; i++) {
+                    var el = document.getElementById(ids[i]);
+                    if (el) el.scrollTop = 0;
+                }
             });
         })();
     });
