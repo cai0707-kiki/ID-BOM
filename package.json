@@ -1,0 +1,16 @@
+{
+  "name": "id-bom",
+  "version": "1.3.0",
+  "description": "海康机器人产品配单工具",
+  "main": "import_csv.js",
+  "scripts": {
+    "build": "node import_csv.js",
+    "resize": "node resize.js -h"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "dependencies": {
+    "iconv-lite": "^0.7.3",
+    "sharp": "^0.35.3"
+  }
+}

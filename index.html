@@ -1,0 +1,2786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="dns-prefetch" href="//cai0707-kiki.github.io">
+    <link rel="preconnect" href="//cai0707-kiki.github.io" crossorigin>
+    <title>ID产品配单表</title>
+    <script>
+    (function(){
+        var dpr = window.devicePixelRatio || 1;
+        var target = 1.5;
+        if (dpr < target) {
+            var scale = target / dpr;
+            var style = document.createElement('style');
+            // Chrome/Edge/Safari 使用 zoom 属性（同步缩放，事件坐标自动适配）
+            var css = 'html { zoom: ' + scale + '; ';
+            // Firefox 后备：使用 transform（可能有轻微点击偏移，但视觉一致）
+            css += '-moz-transform: scale(' + scale + '); -moz-transform-origin: 0 0; ';
+            css += '}';
+            style.textContent = css;
+            document.head.appendChild(style);
+        }
+    })();
+</script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
+        .header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+        .header-left{display:flex;align-items:center;gap:12px}
+        .header-logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .header-logo span{color:#f97316}
+        .header-logo .logo-text{user-select:none;-webkit-user-select:none}
+        .container{display:flex;gap:12px;padding:12px;max-width:1400px;margin:0 auto}
+        .nav-sidebar{width:64px;flex-shrink:0;display:flex;flex-direction:column;background:#1e3a5f;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);height:fit-content;position:sticky;top:52px;align-self:flex-start;}
+        .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:10px;font-weight:500;text-align:center;color:rgba(255,255,255,0.6)}
+        .nav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.9)}
+        .nav-item.active{background:#fff7ed;border-left-color:#f97316;color:#f97316;font-weight:600}
+        .nav-icon{font-size:18px;line-height:1}
+        #pageBom{display:flex;gap:12px;flex:1;min-width:0}
+        #pageCmp{flex:1;min-width:0;gap:12px;max-height:none;overflow: visible;height: auto;}
+        #pageCmp.active{display:flex}
+        .cmp-content-header{flex-shrink:0}
+        .sidebar{width:300px;flex-shrink:0}
+        .panel{background:white;border-radius:6px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,0.1);margin-bottom:6px}
+        .panel-title{font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+        .panel-title-icon{width:18px;height:18px;background:#1e293b;border-radius:3px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px}
+        .step-section{margin-bottom:3px}
+        .step-label{font-size:10px;color:#64748b;margin-bottom:1px;display:flex;align-items:center;gap:4px}
+        .step-number{width:14px;height:14px;background:#f97316;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600}
+        .step-select{width:100%;padding:5px 6px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;color:#333;background:white;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+        .step-select:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,0.1)}
+        .step-select:disabled{background-color:#f8fafc;color:#94a3b8;cursor:not-allowed}
+        .step-select.has-value{border-color:#f97316;background-color:#fffbeb}
+        .accessory-title{font-size:12px;font-weight:600;color:#1e293b;margin-top:8px;margin-bottom:6px;padding-top:8px;border-top:1px solid #e2e8f0}
+        .accessory-category{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border:1px solid #e2e8f0;border-radius:4px;margin-bottom:4px;cursor:pointer;transition:all 0.2s}
+        .accessory-category:hover{border-color:#f97316;background:#fffbeb}
+        .accessory-category-left{display:flex;align-items:center;gap:8px}
+        .accessory-icon{width:24px;height:24px;background:#f1f5f9;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
+        .accessory-category-name{font-size:11px;font-weight:500;color:#333}
+        .accessory-category-count{font-size:10px;color:#94a3b8}
+        .accessory-arrow{color:#94a3b8;font-size:12px}
+        .quick-search{margin-top:6px}
+        .quick-search-wrap{position:relative;display:flex;align-items:center}
+        .quick-search-icon{position:absolute;left:8px;color:#94a3b8;font-size:12px;pointer-events:none}
+        .quick-search-input{width:100%;padding:6px 8px 6px 28px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;box-sizing:border-box}
+        .quick-search-input:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
+        .quick-search-results{margin-top:2px;max-height:120px;overflow-y:auto;background:white;border:1px solid #e2e8f0;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);display:none;z-index:50}
+        .quick-search-item{padding:8px 10px;cursor:pointer;border-bottom:1px solid #f1f5f9}
+        .quick-search-item:last-child{border-bottom:none}
+        .quick-search-item:hover{background:#fff7ed}
+        .qs-row1{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+        .qs-name{font-size:12px;font-weight:600;color:#1e293b;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .qs-tag{font-size:9px;padding:1px 5px;border-radius:3px;background:#f1f5f9;color:#64748b;flex-shrink:0}
+        .qs-row2{font-size:10px;color:#94a3b8;display:flex;gap:4px;margin-bottom:2px}
+        .qs-code{color:#3b82f6;font-family:monospace}
+        .qs-desc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .qs-row3{font-size:10px;color:#3b82f6;cursor:pointer}
+        .qs-row3:hover{color:#1d4ed8}
+        .content{flex:1 1 0%;min-width:0;padding-left:8px;padding-bottom:80px;display:flex;flex-direction:column}
+        .content-panel{background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column}
+        .content-header{padding:8px 12px;border-bottom:1px solid #e2e8f0}
+        .content-title{font-size:13px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+        .content-title-icon{width:20px;height:20px;background:#1e293b;border-radius:4px;display:flex;align-items:center;justify-content:center;color:white;font-size:12px}
+        .content-toolbar{display:flex;justify-content:space-between;align-items:center}
+        .legend{display:flex;gap:12px;font-size:12px}
+        .legend-item{display:flex;align-items:center;gap:4px}
+        .legend-dot{width:8px;height:8px;border-radius:2px}
+        .legend-dot.host{background:#1e293b}
+        .legend-dot.standard{background:#3b82f6}
+        .legend-dot.optional{background:#f97316}
+        .toolbar-right{display:flex;align-items:center;gap:10px}
+        .stats{display:flex;gap:16px}
+        .stat-item{text-align:center}
+        .stat-value{font-size:18px;font-weight:700;color:#1e293b}
+        .stat-value.orange{color:#f97316}
+        .stat-label{font-size:10px;color:#94a3b8}
+        .btn-reset{padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;background:white;color:#64748b;font-size:11px;cursor:pointer}
+        .btn-export{padding:5px 10px;border:none;border-radius:4px;background:#f97316;color:white;font-size:11px;cursor:pointer}
+        .data-table{width:100%;border-collapse:collapse}
+        .data-table th{background:#f8fafc;padding:4px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0}
+        .data-table td{padding:4px 8px;font-size:10px;border-bottom:1px solid #f1f5f9}
+        .data-table tr:hover{background:#f8fafc}
+        .type-badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:500}
+        .type-badge.host{background:#1e293b;color:white}
+        .type-badge.standard{background:#3b82f6;color:white}
+        .type-badge.optional{background:#f97316;color:white}
+        .material-name{font-weight:500;color:#1e293b}
+        .material-desc{color:#64748b;line-height:1.3;word-break:break-word}
+        .material-code{font-family:monospace;font-size:9px;color:#64748b}
+        .btn-remove{width:20px;height:20px;border:none;background:#f1f5f9;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:10px}
+        .btn-remove:hover{background:#fee2e2;color:#ef4444}
+        .img-thumb-cell{text-align:center;vertical-align:middle;width:70px;min-width:70px}
+        .img-thumb{width:42px;height:42px;object-fit:contain;border-radius:4px;border:1px solid #e2e8f0;cursor:pointer;transition:all .2s;background:#fff}
+        .img-thumb:hover{border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,0.2)}
+        .img-thumb-placeholder{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:#f8fafc;color:#cbd5e1;font-size:16px}
+        .img-preview-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:2000;align-items:center;justify-content:center;cursor:pointer}
+        .img-preview-overlay.active{display:flex}
+        .img-preview-box{background:white;border-radius:8px;padding:10px;max-width:90vw;max-height:90vh;position:relative;overflow:auto}
+        .img-preview-box img{display:block;max-width:85vw;max-height:80vh;width:auto;height:auto;object-fit:contain}
+        .img-preview-close{position:absolute;top:8px;right:8px;width:32px;height:32px;background:#ef4444;color:white;border:none;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,0.3)}
+        .img-preview-name{text-align:center;padding:8px;font-size:12px;color:#64748b}
+        .table-footer{padding:6px 10px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#64748b}
+        .empty-state{text-align:center;padding:40px 16px;color:#94a3b8}
+        #tableArea{overflow:auto}
+        .empty-state-icon{font-size:36px;margin-bottom:10px}
+        .empty-state h3{font-size:13px;color:#64748b;margin-bottom:4px}
+        .empty-state p{font-size:11px}
+        .announce-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1001;align-items:center;justify-content:center}
+        .announce-overlay.active{display:flex}
+        .announce-box{background:white;border-radius:12px;width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        .announce-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9}
+        .announce-title{font-size:15px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:6px}
+        .announce-close{width:28px;height:28px;border:none;background:#f1f5f9;border-radius:6px;cursor:pointer;font-size:15px;color:#64748b;display:flex;align-items:center;justify-content:center}
+        .announce-close:hover{background:#e2e8f0}
+        .announce-body{padding:16px 18px}
+        .announce-content{background:#fffbeb;border-left:3px solid #f97316;border-radius:0 6px 6px 0;padding:12px 14px;min-height:60px;font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap}
+        .announce-date{font-size:11px;color:#94a3b8;margin-top:10px}
+        .announce-footer{padding:12px 18px;display:flex;align-items:center;justify-content:flex-end;border-top:1px solid #f1f5f9}
+        .announce-btn{padding:8px 28px;background:#f97316;color:white;border:none;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer}
+        .announce-btn:hover{background:#ea580c}
+        .version-bar{
+            position:fixed;
+            bottom:12px;
+            left:50%;
+            transform:translateX(-50%);
+            padding:6px 20px;
+            background:rgba(30,41,59,0.92);
+            backdrop-filter:blur(8px);
+            -webkit-backdrop-filter:blur(8px);
+            border:1px solid #f97316;
+            border-radius:20px;
+            color:white;
+            font-size:12px;
+            z-index:99;
+            white-space:nowrap;
+            box-shadow:0 4px 16px rgba(0,0,0,0.25);
+        }
+        .version-bar a{color:#f97316;text-decoration:none;}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:1000;align-items:center;justify-content:center;transition:background 0.3s ease}
+        .modal-overlay.active{display:flex;background:rgba(0,0,0,0.5)}
+        .modal{background:white;border-radius:12px;width:750px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
+        .modal-overlay.active .modal{transform:scale(1);opacity:1}
+        .modal-header{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .modal-title{font-size:14px;font-weight:600;color:#1e293b}
+        .modal-close{width:26px;height:26px;border:none;background:#f1f5f9;border-radius:6px;cursor:pointer;font-size:14px;color:#64748b}
+        .modal-close:hover{background:#e2e8f0}
+        .modal-body{padding:14px 18px;flex:1 1 0%;max-height:calc(80vh - 100px);overflow-y:auto;overflow-x:auto}
+        .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+        .btn-cancel{padding:6px 14px;border:1px solid #e2e8f0;border-radius:4px;background:white;color:#64748b;font-size:12px;cursor:pointer}
+        .btn-confirm{padding:6px 14px;border:none;border-radius:4px;background:#f97316;color:white;font-size:12px;cursor:pointer}
+        .accessory-table{width:100%;border-collapse:collapse;font-size:10px}
+        .accessory-table th{background:#f8fafc;padding:6px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0}
+        .accessory-table td{padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:10px}
+        .accessory-table tr:hover{background:#f8fafc}
+        .accessory-table tr.acc-selected{background:#fff7ed}
+        .accessory-table input[type="checkbox"]{width:12px;height:12px;cursor:pointer}
+        .accessory-table .col-series{width:130px;color:#64748b}
+        .accessory-table .col-img{width:60px;text-align:center;vertical-align:middle}
+        .accessory-table .col-name{width:180px;font-weight:500;color:#1e293b}
+        .accessory-table .col-desc{color:#64748b}
+        .accessory-table .col-code{width:100px;font-family:monospace;font-size:10px;color:#64748b}
+        .cable-filter{margin-bottom:12px}
+        .cable-filter-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+        .cable-filter-label{font-size:11px;color:#64748b;width:32px;flex-shrink:0}
+        .cable-filter-btns{display:flex;gap:4px;flex-wrap:wrap}
+        .cable-filter-btn{padding:4px 12px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;color:#333;background:white;cursor:pointer;transition:all 0.2s}
+        .cable-filter-btn:hover{border-color:#f97316;background:#fffbeb}
+        .cable-filter-btn.active{border-color:#f97316;background:#f97316;color:white}
+        .cable-warn{padding:8px 12px;border:1px solid #fcd34d;border-radius:6px;background:#fffbeb;color:#b45309;font-size:11px;margin-bottom:12px;line-height:1.5}
+        .cable-warn em{font-style:normal;color:#f97316}
+        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageBom{flex-direction:column}}
+        /* ====== 响应式：移动端 — 配单配置自适应 + 明细横向滑动 ======
+           TODO: 以下部分 CSS 属性与桌面端重复（如 .cmp-filter-btn, .series-item 等）
+           可考虑将公共属性提取到桌面端，移动端只保留差异属性以减少代码量。
+        */
+        
+@media(max-width:768px){
+    /* ====== 基础重置 ====== */
+    html,body{overflow-x:hidden;overflow-y:auto;height:auto;min-height:100vh}
+    .header{padding:10px 14px;flex-wrap:wrap;gap:6px}
+    .header-logo{font-size:15px}
+
+    /* ====== 容器 ====== */
+    .container{
+        padding:0;
+        gap:0;
+        flex-direction:column;
+        min-height:0;
+        height:auto;
+        overflow:visible;
+    }
+
+    /* ====== 导航栏 ====== */
+    .nav-sidebar{
+        width:100%;
+        flex-direction:row;
+        border-radius:0;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        padding:0 10px;
+        position:sticky;
+        top:0;
+        z-index:50;
+        background:#1e3a5f;
+        margin-bottom:0;
+    }
+    .nav-item{
+        flex-direction:row;
+        gap:4px;
+        padding:10px 16px;
+        border-left:none;
+        border-bottom:2px solid transparent;
+        white-space:nowrap;
+        font-size:12px;
+    }
+    .nav-item.active{
+        border-left:none;
+        border-bottom-color:#f97316;
+    }
+    /* ====== 页面容器 ====== */
+    #pageBom,
+    #pageCmp,
+    #pageOverview {
+        flex-direction:column;
+        gap:0;
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+
+    /* ====== 配单配置侧边栏 ====== */
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:#f0f2f5;
+    }
+
+    /* ====== 内容区 ====== */
+    .content{
+        padding:10px;
+        width:100%;
+        flex:1 1 0%;
+        min-height:200px;
+        display:flex;
+        flex-direction:column;
+    }
+
+    /* ====== 对照表 ====== */
+    .cmp-sidebar{
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        flex-shrink:0 !important;
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:#f0f2f5;
+        padding:8px 12px !important;
+        margin-bottom:4px;
+        border-radius:0;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+    .cmp-search-wrap{width:100%;margin-bottom:6px}
+    .cmp-search-input{width:100%;font-size:14px;padding:8px 10px;box-sizing:border-box}
+    .cmp-filter-title{font-size:12px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+    .cmp-filter-all{font-size:11px;padding:3px 12px;flex-shrink:0}
+    .cmp-filter-list{
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        gap:5px !important;
+        max-height:none !important;
+        overflow-y:visible !important;
+        padding:2px 0 4px 0;
+        width:100%;
+    }
+    .cmp-filter-btn{
+        display:inline-block !important;
+        width:auto !important;
+        padding:4px 12px !important;
+        border-radius:14px !important;
+        font-size:11px !important;
+        white-space:nowrap;
+        flex-shrink:0;
+        border:1px solid #e2e8f0;
+        background:white;
+        color:#333;
+        cursor:pointer;
+        transition:all 0.2s;
+    }
+    .cmp-filter-btn.active{
+        border-color:#f97316;
+        background:#fff7ed;
+        color:#f97316;
+        font-weight:600;
+    }
+    .cmp-content{
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        overflow:visible !important;
+        max-height:none !important;
+        padding:0 10px;
+    }
+    .cmp-body{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        padding:0 10px 60px 10px !important;   /* 底部留白 */
+    }
+    .cmp-table{
+        font-size:10px;
+        min-width:700px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .cmp-table th,.cmp-table td{
+        padding:5px 8px;
+        font-size:10px;
+        white-space:nowrap;
+        overflow:visible;
+        text-overflow:unset;
+    }
+    .cmp-table .col-num{width:30px;min-width:30px}
+    .cmp-table .col-base,.cmp-table .col-dist{width:auto;min-width:130px}
+    .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
+
+    /* ====== 系列总览 ====== */
+    #pageOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
+    .series-sidebar{
+        width:100% !important;
+        max-width:100% !important;
+        min-width:0 !important;
+        flex-shrink:0 !important;
+        border-radius:0;
+        padding:6px 12px !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        -webkit-overflow-scrolling:touch;
+        position:sticky !important;
+        top:52px !important;
+        z-index:10;
+        background:#f0f2f5;
+        margin-bottom:4px;
+        max-height:none !important;
+        border-bottom:1px solid #e2e8f0;
+    }
+    .series-list{
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        gap:5px !important;
+        padding:4px 0 !important;
+        width:100%;
+    }
+    .series-item{
+        display:inline-block !important;
+        width:auto !important;
+        padding:4px 12px !important;
+        font-size:11px !important;
+        border-left:none !important;
+        border-bottom:2px solid transparent !important;
+        border-radius:14px !important;
+        white-space:nowrap !important;
+        flex-shrink:0;
+        background:#f8fafc;
+        color:#64748b;
+        cursor:pointer;
+        transition:all 0.2s;
+        border:1px solid #e2e8f0;
+        text-align:center;
+    }
+    .series-item.active{
+        border-left:none !important;
+        border-bottom:2px solid transparent !important;
+        border-color:#f97316 !important;
+        background:#fff7ed !important;
+        color:#f97316 !important;
+        font-weight:600;
+    }
+    .series-item:hover{background:#f1f5f9}
+    .overview-content{
+        overflow:visible;
+        flex:1 1 0% !important;
+        min-height:0 !important;
+        height:auto !important;
+        padding:0 10px !important;
+    }
+    .overview-title{font-size:12px}
+    .overview-count{font-size:10px}
+    .overview-table-wrap{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        width:100% !important;
+        padding:0 0 60px 0 !important;         /* 底部留白 */
+        -webkit-overflow-scrolling:touch;
+    }
+    .overview-table-wrap .data-table{
+        font-size:11px;
+        min-width:600px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .overview-table-wrap .data-table td{padding:4px 6px}
+    .overview-table-wrap .data-table .img-thumb{width:32px;height:32px}
+
+    /* ====== 配单明细 ====== */
+    .content-header{padding:8px 10px}
+    .content-title{font-size:13px}
+    .content-toolbar{flex-wrap:wrap;gap:8px}
+    .legend{font-size:11px;gap:10px}
+    .stats{gap:12px}
+    .stat-value{font-size:16px}
+
+    #tableArea{
+        flex:1 1 0% !important;
+        min-height:200px !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-x:auto !important;
+        overflow-y:visible !important;
+        display:block !important;
+        padding:0 4px 60px 4px !important;     /* 底部留白 */
+        -webkit-overflow-scrolling:touch;
+    }
+    .data-table{
+        font-size:11px;
+        min-width:700px;
+        width:100%;
+        table-layout:auto;
+        display:table !important;
+    }
+    .data-table th,.data-table td{padding:5px 6px}
+
+    /* ====== 面板/表单 ====== */
+    .panel{padding:12px}
+    .panel-title{font-size:13px;margin-bottom:8px}
+    .step-section{margin-bottom:5px}
+    .step-label{font-size:12px;margin-bottom:2px}
+    .step-select{font-size:15px;padding:10px 8px}
+    .accessory-title{font-size:13px;margin-top:8px;margin-bottom:6px}
+    .accessory-category{padding:8px 10px}
+    .accessory-category-name{font-size:12px}
+    .quick-search-input{font-size:14px;padding:10px 10px 10px 32px}
+
+    /* ====== 弹窗 ====== */
+    .modal{width:96vw;max-width:none;max-height:92vh;border-radius:8px}
+    .modal-body{padding:10px;max-height:calc(92vh - 100px);-webkit-overflow-scrolling:touch;overflow-x:auto}
+    .accessory-table{min-width:700px;width:100%;display:table}
+    .accessory-table .col-series{min-width:80px}
+    .accessory-table .col-img{min-width:55px}
+    .accessory-table .col-name{min-width:140px}
+    .accessory-table .col-desc{min-width:180px;white-space:normal;word-break:break-all}
+    .accessory-table .col-code{min-width:100px}
+
+    /* ====== 图片预览 ====== */
+    .img-preview-box{padding:6px;max-width:98vw;max-height:95vh;border-radius:6px}
+    .img-preview-box img{max-width:95vw;max-height:88vh}
+    .img-preview-close{width:36px;height:36px;font-size:18px;top:6px;right:6px}
+
+    /* ====== 公告 ====== */
+    .announce-box{width:95vw}
+
+    /* ====== 版本条（移动端优化：半透明毛玻璃 + 底部固定） ====== */
+    .version-bar{
+        display:block !important;
+        position:fixed;
+        bottom:8px;
+        left:50%;
+        transform:translateX(-50%);
+        padding:5px 14px;
+        font-size:10px;
+        white-space:nowrap;
+        background:rgba(30,41,59,0.92);
+        backdrop-filter:blur(8px);
+        -webkit-backdrop-filter:blur(8px);
+        border:1px solid #f97316;
+        border-radius:20px;
+        color:white;
+        z-index:99;
+        box-shadow:0 4px 16px rgba(0,0,0,0.25);
+        max-width:95vw;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+    .version-bar a{
+        color:#f97316 !important;
+        text-decoration:none;
+    }
+}
+
+        /* 对照表 */
+        .cmp-sidebar{width:200px;flex-shrink:0;position: sticky;top: 52px;align-self: flex-start;max-height: calc(100vh - 52px);overflow-y: auto;}
+        .cmp-search-wrap{margin-bottom:10px}
+        .cmp-search-input{width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;box-sizing:border-box}
+        .cmp-search-input:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
+        .cmp-filter-title{font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+        .cmp-filter-list{display:flex;flex-direction:column;gap:3px;max-height:calc(100vh - 280px);overflow-y:auto}
+        .cmp-filter-all{padding:2px 10px;border:1px solid #e2e8f0;border-radius:10px;font-size:10px;color:#64748b;background:white;cursor:pointer;transition:all .2s;margin-left:auto}
+        .cmp-filter-all:hover{border-color:#f97316;color:#f97316}
+        .cmp-filter-all.active{border-color:#f97316;background:#fff7ed;color:#f97316;font-weight:600}
+        .cmp-filter-btn{display:block;width:100%;padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;color:#333;background:white;cursor:pointer;transition:all .2s;text-align:left}
+        .cmp-filter-btn:hover{border-color:#f97316;background:#fffbeb}
+        .cmp-filter-btn.active{border-color:#f97316;background:#fff7ed;color:#f97316;font-weight:600}
+        .cmp-content{flex:1;min-width:0;display:flex;flex-direction:column;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:visible;height:auto;padding-bottom:80px;}
+        .cmp-content-header{padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .cmp-stats{font-size:10px;color:#94a3b8}
+        .cmp-body{flex:1;overflow:visible;padding:0;height: auto;}
+        .cmp-table{width:100%;border-collapse:collapse;table-layout:fixed}
+        .cmp-table th{background:#f8fafc;padding:6px 12px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .cmp-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;font-size:10px;font-weight:500;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .cmp-table tr:hover{background:#f8fafc}
+        .cmp-table .col-num{width:36px;text-align:center;color:#94a3b8;font-size:10px}
+        .cmp-table .col-base{width:28%}
+        .cmp-table .col-basecode{width:18%}
+        .cmp-table .col-dist{width:28%}
+        .cmp-table .col-distcode{width:18%}
+        .cmp-table .col-model{font-size:10px;font-weight:400}
+        .cmp-table .col-code{font-size:10px;font-weight:400;color:#3b82f6}
+        .cmp-table .cmp-empty{text-align:center;color:#94a3b8;padding:30px}
+        .cmp-empty{text-align:center;padding:60px 20px;color:#94a3b8;font-size:14px}
+            /* ====== 新增：公告浮动按钮 ====== */
+        .announce-float-btn {
+            position: fixed;
+            bottom: 70px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            border: 2px solid #f97316;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .announce-float-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.35);
+        }
+        .announce-float-btn:active {
+            transform: scale(0.94);
+        }
+        .announce-float-btn .announce-dot {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid #1e293b;
+            display: none;
+            animation: pulse-dot 1.8s ease-in-out infinite;
+        }
+        .announce-float-btn .announce-dot.active {
+            display: block;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        /* ====== 联系我们浮动按钮 ====== */
+        .contact-float-btn {
+            position: fixed;
+            bottom: 116px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            border: 2px solid #f97316;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .contact-float-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.35);
+        }
+        .contact-float-btn:active {
+            transform: scale(0.94);
+        }
+        .contact-float-btn .contact-icon {
+            font-size: 20px;
+            line-height: 1;
+        }
+        /* ====== 联系我们弹窗 ====== */
+        .contact-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-overlay.active {
+            display: flex;
+        }
+        .contact-box {
+            background: white;
+            border-radius: 12px;
+            width: 520px;
+            max-width: 95vw;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: contactFadeIn 0.3s ease;
+        }
+        @keyframes contactFadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .contact-header {
+            padding: 14px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .contact-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .contact-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-close:hover {
+            background: #e2e8f0;
+        }
+        .contact-body {
+            padding: 40px 36px;
+        }
+        .contact-qr-list {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .contact-qr-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-qr-img-wrap {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .contact-qr-img-wrap:hover {
+            border-color: #f97316;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+            transform: scale(1.02);
+        }
+        .contact-qr-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .contact-qr-info {
+            text-align: center;
+        }
+        .contact-qr-platform {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        .contact-qr-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.4;
+        }
+        .contact-footer {
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid #f1f5f9;
+        }
+        .contact-footer-text {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        /* ====== 系列总览 ====== */
+        #pageOverview {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+            max-height: auto;
+        }
+        .series-sidebar {
+            width: 180px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            position: sticky;
+            top: 52px;
+            align-self: flex-start;
+            max-height: calc(100vh - 52px);
+        }
+        .series-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .series-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #64748b;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .series-item:hover {
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        .series-item.active {
+            background: #fff7ed;
+            border-left-color: #f97316;
+            color: #f97316;
+            font-weight: 600;
+        }
+        .row-accessory td {
+            background: #eff6ff;
+        }
+        .row-accessory:hover td {
+            background: #dbeafe;
+        }
+        .overview-content {
+            flex: 1;
+            padding: 0 0 60px 0;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: visible;
+        }
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .overview-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .overview-count {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        .overview-table-wrap {
+            flex: 1;
+            overflow: visible;
+        }
+        .overview-table-wrap .data-table {
+            font-size: 10px;
+        }
+        .overview-table-wrap .data-table th {
+            background: #f8fafc;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .overview-table-wrap .data-table td {
+            padding: 4px 8px;
+            vertical-align: middle;
+        }
+        .overview-table-wrap .data-table .img-thumb-cell {
+            width: 60px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .overview-table-wrap .data-table .img-thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        /* ====== 返回顶部按钮 ====== */
+        .back-to-top {
+            position: fixed;
+            bottom: 120px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1e293b;
+            color: white;
+            border: 2px solid #f97316;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: none;          /* 默认隐藏，滚动后显示 */
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 999;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .back-to-top.show {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+        .back-to-top:hover {
+            transform: scale(1.10);
+            box-shadow: 0 6px 24px rgba(249, 115, 22, 0.35);
+        }
+        .back-to-top:active {
+            transform: scale(0.92);
+        }
+        /* ====== 联系我们按钮 ====== */
+        .contact-float-btn {
+            bottom: 120px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+        }
+        /* ====== 联系我们弹窗 ====== */
+        .contact-box {
+            width: 520px;
+        }
+        .contact-body {
+            padding: 40px 36px;
+        }
+        .contact-qr-list {
+            gap: 12px;
+        }
+        .contact-qr-img-wrap {
+            width: 100px;
+            height: 100px;
+        }
+        .contact-qr-item {
+            gap: 8px;
+        }
+        .contact-qr-platform {
+            font-size: 12px;
+        }
+        .contact-qr-name {
+            font-size: 13px;
+        }
+        /* ====== 移动端覆盖 ====== */
+        @media(max-width:768px) {
+            .back-to-top {
+                bottom: 170px;
+            }
+            .contact-box {
+                width: 360px;
+            }
+            .contact-body {
+                padding: 28px 28px;
+            }
+            .contact-qr-list {
+                gap: 8px;
+            }
+            .contact-qr-img-wrap {
+                width: 96px;
+                height: 96px;
+            }
+            .contact-qr-item {
+                gap: 6px;
+            }
+            .contact-qr-platform {
+                font-size: 11px;
+            }
+            .contact-qr-name {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
+            </div>
+        </div>
+    </div>
+    <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
+    <script id="announceConfig" type="application/json">
+    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享","date":"2026-08-28"}
+    </script>
+    <!-- ====== /公告配置 ====== -->
+        <div class="container">
+        <div class="nav-sidebar">
+            <div class="nav-item active" onclick="switchPage('bom', event)"><span class="nav-icon">📋</span>配单表</div>
+            <div class="nav-item" onclick="switchPage('cmp', event)"><span class="nav-icon">📊</span>对照表</div>
+            <div class="nav-item" onclick="switchPage('overview', event)"><span class="nav-icon">📦</span>系列表</div>
+        </div>
+        <div id="pageBom">
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="panel-title" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div class="panel-title-icon">📋</div>配单配置</div><button class="btn-reset" onclick="clearAll()" style="font-size:10px;padding:3px 8px">清除</button></div>
+                    <div class="quick-search">
+                        <div class="quick-search-wrap">
+                            <span class="quick-search-icon">🔍</span>
+                            <input type="text" id="quickSearchInput" class="quick-search-input" placeholder="输入型号名称或物料代码..." oninput="onQuickSearch()">
+                        </div>
+                        <div id="quickSearchResults" class="quick-search-results"></div>
+                    </div>
+                    <div class="step-section">
+                        <div class="step-label"><span class="step-number">1</span>产品大类</div>
+                        <select id="categorySelect" class="step-select" onchange="onCategoryChange()"><option value="">请选择产品大类</option></select>
+                    </div>
+                    <div class="step-section">
+                        <div class="step-label"><span class="step-number">2</span>产品系列</div>
+                        <select id="seriesSelect" class="step-select" onchange="onSeriesChange()" disabled><option value="">请先选择产品大类</option></select>
+                    </div>
+                    <div class="step-section">
+                        <div class="step-label"><span class="step-number">3</span>具体型号</div>
+                        <select id="modelSelect" class="step-select" onchange="onModelChange()" disabled><option value="">请先选择产品系列</option></select>
+                    </div>
+                    <div class="accessory-title">选装配件</div>
+                    <div id="accessoryCategories"></div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="content-panel">
+                    <div class="content-header">
+                        <div class="content-title"><div class="content-title-icon">📊</div>配单明细</div>
+                        <div class="content-toolbar">
+                            <div class="legend">
+                                <div class="legend-item"><div class="legend-dot host"></div>主机</div>
+                                <div class="legend-item"><div class="legend-dot standard"></div>标配</div>
+                                <div class="legend-item"><div class="legend-dot optional"></div>选配</div>
+                            </div>
+                            <div class="toolbar-right">
+                                <div class="stats">
+                                    <div class="stat-item"><div class="stat-value" id="statTotal">0</div><div class="stat-label">总计</div></div>
+                                    <div class="stat-item"><div class="stat-value" id="statHost">0</div><div class="stat-label">主机</div></div>
+                                    <div class="stat-item"><div class="stat-value orange" id="statAccessory">0</div><div class="stat-label">配件</div></div>
+                                </div>
+                                <button class="btn-reset" onclick="resetConfig()">重置</button>
+                                <button class="btn-export" onclick="exportCSV()">📥 导出CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tableArea"><div class="empty-state"><div class="empty-state-icon">📦</div><h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div></div>
+                </div>
+            </div>
+        </div>
+        <div id="pageCmp" style="display:none">
+            <div class="cmp-sidebar">
+                <div class="panel">
+                    <div class="panel-title"><div class="panel-title-icon">🔍</div>搜索筛选</div>
+                    <div class="cmp-search-wrap">
+                        <input type="text" id="cmpSearchInput" class="cmp-search-input" placeholder="输入基线型号、经销型号或代码..." oninput="cmpSearch()">
+                    </div>
+                    <div class="cmp-filter-title">系列筛选 <button class="cmp-filter-all active" id="cmpFilterAll" onclick="filterCmpAll(this)">全部</button></div>
+                    <div id="cmpSeriesFilter" class="cmp-filter-list"></div>
+                </div>
+            </div>
+            <div class="cmp-content">
+                <div class="cmp-content-header">
+                    <div class="content-title"><div class="content-title-icon">📊</div>经销基线对照表</div>
+                    <div class="content-toolbar">
+                        <div class="toolbar-right">
+                            <span id="cmpStats" class="cmp-stats">共 0 条</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="cmpTableArea" class="cmp-body"></div>
+            </div>
+        </div>
+        <!-- ====== 系列总览 ====== -->
+        <div id="pageOverview" style="display:none; flex:1; min-width:0;">
+            <div class="series-sidebar" id="seriesSidebar">
+                <div class="panel">
+                    <div class="panel-title"><div class="panel-title-icon">📦</div>产品系列</div>
+                    <div id="seriesList" class="series-list"></div>
+                </div>
+            </div>
+            <div class="overview-content">
+                <div class="overview-header">
+                    <span class="overview-title" id="overviewTitle">请选择系列</span>
+                    <span class="overview-count" id="overviewCount">共 0 项</span>
+                </div>
+                <div id="overviewTableWrap" class="overview-table-wrap">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <h3>请选择左侧系列</h3>
+                        <p>点击系列名称查看该系列全部物料</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ====== /系列总览 ====== -->
+    </div>
+
+    <div class="version-bar">有任何建议和问题请及时联系蔡修钢 · 网址：<a href="https://cai0707-kiki.github.io/ID-BOM/" target="_blank" style="color:#f97316;text-decoration:none">https://cai0707-kiki.github.io/ID-BOM/</a></div>
+    <button id="backToTop" class="back-to-top" title="返回顶部">↑</button>
+    <!-- ====== 联系我们浮动按钮 ====== -->
+    <div id="contactFloatBtn" class="contact-float-btn" onclick="showContactModal()" title="联系我们">
+        <span class="contact-icon">💬</span>
+    </div>
+    <!-- ====== 联系我们弹窗 ====== -->
+    <div id="contactOverlay" class="contact-overlay" onclick="closeContactModal()">
+        <div class="contact-box" onclick="event.stopPropagation()">
+            <div class="contact-header">
+                <span class="contact-title">📱 关注我们</span>
+                <button class="contact-close" onclick="closeContactModal()">&#x2715;</button>
+            </div>
+            <div class="contact-body">
+                <div class="contact-qr-list">
+                    <div class="contact-qr-item">
+                        <div class="contact-qr-img-wrap" onclick="openQrPreview('IMG/PIC/mvlab.png', 'Mvlab')">
+                            <img src="IMG/PIC/mvlab.png" alt="Mvlab" loading="lazy">
+                        </div>
+                        <div class="contact-qr-info">
+                            <div class="contact-qr-platform">微信视频号</div>
+                            <div class="contact-qr-name">Mvlab</div>
+                        </div>
+                    </div>
+                    <div class="contact-qr-item">
+                        <div class="contact-qr-img-wrap" onclick="openQrPreview('IMG/PIC/wmv.png', '案例馆')">
+                            <img src="IMG/PIC/wmv.png" alt="案例馆" loading="lazy">
+                        </div>
+                        <div class="contact-qr-info">
+                            <div class="contact-qr-platform">微信视频号</div>
+                            <div class="contact-qr-name">案例馆</div>
+                        </div>
+                    </div>
+                    <div class="contact-qr-item">
+                        <div class="contact-qr-img-wrap" onclick="openQrPreview('IMG/PIC/dmv.png', '案例馆')">
+                            <img src="IMG/PIC/dmv.png" alt="案例馆" loading="lazy">
+                        </div>
+                        <div class="contact-qr-info">
+                            <div class="contact-qr-platform">抖音视频号</div>
+                            <div class="contact-qr-name">案例馆</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-footer">
+                <span class="contact-footer-text">扫码关注，获取更多产品资讯与案例分享</span>
+            </div>
+        </div>
+    </div>
+    <!-- ====== 新增：公告浮动按钮 ====== -->
+    <div id="announceFloatBtn" class="announce-float-btn" onclick="forceShowAnnounce()" title="查看公告">
+        <span>🔔</span>
+        <span class="announce-dot" id="announceDot"></span>
+    </div>
+    <div id="accessoryModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">选择配件</span>
+                <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cableFilterArea"></div>
+                <table class="accessory-table">
+                    <thead><tr><th style="width:40px">选择</th><th class="col-series">产品系列</th><th class="col-img">图片</th><th class="col-name">物料名称</th><th class="col-desc">描述</th><th class="col-code">物料代码</th></tr></thead>
+                    <tbody id="modalTableBody"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-confirm" onclick="confirmAccessories()">确定</button>
+            </div>
+        </div>
+    </div>
+    <div id="imgPreviewOverlay" class="img-preview-overlay" onclick="closeImg()">
+        <div class="img-preview-box" onclick="event.stopPropagation()">
+            <button class="img-preview-close" onclick="closeImg()">✕</button>
+            <img id="previewImg" src="" alt="">
+            <div id="previewName" class="img-preview-name"></div>
+        </div>
+    </div>
+
+    <script src="scripts/spec-mapping.js"></script>
+    <script>
+    // fallback: spec-mapping.js 加载失败时提供空实现
+    if (typeof window.getSpecUrl !== 'function') {
+      window.getSpecUrl = function() { return ''; };
+    }
+    </script>
+    <script src="scripts/camera_data.js"></script>
+    <script src="scripts/accessory_data.js"></script>
+    <script src="scripts/mapping_data.js"></script>
+    <script>
+    /* ==================== 配置常量 ==================== */
+
+    var accessoryColumns = {
+        '电源':     { name: '电源',     icon: '⚡', col: 7,  flagCol: 8,  accCol: 7, accFlagCol: 8 },
+        '安装板':   { name: '安装板',   icon: '🔧', col: 9,  flagCol: 10, accCol: 7, accFlagCol: 8 },
+        '一体线':   { name: '一体线',   icon: '🔌', col: 11, flagCol: 12, accCol: 7, accFlagCol: 8 },
+        'IO线':     { name: 'IO电源线', icon: '🔗', col: 13, flagCol: 14, accCol: 7, accFlagCol: 8 },
+        '网线':     { name: '网线',     icon: '🌐', col: 15, flagCol: 16, accCol: 7, accFlagCol: 8 },
+        '灯板':     { name: '灯板',     icon: '💡', col: 17, flagCol: 18, accCol: 7, accFlagCol: 8 },
+        '镜头罩':   { name: '镜头罩',   icon: '📷', col: 19, flagCol: 20, accCol: 7, accFlagCol: 8 },
+        'FA镜头':   { name: 'FA镜头',   icon: '🔭', col: 21, flagCol: 22, accCol: 7, accFlagCol: 8 },
+        '扩展配件': { name: '扩展配件', icon: '📦', col: 23, flagCol: 24, accCol: 7, accFlagCol: 8 }
+    };
+
+    var cableCategories = {
+        '一体线': { materials: ['普通', '高柔', '超柔'] },
+        'IO线':   { materials: ['普通', '高柔', '超柔'] },
+        '网线':   { materials: ['普通', '高柔', '超柔', '弯头'] }
+    };
+
+    /* ==================== 全局状态 ==================== */
+
+    var allRows = [];
+    var currentMatch = null;
+    var selectedAccessories = [];
+    var currentAccessoryKey = '';
+    var currentAccessoryItems = [];
+    var tempSelectedItems = [];
+    var standardCache = {};
+    var cableFilterState = { length: 'all', material: 'all' };
+
+    /* ==================== 工具函数 ==================== */
+
+    function isAccessory(r) {
+        return r && r[0] && r[0].trim() === '配件';
+    }
+
+    function getAccCol(r, cfg) {
+        return isAccessory(r) ? cfg.accCol : cfg.col;
+    }
+
+    function getAccFlagCol(r, cfg) {
+        return isAccessory(r) ? cfg.accFlagCol : cfg.flagCol;
+    }
+
+    /* ==================== 数据加载 ==================== */
+
+    function loadData() {
+        try {
+            // 合并相机数据和配件数据（来自 camera_data.js 和 accessory_data.js）
+            var raw = [];
+            if (typeof IDBOM_CAMERA_DATA !== 'undefined' && Array.isArray(IDBOM_CAMERA_DATA)) {
+                raw = raw.concat(IDBOM_CAMERA_DATA);
+            }
+            if (typeof IDBOM_ACCESSORY_DATA !== 'undefined' && Array.isArray(IDBOM_ACCESSORY_DATA)) {
+                raw = raw.concat(IDBOM_ACCESSORY_DATA);
+            }
+            if (raw.length > 0 && raw[0]._version) raw = raw.slice(1);
+            var embedded = raw.map(function(i) {
+                var r = i.value || i;
+                return r.map(function(c) {
+                    return typeof c === 'string' ? c.replace(/\\r$/g, '').replace(/\r/g, '') : c;
+                });
+            });
+            if (embedded.length > 0) {
+                allRows = embedded;
+                init();
+                setTimeout(setupImageLazyLoad, 100);
+            }
+        } catch (e) {
+            console.error('Parse error:', e);
+        }
+    }
+
+    /* ==================== 图片懒加载（IntersectionObserver） ==================== */
+
+    function setupImageLazyLoad() {
+        if (!('IntersectionObserver' in window)) return;
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    var img = entry.target;
+                    var fullSrc = img.getAttribute('data-full');
+                    if (fullSrc && !img.dataset.loaded) {
+                        var preloader = new Image();
+                        preloader.src = fullSrc;
+                        img.dataset.loaded = '1';
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, { rootMargin: '200px' });
+
+        document.querySelectorAll('img[data-full]').forEach(function(img) {
+            observer.observe(img);
+        });
+    }
+
+    /* ==================== 级联选择器初始化 ==================== */
+
+    function init() {
+        var seen = {};
+        var catList = [];
+        allRows.forEach(function(r) {
+            if (r.length > 1 && r[1] && r[0] && r[0].trim() === '相机') {
+                var c = r[1].trim();
+                if (!seen[c]) { seen[c] = true; catList.push(c); }
+            }
+        });
+        var sel = document.getElementById('categorySelect');
+        catList.forEach(function(c) {
+            var o = document.createElement('option');
+            o.value = c;
+            o.textContent = c;
+            sel.appendChild(o);
+        });
+    }
+
+    function onCategoryChange() {
+        var cat = document.getElementById('categorySelect').value;
+        var ss = document.getElementById('seriesSelect');
+        var ms = document.getElementById('modelSelect');
+        ss.innerHTML = '<option value="">请选择产品系列</option>';
+        ss.disabled = true;
+        ms.innerHTML = '<option value="">请先选择产品大类</option>';
+        ms.disabled = true;
+        updateSelectStyle(ss); updateSelectStyle(ms); updateSelectStyle(document.getElementById('categorySelect'));
+        clearAccessoryPanel(); clearTable();
+        if (!cat) return;
+        var seen = {};
+        var seriesList = [];
+        allRows.forEach(function(r) {
+            if (r.length > 2 && r[1] && r[1].trim() === cat && r[2] && r[0] && r[0].trim() === '相机') {
+                var s = r[2].trim();
+                if (!seen[s]) { seen[s] = true; seriesList.push(s); }
+            }
+        });
+        seriesList.forEach(function(v) {
+            var o = document.createElement('option');
+            o.value = v;
+            o.textContent = v;
+            ss.appendChild(o);
+        });
+        ss.disabled = false;
+    }
+
+    function onSeriesChange() {
+        var cat = document.getElementById('categorySelect').value;
+        var series = document.getElementById('seriesSelect').value;
+        var ms = document.getElementById('modelSelect');
+        ms.innerHTML = '<option value="">请选择具体型号</option>';
+        ms.disabled = true;
+        updateSelectStyle(ms); updateSelectStyle(document.getElementById('seriesSelect'));
+        clearAccessoryPanel(); clearTable();
+        if (!series) return;
+        var seen = {};
+        var modelList = [];
+        allRows.forEach(function(r) {
+            if (r.length > 4 && r[1] && r[1].trim() === cat && r[2] && r[2].trim() === series
+                && r[3] && r[4] && r[0] && r[0].trim() === '相机') {
+                var m = r[3].trim();
+                if (!seen[m]) { seen[m] = true; modelList.push(m); }
+            }
+        });
+        modelList.forEach(function(mdl) {
+            var o = document.createElement('option');
+            o.value = mdl;
+            o.textContent = mdl;
+            ms.appendChild(o);
+        });
+        ms.disabled = false;
+    }
+
+    function onModelChange() {
+        var cat = document.getElementById('categorySelect').value;
+        var series = document.getElementById('seriesSelect').value;
+        var mdl = document.getElementById('modelSelect').value;
+        updateSelectStyle(document.getElementById('modelSelect'));
+        clearAccessoryPanel(); clearTable();
+        if (!mdl) return;
+        for (var i = 0; i < allRows.length; i++) {
+            var r = allRows[i];
+            if (r.length > 4 && r[1] && r[1].trim() === cat && r[2] && r[2].trim() === series
+                && r[3] && r[3].trim() === mdl) {
+                currentMatch = r;
+                break;
+            }
+        }
+        if (currentMatch) { renderAccessoryCategories(); generateStandardAccessories(); }
+    }
+
+    function updateSelectStyle(s) {
+        if (s.value) s.classList.add('has-value');
+        else s.classList.remove('has-value');
+    }
+
+    /* ==================== 渲染配件分类按钮 ==================== */
+
+    function renderAccessoryCategories() {
+        var c = document.getElementById('accessoryCategories');
+        var h = '';
+        var keys = Object.keys(accessoryColumns);
+
+        for (var i = 0; i < keys.length; i++) {
+            var cfg = accessoryColumns[keys[i]];
+            var val = currentMatch[cfg.col] || '';
+            if (!val) continue;
+
+            // 解析标签和标志
+            var refTags = val.split(';').map(function(s) {
+                return s.trim().toLowerCase();
+            }).filter(function(s) { return s.length > 0; });
+
+            // 统计匹配到的配件总数和其中标配数
+            var matchCount = 0;
+            var stdCount = 0;
+            allRows.forEach(function(r) {
+                var accCol = getAccCol(r, cfg);
+                if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
+                    var accFlagCol = getAccFlagCol(r, cfg);
+                    var accTag = (r[accCol] || '').toLowerCase();
+                    var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
+                    var accParts = accTag.split(';').map(function(s) { return s.trim(); });
+                    for (var k = 0; k < refTags.length; k++) {
+                        for (var p = 0; p < accParts.length; p++) {
+                            if (accParts[p] === refTags[k]) {
+                                matchCount++;
+                                if (accFlag === '1') stdCount++;
+                                return;
+                            }
+                        }
+                    }
+                }
+            });
+
+            if (matchCount === 0) continue;
+            if (matchCount === stdCount) continue;
+
+            var cnt = selectedAccessories.filter(function(a) { return a.key === keys[i]; }).length;
+            var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
+            h += '<div class="accessory-category" onclick="openAccessoryModal(\'' + keys[i] + '\')">'
+               +   '<div class="accessory-category-left">'
+               +     '<div class="accessory-icon">' + cfg.icon + '</div>'
+               +     '<div>'
+               +       '<div class="accessory-category-name">' + cfg.name + '</div>'
+               +       '<div class="accessory-category-count">' + txt + '</div>'
+               +     '</div>'
+               +   '</div>'
+               +   '<div class="accessory-arrow">›</div>'
+               + '</div>';
+        }
+        c.innerHTML = h || '<div style="text-align:center;color:#94a3b8;font-size:11px;padding:12px;">暂无配件</div>';
+    }
+
+    /* ==================== 弹窗尺寸自适应 ==================== */
+
+    function resizeModalBody() {
+        var modal = document.querySelector('#accessoryModal .modal');
+        var body = document.querySelector('#accessoryModal .modal-body');
+        var header = document.querySelector('#accessoryModal .modal-header');
+        var footer = document.querySelector('#accessoryModal .modal-footer');
+        if (!modal || !body || !header || !footer) return;
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        var maxH = Math.floor(vh * 0.8);
+        var headerH = header.offsetHeight || 60;
+        var footerH = footer.offsetHeight || 50;
+        var pad = 28;
+        body.style.maxHeight = (maxH - headerH - footerH - pad) + 'px';
+    }
+
+    window.addEventListener('resize', resizeModalBody);
+
+    /* ==================== 打开配件选择弹窗 ==================== */
+
+    function openAccessoryModal(key) {
+        currentAccessoryKey = key;
+        var cfg = accessoryColumns[key];
+        var catName = cfg.name;
+        var refVal = currentMatch[cfg.col] || '';
+
+        var refTags = refVal.split(';').map(function(s) {
+            return s.trim().toLowerCase();
+        }).filter(function(s) { return s.length > 0; });
+
+        var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+            return s.trim();
+        });
+
+        var camStdTags = {};
+        refTags.forEach(function(t, i) {
+            if (refFlags[i] === '1') camStdTags[t] = true;
+        });
+
+        currentAccessoryItems = [];
+        var _tmpItems = [];
+
+        allRows.forEach(function(r) {
+            var accCol = getAccCol(r, cfg);
+            if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[1] && r[1].trim() === cfg.name) {
+                var accFlagCol = getAccFlagCol(r, cfg);
+                var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
+                var accTag = (r[accCol] || '').toLowerCase();
+                var accParts = accTag.split(';').map(function(s) { return s.trim(); });
+                var matchTag = '';
+
+                for (var i = 0; i < refTags.length; i++) {
+                    for (var j = 0; j < accParts.length; j++) {
+                        if (accParts[j] === refTags[i]) { matchTag = refTags[i]; break; }
+                    }
+                    if (matchTag) break;
+                }
+
+                if (matchTag || refTags.length === 0) {
+                    var series = currentMatch[1] || '';
+                    if (key === '一体线' && series.indexOf('ID2000XM') >= 0 && (r[4] || '') === '101515363') return;
+                    var bothStd = camStdTags[matchTag] && accFlag === '1';
+                    _tmpItems.push({
+                        series: r[2] || '',
+                        name: r[3] || '',
+                        desc: r[5] || '',
+                        code: r[4] || '',
+                        remark: r[6] || '',
+                        img: r[9] || '',
+                        isStd: bothStd
+                    });
+                }
+            }
+        });
+
+        var hasOptional = _tmpItems.some(function(x) { return !x.isStd; });
+        _tmpItems.forEach(function(x) {
+            if (!hasOptional || !x.isStd) {
+                currentAccessoryItems.push({
+                    series: x.series, name: x.name, desc: x.desc,
+                    code: x.code, remark: x.remark, img: x.img
+                });
+            }
+        });
+
+        document.getElementById('modalTitle').textContent = catName + ' - 选择配件';
+        tempSelectedItems = selectedAccessories.filter(function(a) {
+            return a.key === key;
+        }).map(function(a) { return a.code; });
+
+        if (cableCategories[key]) {
+            cableFilterState = { length: 'all', material: 'all' };
+            renderCableFilterArea();
+            renderCableFilteredItems();
+        } else {
+            document.getElementById('cableFilterArea').innerHTML = '';
+            renderCableFilteredItems();
+        }
+
+        resizeModalBody();
+        document.getElementById('accessoryModal').classList.add('active');
+    }
+
+    /* ==================== 关闭弹窗 ==================== */
+
+    function closeModal() {
+        document.getElementById('accessoryModal').classList.remove('active');
+        currentAccessoryKey = '';
+        currentAccessoryItems = [];
+        tempSelectedItems = [];
+        document.getElementById('cableFilterArea').innerHTML = '';
+    }
+
+    /* ==================== 线缆筛选 ==================== */
+
+    function extractCableLengths() {
+        var lengths = {};
+        currentAccessoryItems.forEach(function(item) {
+            var s = item.series || '';
+            var m = s.match(/^(\d+(?:\.\d+)?m)/);
+            if (m) lengths[m[1]] = true;
+        });
+        return Object.keys(lengths).sort(function(a, b) {
+            return parseFloat(a) - parseFloat(b);
+        });
+    }
+
+    function extractCableMaterials(key) {
+        var mats = {};
+        var kw = cableCategories[key].materials;
+        currentAccessoryItems.forEach(function(item) {
+            var s = item.series || '';
+            for (var i = 0; i < kw.length; i++) {
+                if (s.indexOf(kw[i]) >= 0) mats[kw[i]] = true;
+            }
+        });
+        return Object.keys(mats);
+    }
+
+    function renderCableFilterArea() {
+        var fa = document.getElementById('cableFilterArea');
+        var lengths = extractCableLengths();
+        var materials = extractCableMaterials(currentAccessoryKey);
+        var h = '<div class="cable-filter">';
+        h += '<div class="cable-warn"><em>⚠️ 7m线缆无法配置下单，须订单备注删除标配线缆，再额外下单！</em></div>';
+        h += '<div class="cable-filter-row"><span class="cable-filter-label">长度</span><div class="cable-filter-btns">';
+        h += '<button class="cable-filter-btn active" onclick="setCableFilter(\'length\',\'all\',this)">全部</button>';
+        lengths.forEach(function(l) {
+            h += '<button class="cable-filter-btn" onclick="setCableFilter(\'length\',\'' + l + '\',this)">' + l + '</button>';
+        });
+        h += '</div></div>';
+        if (materials.length > 0) {
+            h += '<div class="cable-filter-row"><span class="cable-filter-label">材质</span><div class="cable-filter-btns">';
+            h += '<button class="cable-filter-btn active" onclick="setCableFilter(\'material\',\'all\',this)">全部</button>';
+            materials.forEach(function(m) {
+                h += '<button class="cable-filter-btn" onclick="setCableFilter(\'material\',\'' + m + '\',this)">' + m + '</button>';
+            });
+            h += '</div></div>';
+        }
+        h += '</div>';
+        fa.innerHTML = h;
+    }
+
+    function setCableFilter(type, value, btn) {
+        cableFilterState[type] = value;
+        var row = btn.parentNode;
+        var btns = row.querySelectorAll('.cable-filter-btn');
+        btns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderCableFilteredItems();
+    }
+
+    function parseCableSeriesInfo(series) {
+        var s = series || '';
+        var len = 'other';
+        var mat = '';
+        var m = s.match(/^(\d+(?:\.\d+)?m)/);
+        if (m) len = m[1];
+        var kw = cableCategories[currentAccessoryKey].materials;
+        for (var i = 0; i < kw.length; i++) {
+            if (s.indexOf(kw[i]) >= 0) { mat = kw[i]; break; }
+        }
+        return { length: len, material: mat };
+    }
+
+    /* ==================== 渲染弹窗配件列表 ==================== */
+
+    function renderCableFilteredItems() {
+        var tb = document.getElementById('modalTableBody');
+        var filtered = [];
+        var isCable = !!cableCategories[currentAccessoryKey];
+
+        currentAccessoryItems.forEach(function(item) {
+            if (isCable) {
+                var info = parseCableSeriesInfo(item.series);
+                if (cableFilterState.length !== 'all' && info.length !== cableFilterState.length) return;
+                if (cableFilterState.material !== 'all' && info.material !== cableFilterState.material) return;
+            }
+            filtered.push(item);
+        });
+
+        if (filtered.length === 0) {
+            tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">无匹配的配件</td></tr>';
+        } else {
+            var h = '';
+            filtered.forEach(function(item) {
+                var origIdx = currentAccessoryItems.indexOf(item);
+                var chk = tempSelectedItems.indexOf(item.code) >= 0 ? 'checked' : '';
+
+                var imgCell = '';
+                imgCell = '<td class="col-img">' + getImageHtml(item.img, 'img-thumb', 42, 42) + '</td>';
+
+                h += '<tr class="' + (chk ? 'acc-selected' : '') + '" style="cursor:pointer" '
+                   + 'onclick="var cb=document.getElementById(\'acc_' + origIdx
+                   + '\');cb.checked=!cb.checked;toggleTempItem(' + origIdx + ')" '
+                   + 'ondblclick="event.preventDefault();event.stopPropagation();'
+                   + 'var cb=document.getElementById(\'acc_' + origIdx + '\');'
+                   + 'if(!cb.checked){cb.checked=true;toggleTempItem(' + origIdx + ');}confirmAccessories()">'
+                   + '<td><input type="checkbox" id="acc_' + origIdx + '" ' + chk
+                   + ' onclick="event.stopPropagation();toggleTempItem(' + origIdx + ')"></td>'
+                   + '<td class="col-series">' + item.series + '</td>'
+                   + imgCell
+                   + '<td class="col-name">' + item.name + '</td>'
+                   + '<td class="col-desc">' + item.desc + '</td>'
+                   + '<td class="col-code">' + item.code + '</td>'
+                   + '</tr>';
+            });
+            tb.innerHTML = h;
+        }
+    }
+
+    /* ==================== 配件选择/取消逻辑 ==================== */
+
+    function toggleTempItem(idx) {
+        var item = currentAccessoryItems[idx];
+        var cb = document.getElementById('acc_' + idx);
+        var tr = cb.parentNode.parentNode;
+        var key = currentAccessoryKey;
+
+        if (cb.checked) {
+            // 非扩展配件：单选互斥
+            if (key !== '扩展配件') {
+                tempSelectedItems = [];
+                currentAccessoryItems.forEach(function(_, i) {
+                    var c = document.getElementById('acc_' + i);
+                    if (c) {
+                        c.checked = false;
+                        c.parentNode.parentNode.classList.remove('acc-selected');
+                    }
+                });
+                cb.checked = true;
+            }
+            tr.classList.add('acc-selected');
+            if (tempSelectedItems.indexOf(item.code) < 0) tempSelectedItems.push(item.code);
+
+            // 电源自动配对逻辑
+            if (key === '电源') {
+                var ms = item.series;
+                if (ms === '电源适配器') {
+                    var b = currentAccessoryItems.find(function(x) { return x.series === '电源适配器线缆'; });
+                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
+                        tempSelectedItems.push(b.code);
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
+                    }
+                } else if (ms === '电源适配器线缆') {
+                    var b = currentAccessoryItems.find(function(x) { return x.series === '电源适配器'; });
+                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
+                        tempSelectedItems.push(b.code);
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
+                    }
+                } else if (ms.indexOf('开关电源') === 0 && ms.indexOf('线缆') < 0) {
+                    var b = currentAccessoryItems.find(function(x) { return x.series.indexOf('开关电源线缆') >= 0; });
+                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
+                        tempSelectedItems.push(b.code);
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
+                    }
+                } else if (ms.indexOf('开关电源线缆') >= 0) {
+                    var b = currentAccessoryItems.find(function(x) {
+                        return x.series.indexOf('开关电源') === 0 && x.series.indexOf('线缆') < 0;
+                    });
+                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
+                        tempSelectedItems.push(b.code);
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
+                    }
+                }
+            }
+        } else {
+            // 取消选择
+            tr.classList.remove('acc-selected');
+            tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== item.code; });
+
+            if (key === '电源') {
+                var ms = item.series;
+                if (ms === '电源适配器' || ms === '电源适配器线缆') {
+                    var bs = ms === '电源适配器' ? '电源适配器线缆' : '电源适配器';
+                    var b = currentAccessoryItems.find(function(x) { return x.series === bs; });
+                    if (b) {
+                        tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== b.code; });
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = false; bc.parentNode.parentNode.classList.remove('acc-selected'); }
+                    }
+                } else if (ms.indexOf('开关电源') === 0) {
+                    var bs = ms.indexOf('开关电源线缆') >= 0 ? '开关电源' : '开关电源线缆';
+                    var b = currentAccessoryItems.find(function(x) { return x.series.indexOf(bs) === 0; });
+                    if (b) {
+                        tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== b.code; });
+                        var bi = currentAccessoryItems.indexOf(b);
+                        var bc = document.getElementById('acc_' + bi);
+                        if (bc) { bc.checked = false; bc.parentNode.parentNode.classList.remove('acc-selected'); }
+                    }
+                }
+            }
+        }
+    }
+
+    /* ==================== 确认配件选择 ==================== */
+
+    function confirmAccessories() {
+        var key = currentAccessoryKey;
+        selectedAccessories = selectedAccessories.filter(function(a) {
+            return a.key !== key || (key === '扩展配件' && a.type === 'standard');
+        });
+        tempSelectedItems.forEach(function(code) {
+            var item = currentAccessoryItems.find(function(i) { return i.code === code; });
+            if (item) {
+                selectedAccessories.push({
+                    key: key, 
+                    subCategory: (key === '扩展配件') ? (item.series || '') : '',  // ← 新增
+                    name: item.name, 
+                    value: item.desc,
+                    code: item.code, 
+                    remark: item.remark, 
+                    img: item.img, 
+                    type: 'optional'
+                });
+            }
+        });
+        closeModal();
+        renderTable();
+        renderAccessoryCategories();
+    }
+
+    /* ==================== 生成标配配件 ==================== */
+
+    function generateStandardAccessories() {
+        if (!currentMatch) { alert('请先选择产品型号'); return; }
+        selectedAccessories = [];
+        standardCache = {};
+        var keys = Object.keys(accessoryColumns);
+
+        for (var i = 0; i < keys.length; i++) {
+            var cfg = accessoryColumns[keys[i]];
+            var val = currentMatch[cfg.col] || '';
+            if (!val) continue;
+
+            var refTags = val.split(';').map(function(s) {
+                return s.trim().toLowerCase();
+            }).filter(function(s) { return s.length > 0; });
+
+            var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+                return s.trim();
+            });
+
+            var camStdTags = {};
+            refTags.forEach(function(t, i) {
+                if (refFlags[i] === '1') camStdTags[t] = true;
+            });
+
+            if (Object.keys(camStdTags).length === 0) continue;
+
+            for (var j = 0; j < allRows.length; j++) {
+                var r = allRows[j];
+                var accCol = getAccCol(r, cfg);
+                if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
+                    var accFlagCol = getAccFlagCol(r, cfg);
+                    var accTag = (r[accCol] || '').toLowerCase();
+                    var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
+
+                    for (var k = 0; k < refTags.length; k++) {
+                        var accParts = accTag.split(';').map(function(s) { return s.trim(); });
+                        var exactMatch = false;
+                        for (var p = 0; p < accParts.length; p++) {
+                            if (accParts[p] === refTags[k]) { exactMatch = true; break; }
+                        }
+                        if (exactMatch && camStdTags[refTags[k]] && accFlag === '1') {
+                            var item = {
+                                key: keys[i], 
+                                subCategory: (keys[i] === '扩展配件') ? (r[2] || '') : '',  // ← 新增
+                                name: r[3] || cfg.name, 
+                                value: r[5] || val,
+                                code: r[4] || '', 
+                                remark: r[6] || '', 
+                                img: r[9] || '', 
+                                type: 'standard'
+                            };
+                            selectedAccessories.push(item);
+                            standardCache[keys[i]] = item;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        renderTable();
+    }
+
+    /* ==================== 渲染配单明细表 ==================== */
+
+    function renderTable() {
+    var tblHead = '<thead><tr>'
+        + '<th style="width:70px">类型</th>'
+        + '<th style="width:180px">物料名称</th>'
+        + '<th style="width:60px;text-align:center">图片</th>'
+        + '<th style="width:260px">描述</th>'
+        + '<th style="width:80px">物料代码</th>'
+        + '<th style="width:160px">备注</th>'
+        + '<th style="width:60px">操作</th>'
+        + '</tr></thead>';
+
+    // 无主机但有选配件的场景
+    if (!currentMatch && selectedAccessories.length > 0) {
+        document.getElementById('statTotal').textContent = selectedAccessories.length;
+        document.getElementById('statHost').textContent = 0;
+        document.getElementById('statAccessory').textContent = selectedAccessories.length;
+        var h = '<table class="data-table">' + tblHead + '<tbody>';
+        selectedAccessories.forEach(function(a) {
+            var imgCell2 = '<td class="img-thumb-cell">' + getImageHtml(a.img, 'img-thumb', 42, 42) + '</td>';
+            // ★★★ 无主机场景：扩展配件使用 subCategory ★★★
+            var typeLabel;
+            if (a.key === '扩展配件') {
+                typeLabel = a.subCategory || '扩展配件';
+            } else {
+                typeLabel = a.key || '选配';
+            }
+            h += '<tr>'
+               + '<td><span class="type-badge optional">' + typeLabel + '</span></td>'
+               + '<td class="material-name">' + a.name + '</td>'
+               + imgCell2
+               + '<td class="material-desc">' + a.desc + '</td>'
+               + '<td class="material-code">' + (a.code || '-') + '</td>'
+               + '<td>' + (a.remark || '') + '</td>'
+               + '<td><button class="btn-remove" onclick="removeItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
+               + '</tr>';
+        });
+        h += '</tbody></table><div class="table-footer"><span>共 ' + selectedAccessories.length + ' 行</span></div>';
+        document.getElementById('tableArea').innerHTML = h;
+        return;
+    }
+
+    if (!currentMatch) { clearTable(); return; }
+
+    var items = [];
+
+    // 主机行
+    items.push({
+        type: 'host', typeName: '主机',
+        name: currentMatch[3] || '-', desc: currentMatch[5] || '-',
+        code: currentMatch[4] || '-', remark: currentMatch[6] || '',
+        img: currentMatch[25] || ''
+    });
+
+    // 线缆标配判断
+    var cableKeys = { '一体线': true, 'IO线': true, '网线': true };
+    var cableIsStd = {};
+    Object.keys(cableKeys).forEach(function(k) {
+        var cfg = accessoryColumns[k];
+        if (cfg && cfg.flagCol) {
+            cableIsStd[k] = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+                return s.trim();
+            }).some(function(f) { return f === '1'; });
+        }
+    });
+
+    // 选配排序：选配在前
+    var sorted = selectedAccessories.slice().sort(function(a, b) {
+        if (a.type === 'optional' && b.type !== 'optional') return -1;
+        if (a.type !== 'optional' && b.type === 'optional') return 1;
+        return 0;
+    });
+
+    sorted.forEach(function(a) {
+        var remark = a.remark || '';
+        if (a.type === 'optional' && cableKeys[a.key] && !cableIsStd[a.key]) remark = '';
+        
+        // ★★★ 确定显示的类型名称 ★★★
+        var displayType;
+        if (a.key === '扩展配件') {
+            // 扩展配件：使用 subCategory（即配件行 row[2] 的值）
+            displayType = a.subCategory || '扩展配件';
+        } else {
+            // 其他配件：使用 key（如"电源"、"安装板"等）
+            displayType = a.key;
+        }
+        
+        items.push({
+            type: a.type,
+            typeName: a.type === 'standard' ? '标配' : '选配',
+            displayType: displayType,   // ← 新增：保存最终显示的类型名称
+            name: a.name,
+            desc: a.value,
+            code: a.code || '-',
+            remark: remark,
+            img: a.img || ''
+        });
+    });
+
+    document.getElementById('statTotal').textContent = items.length;
+    document.getElementById('statHost').textContent = 1;
+    document.getElementById('statAccessory').textContent = items.length - 1;
+
+    var h = '<table class="data-table">' + tblHead + '<tbody>';
+
+    items.forEach(function(item, idx) {
+        var actionBtn = '';
+        if (item.type === 'host') {
+            var specUrl = getSpecUrl(item.name);
+            actionBtn = specUrl
+                ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
+                : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
+        } else if (item.type === 'optional') {
+            actionBtn = '<button class="btn-remove" onclick="removeItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
+        }
+
+        var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42) + '</td>';
+
+        // ★★★ 核心修改：主机显示"主机"，配件显示 displayType（子类别名称）★★★
+        var typeLabel = (item.type === 'host') ? '主机' : (item.displayType || item.typeName);
+
+        h += '<tr>'
+           + '<td><span class="type-badge ' + item.type + '">' + typeLabel + '</span></td>'
+           + '<td class="material-name">' + item.name + '</td>'
+           + imgCell
+           + '<td class="material-desc">' + item.desc + '</td>'
+           + '<td class="material-code">' + item.code + '</td>'
+           + '<td>' + item.remark + '</td>'
+           + '<td>' + actionBtn + '</td>'
+           + '</tr>';
+    });
+
+    h += '</tbody></table><div class="table-footer"><span>共 ' + items.length + ' 行</span></div>';
+    document.getElementById('tableArea').innerHTML = h;
+}
+
+    /* ==================== 移除选配项 ==================== */
+
+    function removeItem(name) {
+        var idx = selectedAccessories.findIndex(function(a) { return a.name === name; });
+        if (idx === -1) return;
+        var removed = selectedAccessories[idx];
+        selectedAccessories.splice(idx, 1);
+
+        // 移除选配后恢复对应标配
+        if (removed && removed.type === 'optional' && standardCache[removed.key]) {
+            if (removed.key === '扩展配件') {
+                var alreadyHasStd = selectedAccessories.some(function(a) {
+                    return a.key === removed.key && a.type === 'standard';
+                });
+                if (!alreadyHasStd) {
+                    selectedAccessories.push(JSON.parse(JSON.stringify(standardCache[removed.key])));
+                }
+            } else {
+                selectedAccessories.push(JSON.parse(JSON.stringify(standardCache[removed.key])));
+            }
+        }
+        renderTable();
+        renderAccessoryCategories();
+    }
+
+    /* ==================== 清空/重置 ==================== */
+
+    function clearAccessoryPanel() {
+        document.getElementById('accessoryCategories').innerHTML = '';
+        selectedAccessories = [];
+        currentMatch = null;
+    }
+
+    function clearTable() {
+        document.getElementById('tableArea').innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">📦</div>'
+            + '<h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div>';
+        document.getElementById('statTotal').textContent = '0';
+        document.getElementById('statHost').textContent = '0';
+        document.getElementById('statAccessory').textContent = '0';
+    }
+
+    function resetConfig() {
+        if (currentMatch) { generateStandardAccessories(); renderAccessoryCategories(); }
+    }
+
+    function clearAll() {
+        selectedAccessories = [];
+        currentMatch = null;
+        standardCache = {};
+        document.getElementById('categorySelect').selectedIndex = 0;
+        document.getElementById('seriesSelect').innerHTML = '<option value="">请先选择产品大类</option>';
+        document.getElementById('seriesSelect').disabled = true;
+        document.getElementById('modelSelect').innerHTML = '<option value="">请先选择产品系列</option>';
+        document.getElementById('modelSelect').disabled = true;
+        document.getElementById('accessoryCategories').innerHTML = '';
+        document.getElementById('quickSearchInput').value = '';
+        document.getElementById('quickSearchResults').style.display = 'none';
+        clearTable();
+    }
+
+    /* ==================== CSV 导出 ==================== */
+
+    function csvEscape(s) {
+        if (s == null) s = '';
+        s = String(s);
+        if (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0 || s.indexOf('\r') >= 0) {
+            return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+    }
+
+    function exportCSV() {
+        if (!currentMatch) { alert('请先生成配单'); return; }
+
+        var csv = '\uFEFF类型,物料名称,描述,物料代码,备注\n';
+        csv += '主机,' + csvEscape(currentMatch[3] || '-') + ','
+              + csvEscape(currentMatch[5] || '-') + ','
+              + csvEscape(currentMatch[4] || '-') + ','
+              + csvEscape(currentMatch[6] || '') + '\n';
+
+        selectedAccessories.forEach(function(a) {
+            if (a.type === 'optional') {
+                csv += '选配,' + csvEscape(a.name) + ','
+                     + csvEscape(a.value) + ','
+                     + csvEscape(a.code || '-') + ','
+                     + csvEscape(a.remark || '') + '\n';
+            }
+        });
+
+        var b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var l = document.createElement('a');
+        l.href = URL.createObjectURL(b);
+
+        // 文件名带时间戳
+        var now = new Date();
+        var ts = now.getFullYear()
+            + String(now.getMonth() + 1).padStart(2, '0')
+            + String(now.getDate()).padStart(2, '0') + '_'
+            + String(now.getHours()).padStart(2, '0')
+            + String(now.getMinutes()).padStart(2, '0')
+            + String(now.getSeconds()).padStart(2, '0');
+        l.download = 'ID产品配单表_' + ts + '.csv';
+        l.click();
+    }
+
+    /* ==================== 快速搜索 ==================== */
+
+    function onQuickSearch() {
+        var q = document.getElementById('quickSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('quickSearchResults');
+        if (!q) { el.style.display = 'none'; return; }
+
+        var results = [];
+        for (var i = 0; i < allRows.length; i++) {
+            var r = allRows[i];
+            var isCam = r[0] === '相机';
+            var isAcc = r[0] === '配件';
+            if (!isCam && !isAcc) continue;
+
+            var series = (r[2] || '').toLowerCase();
+            var name = (r[3] || '').toLowerCase();
+            var code = (r[4] || '').toLowerCase();
+            var desc = (r[5] || '').toLowerCase();
+            var remark = (r[6] || '').toLowerCase();
+
+            if (series.indexOf(q) >= 0 || name.indexOf(q) >= 0
+                || code.indexOf(q) >= 0 || desc.indexOf(q) >= 0 || remark.indexOf(q) >= 0) {
+                results.push({
+                    idx: i, type: isCam ? '相机' : '配件',
+                    cat: r[1] || '', series: r[2] || '', name: r[3] || '',
+                    code: r[4] || '', desc: r[5] || ''
+                });
+                if (results.length >= 50) break;
+            }
+        }
+
+        if (!results.length) {
+            el.innerHTML = '<div style="padding:12px;font-size:11px;color:#94a3b8;text-align:center">无匹配结果</div>';
+            el.style.display = 'block';
+            return;
+        }
+
+        var h = '';
+        results.forEach(function(r) {
+            var tagText = r.type + ' · ' + r.cat;
+            h += '<div class="quick-search-item" onclick="selectQuickSearch(' + r.idx + ')">'
+               +   '<div class="qs-row1">'
+               +     '<span class="qs-name">' + r.name + '</span>'
+               +     '<span class="qs-tag">' + tagText + '</span>'
+               +   '</div>'
+               +   '<div class="qs-row2">'
+               +     '<span class="qs-code">' + r.code + '</span>'
+               +     '<span>|</span>'
+               +     '<span class="qs-desc">' + r.desc + '</span>'
+               +   '</div>'
+               +   '<div class="qs-row3">点击加入配单</div>'
+               + '</div>';
+        });
+        el.innerHTML = h;
+        el.style.display = 'block';
+    }
+
+    function selectQuickSearch(idx) {
+        var r = allRows[idx];
+        if (!r) return;
+        document.getElementById('quickSearchInput').value = '';
+        document.getElementById('quickSearchResults').style.display = 'none';
+
+        if (r[0] === '相机') {
+            var cat = r[1], series = r[2], model = r[3];
+            var catSel = document.getElementById('categorySelect');
+            for (var i = 0; i < catSel.options.length; i++) {
+                if (catSel.options[i].value === cat) { catSel.selectedIndex = i; break; }
+            }
+            onCategoryChange();
+
+            var serSel = document.getElementById('seriesSelect');
+            for (var i = 0; i < serSel.options.length; i++) {
+                if (serSel.options[i].value === series) { serSel.selectedIndex = i; break; }
+            }
+            onSeriesChange();
+
+            var modSel = document.getElementById('modelSelect');
+            for (var i = 0; i < modSel.options.length; i++) {
+                if (modSel.options[i].value === model) { modSel.selectedIndex = i; break; }
+            }
+            onModelChange();
+
+        } else if (r[0] === '配件') {
+            var name = r[3] || '';
+            var exists = selectedAccessories.some(function(a) { return a.name === name; });
+            if (!exists) {
+                selectedAccessories.push({
+                    key: '选配', name: name, value: r[5] || '',
+                    code: r[4] || '', remark: r[6] || '', img: r[9] || '', type: 'optional'
+                });
+                renderTable();
+            }
+        }
+    }
+
+    /* ==================== 公告系统 ==================== */
+    var announceData = { content: '', date: '' };
+    // 强制显示公告（不受“已读”缓存影响）
+    function forceShowAnnounce() {
+        loadAnnounceData();
+        if (!announceData.content) {
+            alert('暂无公告内容。');
+            return;
+        }
+        renderAnnounceView();
+        document.getElementById('announceOverlay').classList.add('active');
+    }
+
+    function showAnnounce() {
+        var today = new Date().toISOString().slice(0, 10);
+        var dismissed = localStorage.getItem('announce_dismissed');
+        // 如果今天未关闭，则显示公告，并显示小红点（默认有内容时就显示）
+        loadAnnounceData();
+        if (!announceData.content) return;
+        
+        if (dismissed !== today) {
+            renderAnnounceView();
+            document.getElementById('announceOverlay').classList.add('active');
+            var dot = document.getElementById('announceDot');
+            if (dot) dot.classList.add('active');
+        }
+    }
+
+    function closeAnnounce() {
+        document.getElementById('announceOverlay').classList.remove('active');
+        localStorage.setItem('announce_dismissed', new Date().toISOString().slice(0, 10));
+        var dot = document.getElementById('announceDot'); if (dot) dot.classList.remove('active');
+    }
+    function loadAnnounceData() {
+        var content = '', date = '';
+        try {
+            var ac = document.getElementById('announceConfig');
+            if (ac) {
+                var acd = JSON.parse(ac.textContent);
+                content = acd.content || '';
+                date = acd.date || '';
+            }
+        } catch (e) {}
+        if (!date) date = new Date().toISOString().slice(0, 10);
+        announceData = { content: content, date: date };
+    }
+
+    function renderAnnounceView() {
+        var c = document.getElementById('announceContent');
+        c.style.display = '';
+        c.textContent = announceData.content;
+        document.getElementById('announceDate').textContent =
+            announceData.date ? '发布日期: ' + announceData.date : '';
+    }
+
+    /* ==================== 经销基线对照表 ==================== */
+    var cmpData = [];
+    var cmpFiltered = [];
+    var cmpActiveSeries = '全部';
+
+    function loadCmpData() {
+        try {
+            // 使用 mapping_data.js 中的全局变量
+            if (typeof IDBOM_MAPPING_DATA !== 'undefined' && Array.isArray(IDBOM_MAPPING_DATA)) {
+                cmpData = IDBOM_MAPPING_DATA;
+                cmpFiltered = cmpData;
+            }
+        } catch (e) {
+            console.error('cmpData parse error:', e);
+        }
+    }
+
+    /* ==================== 系列总览 ==================== */
+
+    // 获取系列分组数据
+    function getSeriesMap() {
+    var map = {};
+    var order = [];
+    allRows.forEach(function(row) {
+        if (row[0] !== '相机') return;
+        var key = row[1];
+        if (!map[key]) {
+            map[key] = [];
+            order.push(key);
+        }
+        map[key].push(row);
+    });
+    // 返回 { map: 系列名→行数组, order: 系列名列表（按首次出现顺序） }
+    return { map: map, order: order };
+    }
+
+    function getAccessoriesForSeries(seriesName) {
+    var accMap = {};
+    // 1. 获取该系列所有相机
+    var cameraRows = allRows.filter(function(r) {
+        return r[0] === '相机' && r[1] === seriesName;
+    });
+    // 2. 收集所有引用标签（相机行的配件列：7,9,11,13,15,17,19,21,23）
+    var refTags = [];
+    cameraRows.forEach(function(r) {
+        for (var i = 7; i <= 23; i += 2) {
+            var val = r[i] || '';
+            if (val) {
+                var tags = val.split(';').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+                tags.forEach(function(t) { refTags.push(t); });
+            }
+        }
+    });
+    refTags = [...new Set(refTags)];
+    // 3. 匹配配件行（配件数据的标签列统一在索引7）
+    allRows.forEach(function(row) {
+        if (row[0] !== '配件') return;
+        var accTag = (row[7] || '').toLowerCase();
+        var parts = accTag.split(';').map(function(s) { return s.trim(); });
+        for (var i = 0; i < refTags.length; i++) {
+            if (parts.indexOf(refTags[i]) !== -1) {
+                var code = row[4] || '';
+                if (!accMap[code]) {
+                    accMap[code] = row;
+                }
+                break;
+            }
+        }
+    });
+    // 返回配件行数组（顺序按照遍历 allRows 的顺序，即枚举顺序）
+    return Object.values(accMap);
+    }
+
+    // 渲染左侧系列列表
+    function renderSeriesList() {
+    var result = getSeriesMap();
+    var map = result.map;
+    var seriesNames = result.order;
+    var container = document.getElementById('seriesList');
+    if (!container) return;
+    if (seriesNames.length === 0) {
+        container.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:12px;text-align:center;">暂无数据</div>';
+        return;
+    }
+    var html = '';
+    seriesNames.forEach(function(name, index) {
+        var active = index === 0 ? ' active' : '';
+        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
+    });
+    container.innerHTML = html;
+    var first = container.querySelector('.series-item');
+    if (first) renderOverviewTable(first.getAttribute('data-series'), first);
+    }
+    // 渲染右侧表格
+    function renderOverviewTable(seriesName, el) {
+        // 高亮切换
+        document.querySelectorAll('.series-item').forEach(function(item) {
+            item.classList.remove('active');
+        });
+        if (el) {
+            el.classList.add('active');
+        } else {
+            document.querySelectorAll('.series-item').forEach(function(item) {
+                if (item.getAttribute('data-series') === seriesName) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // 获取该系列的相机行
+        var cameraRows = allRows.filter(function(r) {
+            return r[0] === '相机' && r[1] === seriesName;
+        });
+        // 获取该系列关联的配件行
+        var accessoryRows = getAccessoriesForSeries(seriesName);
+        // 配件按枚举顺序（allRows 中的索引）排序
+        accessoryRows.sort(function(a, b) {
+            return allRows.indexOf(a) - allRows.indexOf(b);
+        });
+        // 相机在前，配件在后
+        var rows = cameraRows.concat(accessoryRows);
+
+        // 更新标题和计数
+        document.getElementById('overviewTitle').textContent = seriesName;
+        document.getElementById('overviewCount').textContent = '共 ' + rows.length + ' 项';
+
+        if (rows.length === 0) {
+            document.getElementById('overviewTableWrap').innerHTML =
+                '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>该系列暂无数据</h3></div>';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        // 构建表格
+        var html = '<table class="data-table"><thead><tr>'
+            + '<th style="width:50px">序号</th>'
+            + '<th style="width:70px">类型</th>'
+            + '<th style="min-width:200px">物料名称</th>'
+            + '<th style="width:70px;text-align:center">图片</th>'
+            + '<th style="min-width:80px">物料代码</th>'
+            + '<th style="min-width:200px">描述</th>'
+            + '<th style="min-width:100px">备注</th>'
+            + '</tr></thead><tbody>';
+
+        rows.forEach(function(row, index) {
+            var isCamera = row[0] === '相机';
+            var typeLabel;
+            if (isCamera) {
+                typeLabel = '主机';
+            } else {
+                // 如果配件类型是"扩展配件"，显示 row[2]（子类别名称）
+                // 否则显示 row[1]（原有类别名称）
+                if (row[1] === '扩展配件') {
+                    typeLabel = row[2] || '扩展配件';
+                } else {
+                    typeLabel = row[1] || '配件';
+                }
+            }
+            var typeClass = isCamera ? 'host' : 'standard';
+            var trClass = isCamera ? '' : 'row-accessory';
+            var name = row[3] || '';
+            var img = isCamera ? (row[25] || '') : (row[9] || '');
+            var code = row[4] || '';
+            var desc = row[5] || '';
+            var remark = row[6] || '';
+
+            var imgHtml = getImageHtml(img, 'img-thumb', 42, 42);
+
+            html += '<tr class="' + trClass + '">'
+                +  '<td style="text-align:center">' + (index + 1) + '</td>'
+                +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
+                +  '<td>' + name + '</td>'
+                +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
+                +  '<td class="material-code">' + code + '</td>'
+                +  '<td class="material-desc">' + desc + '</td>'
+                +  '<td>' + remark + '</td>'
+                +  '</tr>';
+        });
+
+        html += '</tbody></table>';
+
+        // 更新表格内容
+        var wrap = document.getElementById('overviewTableWrap');
+        wrap.innerHTML = html;
+
+        // 重置滚动容器到顶部，确保从序号1开始显示
+        wrap.scrollTop = 0;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchPage(page, evt) {
+    document.querySelectorAll('.nav-item').forEach(function(t) {
+        t.classList.remove('active');
+    });
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
+
+    // 隐藏所有页面
+    document.getElementById('pageBom').style.display = 'none';
+    var cmp = document.getElementById('pageCmp');
+    cmp.style.display = 'none';
+    cmp.classList.remove('active');
+    var overview = document.getElementById('pageOverview');
+    overview.style.display = 'none';
+    overview.classList.remove('active');
+
+    if (page === 'bom') {
+        document.getElementById('pageBom').style.display = 'flex';
+    } else if (page === 'cmp') {
+        cmp.style.display = 'flex';
+        cmp.classList.add('active');
+        if (cmpData.length === 0) {
+            loadCmpData();
+            initCmpFilter();
+            renderCmpTable();
+        }
+    } else if (page === 'overview') {
+        overview.style.display = 'flex';
+        overview.classList.add('active');
+        // 如果系列列表还未渲染，则渲染
+        if (!document.getElementById('seriesList').children.length) {
+            renderSeriesList();
+        }
+    }
+    }
+
+    function initCmpFilter() {
+        var series = [];
+        var seen = {};
+        cmpData.forEach(function(r) {
+            if (!seen[r.series]) { seen[r.series] = true; series.push(r.series); }
+        });
+        var h = '';
+        series.forEach(function(s) {
+            h += '<button class="cmp-filter-btn" onclick="filterCmpSeries(this,\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
+        });
+        document.getElementById('cmpSeriesFilter').innerHTML = h;
+    }
+
+    function filterCmpAll(btn) {
+        cmpActiveSeries = '全部';
+        btn.classList.add('active');
+        document.querySelectorAll('.cmp-filter-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
+        cmpSearch();
+    }
+
+    function filterCmpSeries(btn, series) {
+        cmpActiveSeries = series;
+        document.getElementById('cmpFilterAll').classList.remove('active');
+        document.querySelectorAll('.cmp-filter-btn').forEach(function(b) {
+            b.classList.remove('active');
+        });
+        btn.classList.add('active');
+        cmpSearch();
+    }
+
+    function cmpSearch() {
+        var q = (document.getElementById('cmpSearchInput').value || '').toLowerCase().trim();
+        cmpFiltered = cmpData.filter(function(r) {
+            if (cmpActiveSeries !== '全部' && r.series !== cmpActiveSeries) return false;
+            if (!q) return true;
+            return r.baseModel.toLowerCase().indexOf(q) >= 0
+                || r.baseCode.indexOf(q) >= 0
+                || r.distModel.toLowerCase().indexOf(q) >= 0
+                || r.distCode.indexOf(q) >= 0;
+        });
+        renderCmpTable();
+    }
+
+    function renderCmpTable() {
+        var h = '<table class="cmp-table"><thead><tr>'
+              + '<th class="col-num">序号</th>'
+              + '<th class="col-base">基线型号</th>'
+              + '<th class="col-basecode">基线代码</th>'
+              + '<th class="col-dist">经销型号</th>'
+              + '<th class="col-distcode">经销代码</th>'
+              + '</tr></thead><tbody>';
+
+        cmpFiltered.forEach(function(r, i) {
+            h += '<tr>'
+               + '<td class="col-num">' + (i + 1) + '</td>'
+               + '<td class="col-base col-model" title="' + esc(r.baseModel) + '">' + esc(r.baseModel) + '</td>'
+               + '<td class="col-basecode col-code">' + esc(r.baseCode) + '</td>'
+               + '<td class="col-dist col-model" title="' + esc(r.distModel) + '">' + esc(r.distModel) + '</td>'
+               + '<td class="col-distcode col-code">' + esc(r.distCode) + '</td>'
+               + '</tr>';
+        });
+
+        if (cmpFiltered.length === 0) {
+            h += '<tr><td colspan="5" class="cmp-empty">无匹配数据</td></tr>';
+        }
+
+        h += '</tbody></table>';
+        document.getElementById('cmpTableArea').innerHTML = h;
+        document.getElementById('cmpStats').textContent =
+            '共 ' + cmpFiltered.length + ' / ' + cmpData.length + ' 条';
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(s) {
+        return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+    }
+
+    /* ==================== 图片工具函数 ==================== */
+
+    function getImageHtml(imgName, className, width, height) {
+        className = className || 'img-thumb';
+        width = width || 42;
+        height = height || 42;
+        if (!imgName) {
+            return '<span class="img-thumb-placeholder">—</span>';
+        }
+        imgName = imgName.replace(/\\r$/g, '').replace(/\r$/g, '');
+        var safeName = imgName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        var safeJsName = imgName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        // 缩略图路径：IMG/CAM/THUMB/xxx.png 或 IMG/ACC/THUMB/xxx.png
+        var parts = safeName.split('/');
+        var thumbSrc = parts.length > 1
+            ? 'IMG/' + parts[0] + '/THUMB/' + parts[1] + '.png'
+            : 'IMG/THUMB/' + safeName + '.png';
+        var fullSrc = 'IMG/' + safeName + '.png';
+        return '<img class="' + className + '" '
+            + 'src="' + thumbSrc + '" '
+            + 'data-img="' + imgName + '" '
+            + 'data-full="' + fullSrc + '" '
+            + 'loading="lazy" '
+            + 'width="' + width + '" '
+            + 'height="' + height + '" '
+            + 'alt="' + safeName + '" '
+            + 'title="点击放大查看" '
+            + 'onclick="event.stopPropagation();showImg(\'' + safeJsName + '\')" '
+            + 'onerror="handleImageError(this)">';
+    }
+
+    function handleImageError(imgElement) {
+        if (imgElement.dataset.errorHandled) return;
+        var retryCount = parseInt(imgElement.dataset.retryCount || '0', 10);
+        var imgName = imgElement.getAttribute('data-img');
+        var fullSrc = imgElement.getAttribute('data-full');
+        if (retryCount < 3) {
+            imgElement.dataset.retryCount = retryCount + 1;
+            var delay = (retryCount + 1) * 2000;
+            setTimeout(function() {
+                // 第1次重试原图，第2次再试缩略图
+                if (retryCount === 1) {
+                    imgElement.src = fullSrc || ('IMG/' + imgName + '.png');
+                } else {
+                    var thumbParts = imgName.split('/');
+                    var thumbPath = thumbParts.length > 1
+                        ? 'IMG/' + thumbParts[0] + '/THUMB/' + thumbParts[1] + '.png'
+                        : 'IMG/THUMB/' + imgName + '.png';
+                    imgElement.src = thumbPath;
+                }
+            }, delay);
+            return;
+        }
+        imgElement.dataset.errorHandled = 'true';
+        imgElement.style.display = 'none';
+        var placeholder = document.createElement('span');
+        placeholder.className = 'img-thumb-placeholder';
+        placeholder.textContent = '📷';
+        placeholder.title = '图片加载失败: ' + (imgName || '');
+        placeholder.style.width = (imgElement.width || 42) + 'px';
+        placeholder.style.height = (imgElement.height || 42) + 'px';
+        placeholder.style.cursor = 'pointer';
+        placeholder.onclick = function(e) {
+            e.stopPropagation();
+            if (imgName) showImg(imgName);
+        };
+        imgElement.parentNode.insertBefore(placeholder, imgElement);
+    }
+
+    /* ==================== 图片预览 ==================== */
+
+    function showImg(imgName) {
+        if (!imgName) return;
+        imgName = imgName.replace(/\\r$/g, '').replace(/\r$/g, '');
+        var overlay = document.getElementById('imgPreviewOverlay');
+        var previewImg = document.getElementById('previewImg');
+        var previewName = document.getElementById('previewName');
+        previewName.textContent = '加载中...';
+        overlay.classList.add('active');
+        previewImg.style.display = 'none';
+        previewImg.onload = null;
+        previewImg.onerror = null;
+
+        var imgUrl = 'IMG/' + imgName + '.png';
+        var retryCount = 0;
+        function tryLoad() {
+            previewImg.onload = function() {
+                previewImg.style.display = 'block';
+                previewName.textContent = imgName;
+            };
+            previewImg.onerror = function() {
+                if (retryCount < 3) {
+                    retryCount++;
+                    previewName.textContent = '加载中... (重试 ' + retryCount + '/3)';
+                    setTimeout(function() {
+                        if (imgCache[imgName] && imgCache[imgName].complete && imgCache[imgName].naturalWidth > 0) {
+                            previewImg.src = imgCache[imgName].src;
+                        } else {
+                            previewImg.src = imgUrl;
+                        }
+                    }, retryCount * 2000);
+                } else {
+                    previewImg.style.display = 'none';
+                    previewName.textContent = imgName + ' (⚠️ 图片不存在或加载失败)';
+                }
+            };
+            previewImg.src = imgUrl;
+        }
+        tryLoad();
+    }
+
+    function closeImg() {
+        var overlay = document.getElementById('imgPreviewOverlay');
+        overlay.classList.remove('active');
+        var previewImg = document.getElementById('previewImg');
+        if (previewImg) {
+            previewImg.onload = null;
+            previewImg.onerror = null;
+        }
+    }
+
+    /* ==================== 联系我们弹窗 ==================== */
+
+    function showContactModal() {
+        var overlay = document.getElementById('contactOverlay');
+        if (overlay) {
+            overlay.classList.add('active');
+        }
+    }
+
+    function closeContactModal() {
+        var overlay = document.getElementById('contactOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    }
+
+    // ESC键关闭联系我们弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeContactModal();
+        }
+    });
+
+    function openQrPreview(imgSrc, name) {
+        var overlay = document.getElementById('imgPreviewOverlay');
+        var previewImg = document.getElementById('previewImg');
+        var previewName = document.getElementById('previewName');
+        
+        if (!overlay || !previewImg) return;
+        
+        previewName.textContent = '加载中...';
+        overlay.classList.add('active');
+        previewImg.style.display = 'none';
+        previewImg.onload = null;
+        previewImg.onerror = null;
+        
+        previewImg.onload = function() {
+            previewImg.style.display = 'block';
+            previewName.textContent = name || '';
+        };
+        previewImg.onerror = function() {
+            previewImg.style.display = 'none';
+            previewName.textContent = (name || '') + ' (图片加载失败)';
+        };
+        previewImg.src = imgSrc;
+    }
+
+    /* ==================== 页面初始化 ==================== */
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    setTimeout(showAnnounce, 500);
+
+        // ===== 从公告配置读取数据更新日期 =====
+        (function() {
+            try {
+                var ac = document.getElementById('announceConfig');
+                if (ac) {
+                    var acd = JSON.parse(ac.textContent);
+                    var date = acd.date || '';
+                    if (date) {
+                        document.getElementById('dataUpdateDate').textContent = '数据更新日期：' + date;
+                    }
+                }
+            } catch (e) {}
+        })();
+
+        // ===== 返回顶部按钮逻辑 =====
+        (function() {
+            var btn = document.getElementById('backToTop');
+            if (!btn) return;
+
+            // 滚动监听：显示/隐藏按钮
+            var scrollHandler = function() {
+                var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+                if (scrollY > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            };
+
+            // 防抖优化
+            var throttleTimer = null;
+            var throttledScroll = function() {
+                if (throttleTimer) return;
+                throttleTimer = setTimeout(function() {
+                    scrollHandler();
+                    throttleTimer = null;
+                }, 80);
+            };
+
+            window.addEventListener('scroll', throttledScroll, { passive: true });
+            // 页面加载完成时执行一次，确保初始状态正确
+            window.addEventListener('load', function() {
+                scrollHandler();
+            });
+
+            // 点击按钮：平滑回到顶部
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        })();
+    });
+    </script>
+
+    <div id="announceOverlay" class="announce-overlay">
+        <div class="announce-box">
+            <div class="announce-header">
+                <div class="announce-title">📢 公告</div>
+                <button class="announce-close" onclick="closeAnnounce()">✕</button>
+            </div>
+            <div class="announce-body">
+                <div class="announce-content" id="announceContent"></div>
+                <div class="announce-date" id="announceDate"></div>
+            </div>
+            <div class="announce-footer">
+                <button class="announce-btn" onclick="closeAnnounce()">我知道了</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

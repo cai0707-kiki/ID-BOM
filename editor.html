@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID-BOM 数据编辑器</title>
+
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
+        .editor-header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+        .editor-header-left{display:flex;align-items:center;gap:12px}
+        .editor-title{font-size:18px;font-weight:700}.editor-title span{color:#f97316}
+        .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:12px}
+        .editor-header-right{display:flex;gap:8px}
+        .btn{padding:6px 14px;border:none;border-radius:4px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
+        .btn-primary{background:#f97316;color:white}.btn-primary:hover{background:#ea580c}
+        .btn-secondary{background:#3b82f6;color:white}.btn-secondary:hover{background:#2563eb}
+        .btn-danger{background:#ef4444;color:white}.btn-danger:hover{background:#dc2626}
+        .btn-outline{background:white;color:#64748b;border:1px solid #e2e8f0}.btn-outline:hover{border-color:#f97316;color:#f97316}
+        .btn-success{background:#10b981;color:white}.btn-success:hover{background:#059669}
+        .btn-sm{padding:4px 10px;font-size:12px}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .tab-bar{background:white;border-bottom:1px solid #e2e8f0;display:flex;padding:0 20px;flex-shrink:0}
+        .tab{padding:10px 20px;font-size:14px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+        .tab:hover{color:#f97316}.tab.active{color:#f97316;border-bottom-color:#f97316;font-weight:600}
+        .tab-count{background:#f1f5f9;color:#64748b;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px}
+        .tab.active .tab-count{background:#fff7ed;color:#f97316}
+        .toolbar{background:white;padding:8px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap}
+        .toolbar-left{display:flex;align-items:center;gap:8px}
+        .toolbar-right{display:flex;align-items:center;gap:8px}
+        .search-box{padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:13px;width:220px}
+        .search-box:focus{outline:none;border-color:#f97316}
+        .stats-bar{font-size:12px;color:#64748b}.stats-bar strong{color:#1e293b}
+        .table-container{flex:1 1 0%;min-height:0;min-width:0;overflow:auto;background:white}
+        .data-editor-table{border-collapse:collapse;font-size:12px;table-layout:fixed;white-space:nowrap}
+        .data-editor-table th{background:#f8fafc;padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;position:sticky;top:0;z-index:10;white-space:nowrap}
+        .data-editor-table td{padding:2px 3px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+        .data-editor-table tr:hover{background:#f8fafc}
+        .data-editor-table tr.editing{background:#eff6ff}
+        .col-fixed{position:sticky;z-index:5;background:#fff}
+        .col-num{left:0;width:36px;min-width:36px}
+        .col-act{left:36px;width:72px;min-width:72px}
+        /* 修改后 */
+        .col-f1{
+            left:60px;
+            white-space:nowrap;  /* 第1列（数据分类/配件类别）数据很短，保持单行 */
+        }
+        .col-f2{
+            white-space:nowrap;  /* 第2列（产品大类）数据很短，保持单行 */
+        }
+        .col-f3{
+            left:108px;
+            white-space:normal;          /* 改为允许换行 */
+            word-break:break-word;       /* 强制长单词/代码换行 */
+        }
+        .cell-textarea {
+        border: 1px solid transparent;
+        border-radius: 3px;
+        background: transparent;
+        transition: all 0.15s;}
+        .cell-textarea:hover {
+            border-color: #e2e8f0;
+        }
+        .cell-textarea:focus {
+            outline: none;
+            border-color: #f97316;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(249,115,22,0.1);
+        }
+        .cell-textarea.modified {
+            background: #fef3c7;
+            border-color: #fbbf24;
+        }
+        .col-auto { white-space: normal; word-break: break-word; }
+        .col-auto-wrap { white-space: normal; word-break: break-word; line-height: 1.5; }
+        .col-resize{position:relative}
+        .col-resize .resize-handle{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;user-select:none;z-index:20}
+        .col-resize .resize-handle:hover,.col-resize .resize-handle.active{background:#f97316}
+        .col-resize input{width:100%;min-width:0}
+        .btn-row.del:hover{background:#fee2e2;color:#ef4444}
+        .btn-row{width:20px;height:20px;border:none;background:transparent;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:11px;padding:0}
+        .btn-row:hover{background:#f1f5f9;color:#333}
+        .cell-combo,.cell-input{width:100%;padding:3px 5px;border:1px solid transparent;border-radius:3px;font-size:12px;font-family:inherit;background:transparent;transition:all .15s;box-sizing:border-box;min-width:0}
+        .cell-combo:hover,.cell-input:hover{border-color:#e2e8f0}
+        .cell-combo:focus,.cell-input:focus{outline:none;border-color:#f97316;background:white;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
+        .cell-combo.modified,.cell-input.modified{background:#fef3c7;border-color:#fbbf24}
+        .status-bar{background:#1e293b;color:#94a3b8;padding:4px 20px;font-size:12px;display:flex;justify-content:space-between;flex-shrink:0}
+        .status-bar .unsaved{color:#fbbf24}.status-bar .saved{color:#10b981}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+        .modal-overlay.active{display:flex}
+        .modal{background:white;border-radius:12px;width:520px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .modal-header{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+        .modal-title{font-size:16px;font-weight:600;color:#1e293b}
+        .modal-close{width:26px;height:26px;border:none;background:#f1f5f9;border-radius:6px;cursor:pointer;font-size:14px;color:#64748b}
+        .modal-close:hover{background:#e2e8f0}
+        .modal-body{padding:18px}
+        .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
+        .toast{position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:6px;font-size:13px;color:white;z-index:2000;transform:translateX(120%);transition:transform .3s ease}
+        .toast.show{transform:translateX(0)}.toast.success{background:#10b981}.toast.error{background:#ef4444}.toast.warning{background:#f59e0b}
+        .confirm-dialog{text-align:center}.confirm-dialog p{font-size:14px;color:#64748b;margin-bottom:8px}.confirm-dialog .warn{color:#ef4444;font-weight:600}
+        #csvFileInput{display:none}
+        #imgFileInput{display:none}
+
+        /* ====== 表格内图片缩略图列 ====== */
+        .col-wrap{white-space:normal!important;word-break:break-word;line-height:1.5}
+        .col-wrap input{white-space:normal;word-break:break-word}
+        .col-img{width:72px;min-width:72px;text-align:center;vertical-align:middle;padding:3px 2px!important}
+        .thumb-wrap{display:inline-block;position:relative;vertical-align:middle}
+        .thumb{width:48px;height:48px;object-fit:contain;border-radius:3px;border:1px solid #e2e8f0;cursor:pointer;transition:all .15s;background:#fff;display:block}
+        .thumb-wrap:hover .thumb{border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,.2)}
+        .thumb-del{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border:none;background:#ef4444;color:white;border-radius:50%;font-size:11px;line-height:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);z-index:2;padding:0}
+        .thumb-wrap:hover .thumb-del{display:flex}
+        .thumb-del:hover{background:#dc2626;transform:scale(1.1)}
+        .thumb-add{width:48px;height:48px;border:2px dashed #cbd5e1;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:#94a3b8;cursor:pointer;transition:all .15s;background:#fafbfc}
+        .thumb-add:hover{border-color:#f97316;color:#f97316;background:#fffbeb}
+        .thumb-err{width:42px;height:42px;border:1px solid #e2e8f0;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#cbd5e1;background:#f8fafc}
+
+        /* ====== 图片预览浮层 ====== */
+        .img-preview-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;cursor:pointer}
+        .img-preview-overlay.active{display:flex}
+        .img-preview-box{position:relative;max-width:90vw;max-height:90vh;cursor:default}
+        .img-preview-box img{display:block;max-width:85vw;max-height:80vh;border-radius:8px;background:white}
+        .img-preview-box .preview-close{position:absolute;top:-12px;right:-12px;width:28px;height:28px;background:#ef4444;color:white;border:none;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+        .img-preview-box .preview-name{text-align:center;padding:8px;font-size:12px;color:white;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+    </style>
+</head>
+<body>
+    <div class="editor-header">
+        <div class="editor-header-left">
+            <div class="editor-title"><span>ID</span> · 数据编辑器</div>
+            <div class="editor-badge">BETA</div>
+        </div>
+        <div class="editor-header-right">
+            <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
+            <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
+        </div>
+    </div>
+    <div class="tab-bar">
+        <div class="tab active" data-tab="camera" onclick="switchTab('camera')">📷 相机数据 <span class="tab-count" id="cameraCount">0</span></div>
+        <div class="tab" data-tab="accessory" onclick="switchTab('accessory')">🔧 配件数据 <span class="tab-count" id="accessoryCount">0</span></div>
+    </div>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索型号、物料代码、描述..." oninput="onSearch()">
+            <button class="btn btn-outline btn-sm" onclick="clearSearch()">清除</button>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn btn-outline btn-sm" onclick="addRow()">➕ 添加行</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSelected()">🗑 删除选中</button>
+            <div class="stats-bar">显示 <strong id="visibleCount">0</strong> / <strong id="totalCount">0</strong> 行 <span id="modifiedIndicator"></span></div>
+        </div>
+    </div>
+    <div class="table-container" id="tableContainer">
+        <table class="data-editor-table" id="editorTable">
+            <thead id="editorHead"></thead>
+            <tbody id="editorBody"></tbody>
+        </table>
+    </div>
+    <div class="status-bar"><span id="statusLeft">就绪</span><span id="statusRight"></span></div>
+    <input type="file" id="imgFileInput" accept="image/*" onchange="onImgFileSelected(event)">
+
+    <!-- Import Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal" style="width:380px">
+            <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
+            <div class="modal-body" style="text-align:center">
+                <div id="importDropzone">
+                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
+                    <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)" style="display:none">
+                </div>
+                <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmImport()" id="btnImport" disabled>确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="width:380px">
+            <div class="modal-header"><span class="modal-title">确认删除</span><button class="modal-close" onclick="closeDeleteModal()">✕</button></div>
+            <div class="modal-body confirm-dialog"><p>确定要删除选中的 <strong id="deleteCount">0</strong> 行数据吗？</p><p class="warn">此操作不可撤销</p></div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeDeleteModal()">取消</button><button class="btn btn-danger" onclick="confirmDelete()">确认删除</button></div>
+        </div>
+    </div>
+
+    <!-- Image Preview -->
+    <div class="img-preview-overlay" id="imgPreviewOverlay" onclick="closeImgPreview()">
+        <div class="img-preview-box" onclick="event.stopPropagation()">
+            <button class="preview-close" onclick="closeImgPreview()">✕</button>
+            <img id="previewBigImg" src="">
+            <div id="previewBigName" class="preview-name"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+<script>
+// ==================== Column Definitions ====================
+// 相机 26 列（含 IMG），配件 10 列（含 IMG）
+var CAMERA_HEADERS = ['数据分类','产品大类','产品系列','具体型号','物料代码','物料描述','备注',
+    '电源','电源标识','安装板','安装板标识','一体线','一体线标识','IO电源线','IO电源线标识',
+    '网线','网线标识','灯板','灯板标识','镜头罩','镜头罩标识','FA镜头','FA镜头标识','扩展配件','扩展配件标识','IMG'];
+var ACCESSORY_HEADERS = ['数据分类','配件类别','产品系列','物料名称','物料代码','物料描述','备注','标签','标识','IMG'];
+
+// IMG 列在数据中的索引
+var IMG_COL_CAMERA = 25;
+var IMG_COL_ACCESSORY = 9;
+
+// 图片缩略图列插入位置：在"具体型号"(camera col3) / "物料名称"(accessory col3) 之后
+// 渲染时会在 col3 之后额外插入一列 <td>，不影响数据列索引
+var IMG_INSERT_AFTER = 3;
+
+var COL_WIDTHS = {
+    camera: {
+        1: 108, 2: 128, 3: 180, 4: 92,
+        5: 256, 6: 256,
+        7: 100, 8: 40, 9: 84, 10: 40, 11: 108, 12: 40,
+        13: 76, 14: 40, 15: 60, 16: 40, 17: 76, 18: 40,
+        19: 60, 20: 60, 21: 60, 22: 40, 23: 108, 24: 40,
+        25: 90
+    },
+    accessory: {
+        1: 84, 2: 180, 3: 180, 4: 80,
+        5: 256, 6: 256,
+        7: 108, 8: 40,
+        9: 90
+    }
+};
+
+var CAMERA_COMBO_COLS = [0, 1, 2];
+var ACCESSORY_COMBO_COLS = [0, 1, 2];
+
+// ==================== State ====================
+var currentTab = 'camera';
+var cameraData = [];
+var accessoryData = [];
+var filteredIndices = [];
+var selectedRows = {};
+var modifiedCells = {};
+var imgUploadTarget = null; // { type, idx }
+
+// ==================== Init ====================
+function init() {
+    loadDataFromParent();
+    rebuildDropdownCache();
+    renderTable();
+    updateStats();
+
+}
+
+function loadDataFromParent() {
+    var saved = localStorage.getItem('idbom_editor_data');
+    if (saved) {
+        try {
+            var d = JSON.parse(saved);
+            cameraData = d.camera || [];
+            accessoryData = d.accessory || [];
+        } catch(e) {}
+    }
+
+    // 兼容旧数据：补齐列
+    var camLen = CAMERA_HEADERS.length;
+    cameraData.forEach(function(r) { while (r.length < camLen) r.push(''); });
+    var accLen = ACCESSORY_HEADERS.length;
+    accessoryData.forEach(function(r) { while (r.length < accLen) r.push(''); });
+}
+
+// ==================== Dropdown Cache ====================
+var cameraDropdownCache = {};
+var accessoryDropdownCache = {};
+
+function rebuildDropdownCache() {
+    cameraDropdownCache = buildDropdownCache(cameraData, CAMERA_HEADERS.length);
+    accessoryDropdownCache = buildDropdownCache(accessoryData, ACCESSORY_HEADERS.length);
+}
+
+function buildDropdownCache(data, colCount) {
+    var cache = {};
+    for (var c = 0; c < colCount; c++) {
+        var seen = {};
+        var list = [];
+        data.forEach(function(row) {
+            var v = (row[c] || '').toString().trim();
+            if (v && !seen[v]) { seen[v] = true; list.push(v); }
+        });
+        list.sort();
+        cache[c] = list;
+    }
+    return cache;
+}
+
+function getDropdownCache() {
+    return currentTab === 'camera' ? cameraDropdownCache : accessoryDropdownCache;
+}
+
+function getComboCols() {
+    return currentTab === 'camera' ? CAMERA_COMBO_COLS : ACCESSORY_COMBO_COLS;
+}
+
+function updateDropdownValue(colIdx, newVal) {
+    var cache = getDropdownCache();
+    if (!cache[colIdx]) cache[colIdx] = [];
+    if (newVal && cache[colIdx].indexOf(newVal) < 0) {
+        cache[colIdx].push(newVal);
+        cache[colIdx].sort();
+    }
+}
+
+// ==================== Tab ====================
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === tab);
+    });
+    selectedRows = {};
+    modifiedCells = {};
+    document.getElementById('searchBox').value = '';
+    renderTable();
+    updateStats();
+}
+
+// ==================== Render Table ====================
+function getHeaders() { return currentTab === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS; }
+function getData() { return currentTab === 'camera' ? cameraData : accessoryData; }
+function getImgColIdx() { return currentTab === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY; }
+
+function renderTable() {
+    var headers = getHeaders();
+    var data = getData();
+    var comboCols = getComboCols();
+    var cache = getDropdownCache();
+    var imgCol = getImgColIdx();
+    var fixedCols = [1, 2, 3];
+    var fixedClasses = ['col-f1','col-f2','col-f3'];
+
+    var search = document.getElementById('searchBox').value.toLowerCase().trim();
+    filteredIndices = [];
+    for (var i = 0; i < data.length; i++) {
+        if (!search) { filteredIndices.push(i); continue; }
+        for (var j = 0; j < data[i].length; j++) {
+            if (data[i][j] && String(data[i][j]).toLowerCase().indexOf(search) >= 0) {
+                filteredIndices.push(i); break;
+            }
+        }
+    }
+
+    // ===== Header =====
+    var th = '<tr>';
+    th += '<th class="col-fixed col-num">#</th>';
+    th += '<th class="col-fixed col-act"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>';
+    var cw = COL_WIDTHS[currentTab] || {};
+    for (var c = 1; c < headers.length; c++) {
+        var isFixed = fixedCols.indexOf(c) >= 0;
+        var w = cw[c];
+        var isAuto = (w === 'auto');
+        var cls = '';
+        if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
+        else if (isAuto) cls = 'col-resize';
+        else cls = 'col-auto';
+        var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+        var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
+        var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
+        var resizeHtml = isAuto ? '<div class="resize-handle" onmousedown="startResize(event)"></div>' : '';
+        th += '<th class="' + cls + '"' + style + autoStyle + '>' + headers[c] + resizeHtml + '</th>';
+        // 在 col3（具体型号/物料名称）之后插入图片列头
+        if (c === IMG_INSERT_AFTER) {
+            th += '<th class="col-img" style="width:72px;min-width:72px">图片</th>';
+        }
+    }
+    th += '</tr>';
+    document.getElementById('editorHead').innerHTML = th;
+
+    // 计算表格最小宽度
+    var totalW = 36 + 72;
+    for (var c = 1; c < headers.length; c++) {
+        var w = cw[c];
+        if (w === 'auto') totalW += ((COL_MIN_WIDTH[currentTab]||{})[c] || 120);
+        else if (w) totalW += w;
+        else totalW += 80;
+        if (c === IMG_INSERT_AFTER) totalW += 72;
+    }
+    document.getElementById('editorTable').style.width = totalW + 'px';
+
+    // ===== Datalists =====
+    var datalists = '';
+    comboCols.forEach(function(ci) {
+        // 第2列保留下拉，但第3列已排除，所以组合框只有第0、1、2列（0,1,2）但第3列排除，所以这里仍生成第2列的下拉
+        // 但我们只对第2列（c=2）使用组合框，第0、1列也是组合框，所以保留所有 comboCols 的 datalist
+        var items = cache[ci] || [];
+        datalists += '<datalist id="dl_' + ci + '">';
+        items.forEach(function(v) { datalists += '<option value="' + escH(v) + '">'; });
+        datalists += '</datalist>';
+    });
+
+    // ===== Body =====
+    var bhtml = '';
+    filteredIndices.forEach(function(idx) {
+        var row = data[idx];
+        var chk = selectedRows[idx] ? 'checked' : '';
+        bhtml += '<tr data-idx="' + idx + '">';
+        bhtml += '<td class="col-fixed col-num">' + (idx + 1) + '</td>';
+        bhtml += '<td class="col-fixed col-act">';
+        bhtml += '<input type="checkbox" ' + chk + ' onchange="toggleRow(' + idx + ')">';
+        bhtml += '<button class="btn-row" onclick="copyRow(' + idx + ')" title="复制此行">📋</button>';
+        bhtml += '<button class="btn-row del" onclick="deleteSingleRow(' + idx + ')" title="删除">✕</button>';
+        bhtml += '</td>';
+
+        for (var c = 1; c < headers.length; c++) {
+            var val = (row[c] || '').toString().trim();
+            var ck = idx + '_' + c;
+            var mc = modifiedCells[ck] ? ' modified' : '';
+            var isFixed = fixedCols.indexOf(c) >= 0;
+            var w = cw[c];
+            var isAuto = (w === 'auto');
+            var cls = '';
+            if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
+            else if (isAuto) cls = 'col-resize';
+            else cls = 'col-auto';
+            // 多行列：第3、5、6列
+            if (c === 3 || c === 5 || c === 6) cls += ' col-wrap';
+            var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+            var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
+            var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
+
+            // 判断：组合框保留（第2列），第3列不组合框
+            if (comboCols.indexOf(c) >= 0 && c !== 3) {
+                // 组合框（单行输入框 + datalist）
+                bhtml += '<td class="' + cls + '"' + style + autoStyle + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+            } else if (c === 3 || c === 5 || c === 6) {
+                // 多行文本列 → textarea
+                bhtml += '<td class="' + cls + '"' + style + '><textarea class="cell-textarea' + mc + '" rows="2" style="width:100%;resize:vertical;font-family:inherit;font-size:12px;padding:3px 5px;border:1px solid transparent;border-radius:3px;background:transparent;box-sizing:border-box;min-height:28px;" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
+            } else {
+                // 普通单行输入框
+                bhtml += '<td class="' + cls + '"' + style + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+            }
+
+            // ===== 图片缩略图列（在第3列之后插入） =====
+            if (c === IMG_INSERT_AFTER) {
+                var imgVal = (row[imgCol] || '').toString().trim().replace(/\r/g, '');
+                bhtml += '<td class="col-img">';
+                if (imgVal) {
+                    var parts = imgVal.split('/');
+                    var thumbSrc = parts.length > 1
+                        ? 'IMG/' + parts[0] + '/THUMB/' + parts[1] + '.png'
+                        : 'IMG/THUMB/' + imgVal + '.png';
+                    var fullSrc = 'IMG/' + imgVal + '.png';
+                    bhtml += '<span class="thumb-wrap">';
+                    bhtml += '<img class="thumb" src="' + escH(thumbSrc) + '" data-full="' + escH(fullSrc) + '" loading="lazy" width="48" height="48" ';
+                    bhtml += 'title="' + escH(imgVal) + ' — 点击放大" ';
+                    bhtml += 'onclick="showImgPreview(\'' + escH(imgVal) + '\')" ';
+                    bhtml += 'onerror="handleThumbError(this,\'' + escH(imgVal) + '\')">';
+                    bhtml += '<button class="thumb-del" title="删除图片标识" onclick="event.stopPropagation();deleteImg(\'' + currentTab + '\',' + idx + ')">✕</button>';
+                    bhtml += '</span>';
+                } else {
+                    bhtml += '<span class="thumb-add" title="点击上传图片" onclick="triggerImgUpload(\'' + currentTab + '\',' + idx + ')">+</span>';
+                }
+                bhtml += '</td>';
+            }
+        }
+        bhtml += '</tr>';
+    });
+    document.getElementById('editorBody').innerHTML = datalists + bhtml;
+    document.getElementById('visibleCount').textContent = filteredIndices.length;
+    document.getElementById('totalCount').textContent = data.length;
+    document.getElementById('cameraCount').textContent = cameraData.length;
+    document.getElementById('accessoryCount').textContent = accessoryData.length;
+}
+
+function updateStats() {
+    var n = Object.keys(modifiedCells).length;
+    var el = document.getElementById('modifiedIndicator');
+    el.innerHTML = n > 0
+        ? ' · <span class="unsaved">' + n + ' 处未保存修改</span>'
+        : ' · <span class="saved">无未保存修改</span>';
+}
+
+// ==================== Auto Save ====================
+function autoSave() {
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+}
+
+// ==================== Cell Edit ====================
+function onCellChange(rowIdx, colIdx, input) {
+    var data = getData();
+    var oldV = (data[rowIdx][colIdx] || '').toString().trim();
+    var newV = input.value.trim();
+    var ck = rowIdx + '_' + colIdx;
+    if (oldV !== newV) {
+        data[rowIdx][colIdx] = newV;
+        modifiedCells[ck] = true;
+        input.classList.add('modified');
+        updateDropdownValue(colIdx, newV);
+        autoSave();
+    } else {
+        delete modifiedCells[ck];
+        input.classList.remove('modified');
+    }
+    updateStats();
+}
+
+// ==================== Selection ====================
+function toggleRow(idx) { selectedRows[idx] ? delete selectedRows[idx] : (selectedRows[idx] = true); }
+function toggleSelectAll() {
+    var chk = document.getElementById('selectAll').checked;
+    filteredIndices.forEach(function(i) { chk ? (selectedRows[i] = true) : delete selectedRows[i]; });
+    document.querySelectorAll('#editorBody input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = !!selectedRows[parseInt(cb.closest('tr').dataset.idx)];
+    });
+}
+
+// ==================== Add / Copy / Delete ====================
+function addRow() {
+    var data = getData();
+    var headers = getHeaders();
+    var newRow = headers.map(function(_, i) { return i === 0 ? (currentTab === 'camera' ? '相机' : '配件') : ''; });
+    data.push(newRow);
+    rebuildDropdownCache();
+    renderTable();
+    autoSave();
+    var ct = document.getElementById('tableContainer');
+    ct.scrollTop = ct.scrollHeight;
+    showToast('已添加新行', 'success');
+}
+
+function copyRow(idx) {
+    var data = getData();
+    var src = data[idx];
+    var newRow = src.map(function(v) { return (v || '').toString(); });
+    data.splice(idx + 1, 0, newRow);
+    var newSel = {};
+    Object.keys(selectedRows).forEach(function(k) {
+        var n = parseInt(k);
+        newSel[n >= idx + 1 ? n + 1 : n] = true;
+    });
+    selectedRows = newSel;
+    var newMod = {};
+    Object.keys(modifiedCells).forEach(function(k) {
+        var parts = k.split('_');
+        var r = parseInt(parts[0]), c = parseInt(parts[1]);
+        if (r >= idx + 1) newMod[(r + 1) + '_' + c] = true;
+        else newMod[k] = true;
+    });
+    modifiedCells = newMod;
+    rebuildDropdownCache();
+    renderTable();
+    autoSave();
+    showToast('已复制第 ' + (idx + 1) + ' 行', 'success');
+}
+
+function deleteSingleRow(idx) {
+    selectedRows = {};
+    selectedRows[idx] = true;
+    document.getElementById('deleteCount').textContent = '1';
+    document.getElementById('deleteModal').classList.add('active');
+}
+
+function deleteSelected() {
+    var count = Object.keys(selectedRows).length;
+    if (!count) { showToast('请先选择要删除的行', 'warning'); return; }
+    document.getElementById('deleteCount').textContent = count;
+    document.getElementById('deleteModal').classList.add('active');
+}
+
+function confirmDelete() {
+    var data = getData();
+    var indices = Object.keys(selectedRows).map(Number).sort(function(a, b) { return b - a; });
+    indices.forEach(function(i) { data.splice(i, 1); });
+    selectedRows = {};
+    modifiedCells = {};
+    closeDeleteModal();
+    rebuildDropdownCache();
+    renderTable();
+    updateStats();
+    autoSave();
+    showToast('已删除 ' + indices.length + ' 行', 'success');
+}
+
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
+
+// ==================== Search ====================
+function onSearch() { renderTable(); }
+function clearSearch() { document.getElementById('searchBox').value = ''; renderTable(); }
+
+// ==================== 图片上传 / 预览 ====================
+function triggerImgUpload(type, idx) {
+    imgUploadTarget = { type: type, idx: idx };
+    document.getElementById('imgFileInput').click();
+}
+
+function deleteImg(type, idx) {
+    var imgCol = type === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY;
+    var data = type === 'camera' ? cameraData : accessoryData;
+    data[idx][imgCol] = '';
+    modifiedCells[idx + '_' + imgCol] = true;
+    updateStats();
+    autoSave();
+    renderTable();
+    showToast('已删除图片标识，可点击 + 重新添加', 'success');
+}
+
+function onImgFileSelected(e) {
+    var file = e.target.files[0];
+    if (!file || !imgUploadTarget) return;
+    // 文件名（不含扩展名）作为 IMG 标识符
+    var fileName = file.name;
+    var dotPos = fileName.lastIndexOf('.');
+    var imgName = dotPos > 0 ? fileName.substring(0, dotPos) : fileName;
+    var imgCol = imgUploadTarget.type === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY;
+    var data = imgUploadTarget.type === 'camera' ? cameraData : accessoryData;
+    data[imgUploadTarget.idx][imgCol] = imgName;
+    if (currentTab === imgUploadTarget.type) {
+        modifiedCells[imgUploadTarget.idx + '_' + imgCol] = true;
+        updateStats();
+    }
+    autoSave();
+    showToast('已设置 IMG 标识符：' + imgName, 'success');
+    imgUploadTarget = null;
+    e.target.value = '';
+    renderTable();
+}
+
+function showImgPreview(imgName) {
+    var overlay = document.getElementById('imgPreviewOverlay');
+    var bigImg = document.getElementById('previewBigImg');
+    var nameEl = document.getElementById('previewBigName');
+    bigImg.src = 'IMG/' + imgName + '.png';
+    bigImg.onerror = function() { bigImg.style.display='none'; nameEl.textContent = imgName + ' (加载失败)'; };
+    bigImg.onload = function() { bigImg.style.display=''; nameEl.textContent = imgName; };
+    overlay.classList.add('active');
+}
+
+function handleThumbError(imgEl, imgName) {
+    // 缩略图失败，尝试加载原图
+    var fullSrc = imgEl.getAttribute('data-full');
+    if (fullSrc && imgEl.src !== fullSrc) {
+        imgEl.src = fullSrc;
+    } else {
+        imgEl.onerror = null;
+        imgEl.parentElement.innerHTML = '<span class="thumb-err">—</span>';
+    }
+}
+
+function closeImgPreview() {
+    document.getElementById('imgPreviewOverlay').classList.remove('active');
+}
+
+// ==================== CSV Import ====================
+function showImportModal() {
+    pendingImports = {camera: null, accessory: null};
+    document.getElementById('importInfo').style.display = 'none';
+    document.getElementById('btnImport').disabled = true;
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importModal').classList.add('active');
+}
+function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
+
+var pendingImports = {camera: null, accessory: null};
+
+function onFileSelected(e) {
+    var files = e.target.files;
+    if (!files.length) return;
+    pendingImports = {camera: null, accessory: null};
+    var remaining = files.length;
+    var infoLines = [];
+    for (var i = 0; i < files.length; i++) {
+        (function(f) {
+            readFile(f, function(target, count, fname) {
+                infoLines.push((target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + fname + ' · ' + count + ' 行');
+                remaining--;
+                if (remaining === 0) {
+                    var infoEl = document.getElementById('importInfo');
+                    infoEl.innerHTML = infoLines.join('<br>');
+                    infoEl.style.display = 'block';
+                    infoEl.style.color = '#166534';
+                    document.getElementById('btnImport').disabled = !(pendingImports.camera || pendingImports.accessory);
+                }
+            });
+        })(files[i]);
+    }
+}
+
+function readFile(file, callback) {
+    var fname = (file.name || '').toLowerCase();
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var text = e.target.result;
+        var hasGarbage = /\ufffd/.test(text.substring(0, 500));
+        if (hasGarbage) {
+            var reader2 = new FileReader();
+            reader2.onload = function(e2) { parseAndStore(e2.target.result, fname, callback); };
+            reader2.onerror = function() { parseAndStore(text, fname, callback); };
+            reader2.readAsText(file, 'gbk');
+        } else {
+            parseAndStore(text, fname, callback);
+        }
+    };
+    reader.readAsText(file, 'utf-8');
+}
+
+function parseAndStore(text, fname, callback) {
+    var rows = parseCSV(text);
+    if (!rows.length) return;
+    var target = '';
+    if (fname.indexOf('camera') >= 0) target = 'camera';
+    else if (fname.indexOf('accessory') >= 0) target = 'accessory';
+    var first = rows[0];
+    if (first.length > 0) {
+        var fc = first[0].toLowerCase().replace(/^\ufeff/, '');
+        if (fc.indexOf('\u6570\u636e\u5206\u7c7b') >= 0 || fc.indexOf('\u4ea7\u54c1\u5927\u7c7b') >= 0 || fc.indexOf('\u914d\u4ef6\u7c7b\u522b') >= 0) rows = rows.slice(1);
+    }
+    if (!target) {
+        for (var i = 0; i < Math.min(10, rows.length); i++) {
+            if (rows[i][0] && rows[i][0].trim() === '\u76f8\u673a') { target = 'camera'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '\u914d\u4ef6') { target = 'accessory'; break; }
+        }
+    }
+    if (!target) target = (first.length >= 20) ? 'camera' : 'accessory';
+    var headers = target === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS;
+    var expectedCols = headers.length;
+    var normalized = rows.map(function(r) {
+        var nr = [];
+        for (var i = 0; i < expectedCols; i++) nr.push((r[i] || '').toString().trim());
+        return nr;
+    }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
+    if (normalized.length === 0) return;
+    if (target === 'camera') pendingImports.camera = normalized;
+    else pendingImports.accessory = normalized;
+    callback(target, normalized.length, fname);
+}
+
+function confirmImport() {
+    var imported = [];
+    if (pendingImports.camera && Array.isArray(pendingImports.camera)) {
+        cameraData = pendingImports.camera;
+        imported.push('\u76f8\u673a ' + cameraData.length + ' \u884c');
+    }
+    if (pendingImports.accessory && Array.isArray(pendingImports.accessory)) {
+        accessoryData = pendingImports.accessory;
+        imported.push('\u914d\u4ef6 ' + accessoryData.length + ' \u884c');
+    }
+    if (!imported.length) return;
+    modifiedCells = {}; selectedRows = {};
+    rebuildDropdownCache();
+    closeImportModal();
+    switchTab(pendingImports.camera ? 'camera' : 'accessory');
+    autoSave();
+    showToast('\u6210\u529f\u5bfc\u5165 ' + imported.join('\uff0c'), 'success');
+    pendingImports = {camera: null, accessory: null};
+}
+
+// ==================== CSV Export ====================
+function exportCurrentCSV() {
+    var headers = getHeaders();
+    var data = getData();
+    var csv = '\uFEFF' + headers.map(csvEsc).join(',') + '\n';
+    data.forEach(function(row) {
+        var line = [];
+        for (var i = 0; i < headers.length; i++) line.push(csvEsc((row[i] || '').toString().trim()));
+        csv += line.join(',') + '\n';
+    });
+    var fname = (currentTab === 'camera' ? 'camera_data.csv' : 'accessory_data.csv');
+    dl(csv, fname, 'text/csv;charset=utf-8;');
+    showToast('已导出 ' + data.length + ' 行', 'success');
+}
+
+// ==================== Save ====================
+function saveChanges() {
+    flushPendingEdits();
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+    modifiedCells = {};
+    renderTable();
+    updateStats();
+    fetch('http://127.0.0.1:18088', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ camera: cameraData, accessory: accessoryData })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.ok) showToast('数据已同步到CSV和index.html！', 'success');
+        else showToast('同步失败', 'error');
+    }).catch(function() {
+        showToast('数据已保存到浏览器（同步服务未启动）', 'warning');
+    });
+}
+
+function flushPendingEdits() {
+    var data = getData();
+    document.querySelectorAll('#editorBody input').forEach(function(input) {
+        var tr = input.closest('tr');
+        if (!tr) return;
+        var td = input.closest('td');
+        if (!td) return;
+        var rowIdx = parseInt(tr.dataset.idx);
+        var cells = Array.from(tr.children);
+        // 跳过 #, actions, 以及图片列（图片列不是 input td）
+        var colOffset = cells.indexOf(td) - 2; // subtract num and actions
+        // 如果图片列在 col3 之后插入，需要减去它
+        if (colOffset > IMG_INSERT_AFTER) colOffset--;
+        var dataColIdx = colOffset + 1;
+        if (isNaN(rowIdx) || dataColIdx < 1 || dataColIdx >= data[rowIdx].length) return;
+        var currentVal = (data[rowIdx][dataColIdx] || '').toString().trim();
+        var inputVal = input.value.trim();
+        if (currentVal !== inputVal) {
+            data[rowIdx][dataColIdx] = inputVal;
+            var ck = rowIdx + '_' + dataColIdx;
+            modifiedCells[ck] = true;
+            updateDropdownValue(dataColIdx, inputVal);
+        }
+    });
+}
+
+// ==================== Utilities ====================
+function csvEsc(s) { if (s == null) s = ''; s = String(s); return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function escH(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
+function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type||'success'); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},3000); }
+
+function parseCSV(text) {
+    var rows = [], cur = [], field = '', inQ = false;
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        if (inQ) {
+            if (ch === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQ = false; }
+            else field += ch;
+        } else {
+            if (ch === '"') inQ = true;
+            else if (ch === ',') { cur.push(field); field = ''; }
+            else if (ch === '\n' || ch === '\r') {
+                if (ch === '\r' && text[i+1] === '\n') i++;
+                cur.push(field); field = '';
+                if (cur.length && !(cur.length === 1 && cur[0] === '')) rows.push(cur);
+                cur = [];
+            } else field += ch;
+        }
+    }
+    if (field || cur.length) { cur.push(field); if (cur.length && !(cur.length === 1 && cur[0] === '')) rows.push(cur); }
+    return rows;
+}
+
+// Column Resize
+var resizeState = null;
+function startResize(e) {
+    e.preventDefault();
+    var th = e.target.parentElement;
+    var colIdx = Array.from(th.parentElement.children).indexOf(th);
+    resizeState = { startX: e.clientX, startWidth: th.offsetWidth, th: th, colIdx: colIdx };
+    e.target.classList.add('active');
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+}
+function doResize(e) {
+    if (!resizeState) return;
+    var newWidth = Math.max(60, resizeState.startWidth + e.clientX - resizeState.startX);
+    resizeState.th.style.width = newWidth + 'px';
+    resizeState.th.style.minWidth = newWidth + 'px';
+    var colIdx = resizeState.colIdx;
+    document.querySelectorAll('#editorBody tr').forEach(function(tr) {
+        var td = tr.children[colIdx];
+        if (td) { td.style.width = newWidth + 'px'; td.style.minWidth = newWidth + 'px'; }
+    });
+}
+function stopResize() {
+    if (resizeState) {
+        var handle = resizeState.th.querySelector('.resize-handle');
+        if (handle) handle.classList.remove('active');
+    }
+    resizeState = null;
+    document.removeEventListener('mousemove', doResize);
+    document.removeEventListener('mouseup', stopResize);
+}
+
+// Keyboard
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveChanges(); }
+    if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('searchBox').focus(); }
+    if (e.key === 'Escape') { closeImportModal(); closeDeleteModal(); closeImgPreview(); }
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
