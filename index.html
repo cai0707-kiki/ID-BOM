@@ -2730,51 +2730,32 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!btn) return;
 
             function getScrollY() {
-                var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-                var ids = ['cmpTableArea', 'overviewTableWrap'];
-                for (var i = 0; i < ids.length; i++) {
-                    var el = document.getElementById(ids[i]);
-                    if (el && el.scrollTop > scrollY) scrollY = el.scrollTop;
+                var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+                var el;
+                el = document.getElementById('cmpTableArea');
+                if (el && el.scrollTop > y) y = el.scrollTop;
+                el = document.getElementById('overviewTableWrap');
+                if (el && el.scrollTop > y) y = el.scrollTop;
+                return y;
+            }
+
+            // 用 setInterval 轮询，兼容所有场景（window 滚动 / 内部容器滚动）
+            setInterval(function() {
+                if (getScrollY() > 300) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
                 }
-                return scrollY;
-            }
-
-            var throttleTimer = null;
-            function throttledCheck() {
-                if (throttleTimer) return;
-                throttleTimer = setTimeout(function() {
-                    throttleTimer = null;
-                    if (getScrollY() > 300) {
-                        btn.classList.add('show');
-                    } else {
-                        btn.classList.remove('show');
-                    }
-                }, 80);
-            }
-
-            window.addEventListener('scroll', throttledCheck, { passive: true });
-            window.addEventListener('load', throttledCheck);
-
-            // scroll 事件不冒泡，需直接绑定到可能滚动的内部容器
-            function bindScrollTargets() {
-                var ids = ['cmpTableArea', 'overviewTableWrap'];
-                for (var i = 0; i < ids.length; i++) {
-                    var el = document.getElementById(ids[i]);
-                    if (el) el.addEventListener('scroll', throttledCheck, { passive: true });
-                }
-            }
-            bindScrollTargets();
-            // 对照表/系列表可能动态渲染，延迟再绑定一次
-            setTimeout(bindScrollTargets, 1000);
+            }, 200);
 
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                var ids = ['cmpTableArea', 'overviewTableWrap'];
-                for (var i = 0; i < ids.length; i++) {
-                    var el = document.getElementById(ids[i]);
-                    if (el) el.scrollTop = 0;
-                }
+                var el;
+                el = document.getElementById('cmpTableArea');
+                if (el) el.scrollTop = 0;
+                el = document.getElementById('overviewTableWrap');
+                if (el) el.scrollTop = 0;
             });
         })();
     });

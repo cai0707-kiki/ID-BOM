@@ -726,6 +726,14 @@ function parseAndStore(text, fname, callback) {
         for (var i = 0; i < expectedCols; i++) nr.push((r[i] || '').toString().trim());
         return nr;
     }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
+    // 补齐 IMG 列前缀（CSV 中只有文件名，需要加上 CAM/ 或 ACC/）
+    var imgColIdx = target === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY;
+    var imgPrefix = target === 'camera' ? 'CAM/' : 'ACC/';
+    normalized.forEach(function(r) {
+        if (r[imgColIdx] && r[imgColIdx].indexOf('/') < 0) {
+            r[imgColIdx] = imgPrefix + r[imgColIdx];
+        }
+    });
     if (normalized.length === 0) return;
     if (target === 'camera') pendingImports.camera = normalized;
     else pendingImports.accessory = normalized;
