@@ -2732,6 +2732,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // 滚动监听：显示/隐藏按钮
             var scrollHandler = function() {
                 var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+                // 同时检测内部滚动容器（对照表/系列表页面表格横向滚动时纵向也在容器内滚动）
+                var cmpBody = document.querySelector('#cmpTableArea');
+                var overviewWrap = document.querySelector('#overviewTableWrap');
+                if (cmpBody && cmpBody.scrollHeight > cmpBody.clientHeight) {
+                    scrollY = Math.max(scrollY, cmpBody.scrollTop);
+                }
+                if (overviewWrap && overviewWrap.scrollHeight > overviewWrap.clientHeight) {
+                    scrollY = Math.max(scrollY, overviewWrap.scrollTop);
+                }
                 if (scrollY > 300) {
                     btn.classList.add('show');
                 } else {
@@ -2750,18 +2759,24 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             window.addEventListener('scroll', throttledScroll, { passive: true });
+            // 同时监听内部滚动容器
+            ['cmpTableArea', 'overviewTableWrap'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.addEventListener('scroll', throttledScroll, { passive: true });
+            });
             // 页面加载完成时执行一次，确保初始状态正确
             window.addEventListener('load', function() {
                 scrollHandler();
             });
 
-            // 点击按钮：平滑回到顶部
+            // 点击按钮：平滑回到顶部（同时回到内部容器顶部）
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                var cmpBody = document.getElementById('cmpTableArea');
+                var overviewWrap = document.getElementById('overviewTableWrap');
+                if (cmpBody) cmpBody.scrollTop = 0;
+                if (overviewWrap) overviewWrap.scrollTop = 0;
             });
         })();
     });
