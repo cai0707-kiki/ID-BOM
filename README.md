@@ -34,7 +34,6 @@ ID-BOM/
 │   │   └── THUMB/          # 配件缩略图 80x80
 │   └── PIC/                # 其他图片（QR 码等）
 │       └── THUMB/          # 其他缩略图 120x120
-├── sw.js                   # Service Worker — 图片缓存策略（Cache First）
 ├── import_csv.js           # 构建脚本 — CSV → JS 数据文件 + 缩略图
 ├── resize.js               # 图片工具 — 缩略图生成 / 图片尺寸调整
 ├── search-spec-url.py      # 工具脚本 — 从海康官网抓取产品链接
@@ -148,33 +147,19 @@ var url = getSpecUrl('MV-ID2013EM-05-RBN');
 - **构建：** Node.js + iconv-lite + sharp
 - **数据格式：** CSV（源数据）→ JS 全局变量（独立文件）
 - **图片优化：** 缩略图按需生成，IntersectionObserver 懒加载
-- **缓存：** Service Worker + Cache API（图片持久化缓存）
 - **兼容性：** 现代浏览器（Chrome、Edge、Firefox、Safari）
 
 ## 版本更新记录
 
-### V1.5 (2026-08-28)
-**图片加载优化 — 缩略图 + 懒加载**
-
-- 缩略图系统：各目录下 `THUMB/` 子目录存放缩略图（CAM/ACC: 80x80，PIC: 120x120）
-- 懒加载：移除全量预加载，改用 IntersectionObserver 按需加载原图
-- 首次加载从 12MB 降至 ~176KB（缩略图），原图滚动到可视区域后后台预加载
-- `resize.js` 新增 `--thumb` 模式生成缩略图
-- `editor.html` 同步支持缩略图显示
-- 修复移动端 CSS 媒体查询错误（联系弹窗、返回顶部按钮）
-- 修复 `handleImageError` 重试逻辑
-- 清理死代码（`imgCache`、空 `preloadAllImages()`、残留 script 标签）
-
 ### V1.4 (2026-08-28)
-**数据层重构 — 数据与 HTML 分离**
+**数据层重构 + 图片加载优化**
 
-- 数据文件独立化：内嵌数据从 `index.html` 分离为独立 JS 文件
-  - `scripts/camera_data.js` — 相机产品数据
-  - `scripts/accessory_data.js` — 配件产品数据
-  - `scripts/mapping_data.js` — 经销基线对照表
+- 数据文件独立化：内嵌数据从 `index.html` 分离为独立 JS 文件（`scripts/camera_data.js`、`accessory_data.js`、`mapping_data.js`）
 - 图片目录重组：`IMG/` 下按 `CAM/`、`ACC/`、`PIC/` 分类存放
-- `import_csv.js` — 重写为生成 JS 数据文件，不再修改 HTML
-- `search-spec-url.py` — 输出路径调整至 `scripts/`
+- 缩略图系统：各目录下 `THUMB/` 子目录存放缩略图（CAM/ACC: 80x80，PIC: 120x120）
+- 懒加载：移除全量预加载，改用 IntersectionObserver 按需加载原图，首次加载从 12MB 降至 ~176KB
+- `import_csv.js` 重写为生成 JS 数据文件 + 缩略图
+- `search-spec-url.py` 输出路径调整至 `scripts/`
 
 ### V1.3 (2026-08-21)
 **系列总览 & 多端适配增强**
