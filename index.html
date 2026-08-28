@@ -2729,7 +2729,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var btn = document.getElementById('backToTop');
             if (!btn) return;
 
-            // 获取所有可能的滚动位置（兼容 window 滚动和内部容器滚动）
             function getScrollY() {
                 var scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
                 var ids = ['cmpTableArea', 'overviewTableWrap'];
@@ -2753,10 +2752,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 80);
             }
 
-            // 用 capture 模式监听 document 上的 scroll 事件，捕获所有子元素的滚动
-            document.addEventListener('scroll', throttledCheck, true);
             window.addEventListener('scroll', throttledCheck, { passive: true });
             window.addEventListener('load', throttledCheck);
+
+            // scroll 事件不冒泡，需直接绑定到可能滚动的内部容器
+            function bindScrollTargets() {
+                var ids = ['cmpTableArea', 'overviewTableWrap'];
+                for (var i = 0; i < ids.length; i++) {
+                    var el = document.getElementById(ids[i]);
+                    if (el) el.addEventListener('scroll', throttledCheck, { passive: true });
+                }
+            }
+            bindScrollTargets();
+            // 对照表/系列表可能动态渲染，延迟再绑定一次
+            setTimeout(bindScrollTargets, 1000);
 
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
