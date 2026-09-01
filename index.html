@@ -2100,13 +2100,18 @@
         } catch(e) {}
 
         var fileName = 'HIKROBOT-ID产品配单表' + version + '_' + date + '.html';
+        var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
-        var a = document.createElement('a');
-        a.href = 'Download/offline.html';
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        if (isMobile) {
+            window.open('Download/offline.html', '_blank');
+        } else {
+            var a = document.createElement('a');
+            a.href = 'Download/offline.html';
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
     }
 
     /* ==================== 快速搜索 ==================== */
