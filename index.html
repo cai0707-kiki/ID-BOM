@@ -28,6 +28,7 @@
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;min-height:100vh}
         .header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
         .header-left{display:flex;align-items:center;gap:12px}
+        .header-right{display:flex;align-items:center;gap:8px}
         .header-logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
         .header-logo span{color:#f97316}
         .header-logo .logo-text{user-select:none;-webkit-user-select:none}
@@ -97,6 +98,7 @@
         .stat-label{font-size:10px;color:#94a3b8}
         .btn-reset{padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;background:white;color:#64748b;font-size:11px;cursor:pointer}
         .btn-export{padding:5px 10px;border:none;border-radius:4px;background:#f97316;color:white;font-size:11px;cursor:pointer}
+        .btn-download{padding:5px 10px;border:none;border-radius:4px;background:#2563eb;color:white;font-size:11px;cursor:pointer}
         .data-table{width:100%;border-collapse:collapse}
         .data-table th{background:#f8fafc;padding:4px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0}
         .data-table td{padding:4px 8px;font-size:10px;border-bottom:1px solid #f1f5f9}
@@ -958,14 +960,17 @@
         <div class="header-left">
             <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4.1</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
+        </div>
+        <div class="header-right">
+            <button class="btn-download" onclick="downloadOffline()">📥 下载离线版</button>
         </div>
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享","date":"2026-08-28"}
+    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享;\n3、新增\"下载离线版\"按钮，提供离线版配单表","date":"2026-09-01"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
@@ -2076,6 +2081,40 @@
             + String(now.getSeconds()).padStart(2, '0');
         l.download = 'ID产品配单表_' + ts + '.csv';
         l.click();
+    }
+
+    /* ==================== 离线版下载 ==================== */
+
+    function downloadOffline() {
+        var version = 'V1.0';
+        var versionDivs = document.querySelectorAll('.header-logo');
+        for (var i = 0; i < versionDivs.length; i++) {
+            var text = versionDivs[i].textContent.trim();
+            if (/^V\d/.test(text)) { version = text; break; }
+        }
+
+        var date = '';
+        try {
+            var ac = document.getElementById('announceConfig');
+            if (ac) { date = JSON.parse(ac.textContent).date || ''; }
+        } catch(e) {}
+
+        var fileName = 'HIKROBOT-ID产品配单表' + version + '_' + date + '.html';
+
+        fetch('Download/offline.html')
+            .then(function(r) { return r.blob(); })
+            .then(function(blob) {
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            })
+            .catch(function() {
+                window.location.href = 'Download/offline.html';
+            });
     }
 
     /* ==================== 快速搜索 ==================== */
