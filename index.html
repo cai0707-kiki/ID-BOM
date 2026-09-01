@@ -960,7 +960,7 @@
         <div class="header-left">
             <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4.1</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
         </div>
@@ -970,7 +970,7 @@
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享","date":"2026-08-28"}
+    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享;\n3、新增\"下载离线版\"按钮，提供离线版配单表","date":"2026-09-01"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
@@ -2100,13 +2100,26 @@
         } catch(e) {}
 
         var fileName = 'HIKROBOT-ID产品配单表' + version + '_' + date + '.html';
+        var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
-        var a = document.createElement('a');
-        a.href = 'Download/offline.html';
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        if (isMobile) {
+            window.open('Download/offline.html', '_blank');
+        } else {
+            fetch('Download/offline.html')
+                .then(function(r) { return r.blob(); })
+                .then(function(blob) {
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(a.href);
+                })
+                .catch(function() {
+                    window.open('Download/offline.html', '_blank');
+                });
+        }
     }
 
     /* ==================== 快速搜索 ==================== */
