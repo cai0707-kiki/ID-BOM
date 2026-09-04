@@ -1842,6 +1842,41 @@
 
     /* ==================== 渲染配单明细表 ==================== */
 
+    // 从相机型号中提取焦距标识（如 "05M", "08L", "12/16M"）
+    function extractFocalFromModel(model) {
+        if (!model) return '';
+        var m = model.match(/(\d+(?:\/\d+)?)[LM]/i);
+        return m ? m[1] + (m[0].slice(-1).toUpperCase()) : '';
+    }
+
+    // 将结构化备注渲染为文本
+    function getDynamicRemark(remark, cameraModel) {
+        if (!remark) return '';
+        if (typeof remark === 'string') return remark;
+        if (typeof remark === 'object' && remark.prefix !== undefined) {
+            var result = remark.prefix || '';
+            var focal = extractFocalFromModel(cameraModel);
+            if (remark.focal && focal) {
+                // 尝试精确匹配，再尝试模糊匹配
+                var focalText = remark.focal[focal];
+                if (!focalText) {
+                    // 模糊匹配：如 "12M" 匹配 "12/16M"
+                    var keys = Object.keys(remark.focal);
+                    for (var i = 0; i < keys.length; i++) {
+                        if (keys[i].indexOf(focal.replace(/[LM]$/i, '')) >= 0) {
+                            focalText = remark.focal[keys[i]];
+                            break;
+                        }
+                    }
+                }
+                if (focalText) result += focalText + '；';
+            }
+            if (remark.suffix) result += remark.suffix;
+            return result;
+        }
+        return String(remark);
+    }
+
     function renderTable() {
     var tblHead = '<thead><tr>'
         + '<th style="width:70px">类型</th>'
@@ -1874,7 +1909,7 @@
                + imgCell2
                + '<td class="material-desc">' + a.desc + '</td>'
                + '<td class="material-code">' + (a.code || '-') + '</td>'
-               + '<td>' + (a.remark || '') + '</td>'
+               + '<td>' + getDynamicRemark(a.remark, currentMatch ? currentMatch[3] : '') + '</td>'
                + '<td><button class="btn-remove" onclick="removeItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
                + '</tr>';
         });
@@ -1935,7 +1970,7 @@
             name: a.name,
             desc: a.value,
             code: a.code || '-',
-            remark: remark,
+            remark: remark || a.remark,  // 保留结构化备注对象
             img: a.img || ''
         });
     });
@@ -1968,7 +2003,7 @@
            + imgCell
            + '<td class="material-desc">' + item.desc + '</td>'
            + '<td class="material-code">' + item.code + '</td>'
-           + '<td>' + item.remark + '</td>'
+           + '<td>' + getDynamicRemark(item.remark, currentMatch ? currentMatch[3] : '') + '</td>'
            + '<td>' + actionBtn + '</td>'
            + '</tr>';
     });
@@ -2063,7 +2098,7 @@
                 csv += '选配,' + csvEscape(a.name) + ','
                      + csvEscape(a.value) + ','
                      + csvEscape(a.code || '-') + ','
-                     + csvEscape(a.remark || '') + '\n';
+                     + csvEscape(getDynamicRemark(a.remark, currentMatch ? currentMatch[3] : '')) + '\n';
             }
         });
 
