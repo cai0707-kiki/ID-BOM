@@ -61,37 +61,6 @@ function writeDataJs(filePath, variableName, jsonData, description) {
     console.log(`  写入 ${path.basename(filePath)}: ${jsonData.length} 条`);
 }
 
-// ========== 紫外灯板结构化备注转换 ==========
-function convertRemarkToStructured(remark, productName) {
-    // 只处理包含焦距区分的紫外灯板备注
-    if (!remark || !productName.includes('紫外灯板')) return remark;
-
-    // 检测是否包含焦距前缀 (05M, 08M, 12/16M 等)
-    const focalPattern = /(05M|08M|12\/16M|25M|08L|12\/16L)删除：/g;
-    const matches = [...remark.matchAll(focalPattern)];
-
-    if (matches.length === 0) return remark;
-
-    // 提取前缀（第一个焦距标记之前的内容）
-    const firstFocalIndex = remark.indexOf(matches[0][0]);
-    const prefix = remark.substring(0, firstFocalIndex);
-
-    // 提取各焦距对应的删除内容
-    const focal = {};
-    const focalRegex = /(05M|08M|12\/16M|25M|08L|12\/16L)删除：([^；;]+)/g;
-    let match;
-    while ((match = focalRegex.exec(remark)) !== null) {
-        focal[match[1]] = '删除：' + match[2].trim();
-    }
-
-    // 提取后缀（最后一个焦距匹配结束后的内容）
-    const lastMatch = matches[matches.length - 1];
-    const lastFocalEnd = remark.indexOf('；', lastMatch.index + lastMatch[0].length);
-    const suffix = lastFocalEnd >= 0 ? remark.substring(lastFocalEnd + 1) : '';
-
-    return { prefix, focal, suffix };
-}
-
 // ========== 主函数 ==========
 function main() {
     console.log('=== CSV导入工具（生成JS数据文件）===\n');
@@ -152,12 +121,6 @@ function main() {
         while (row.length < 10) row.push('');
         const imgVal = row[9].trim();
         row[9] = imgVal ? 'ACC/' + imgVal : '';
-
-        // 对紫外灯板的备注进行结构化处理
-        const productName = row[2] || '';
-        if (productName.includes('紫外灯板')) {
-            row[6] = convertRemarkToStructured(row[6], productName);
-        }
 
         return { Count: 10, value: row.slice(0, 10) };
     });

@@ -960,7 +960,7 @@
         <div class="header-left">
             <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4.1</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.4.2</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
         </div>
@@ -970,7 +970,7 @@
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享;\n3、新增\"下载离线版\"按钮，提供离线版配单表","date":"2026-09-01"}
+    {"content":"本次更新：\n1、ID3000PM发布V3.0代码，定制功能需迁移，请提前梳理;\n2、新增按钮，欢迎扫码关注，获取更多产品资讯与案例分享;\n3、新增\"下载离线版\"按钮，提供离线版配单表","date":"2026-09-04"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
@@ -1365,41 +1365,6 @@
     function updateSelectStyle(s) {
         if (s.value) s.classList.add('has-value');
         else s.classList.remove('has-value');
-    }
-
-    /* ==================== 焦距提取与动态备注 ==================== */
-
-    function extractFocalFromModel(model) {
-        if (!model) return null;
-        var m = model.match(/-(\d+(?:\/\d+)?[ML])/i);
-        if (m) return m[1];
-        return null;
-    }
-
-    function getDynamicRemark(remark) {
-        if (!remark || typeof remark !== 'object' || !remark.prefix) return remark;
-        var model = document.getElementById('modelSelect').value;
-        var focal = extractFocalFromModel(model);
-        if (!focal) return remark.prefix + remark.suffix;
-        // 查找匹配的焦距键（支持 12/16M 匹配 12M 或 16M）
-        var focalText = '';
-        var focalNum = focal.replace(/[ML]$/i, '');
-        Object.keys(remark.focal).forEach(function(k) {
-            if (k === focal) {
-                focalText = remark.focal[k];
-            } else if (k.indexOf('/') >= 0) {
-                // 处理 "12/16M" 这样的键，拆分后匹配数字部分
-                var parts = k.split('/');
-                for (var i = 0; i < parts.length; i++) {
-                    if (parts[i].replace(/[ML]$/i, '') === focalNum) {
-                        focalText = remark.focal[k];
-                        break;
-                    }
-                }
-            }
-        });
-        if (!focalText) return remark.prefix + remark.suffix;
-        return remark.prefix + focalText + '；' + remark.suffix;
     }
 
     /* ==================== 渲染配件分类按钮 ==================== */
@@ -1800,7 +1765,7 @@
                     name: item.name, 
                     value: item.desc,
                     code: item.code, 
-                    remark: getDynamicRemark(item.remark), 
+                    remark: item.remark, 
                     img: item.img, 
                     type: 'optional'
                 });
@@ -2241,7 +2206,7 @@
             if (!exists) {
                 selectedAccessories.push({
                     key: '选配', name: name, value: r[5] || '',
-                    code: r[4] || '', remark: getDynamicRemark(r[6] || ''), img: r[9] || '', type: 'optional'
+                    code: r[4] || '', remark: r[6] || '', img: r[9] || '', type: 'optional'
                 });
                 renderTable();
             }
@@ -2467,7 +2432,7 @@
             var img = isCamera ? (row[25] || '') : (row[9] || '');
             var code = row[4] || '';
             var desc = row[5] || '';
-            var remark = getDynamicRemark(row[6] || '');
+            var remark = row[6] || '';
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42);
 
