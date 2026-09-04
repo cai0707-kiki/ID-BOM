@@ -1,55 +1,6 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 const iconv = require('iconv-lite');
-
-// ========== 备注结构化转换 ==========
-
-// 需要结构化的备注关键词（紫外灯板等焦距区分场景）
-const STRUCTURED_REMARK_KEYWORDS = ['紫外灯板'];
-
-/**
- * 将含有焦距区分的备注文本转换为结构化JSON
- * 格式: { prefix, focal: { "05M": "...", "08M": "..." }, suffix }
- */
-function convertRemarkToStructured(remark) {
-    if (!remark || typeof remark !== 'string') return remark;
-
-    // 检查是否包含焦距区分的删除模式（如 "05M删删除：" "08M删删除："）
-    var hasFocalPattern = /\d+[LM]删除[：:]/.test(remark);
-    var hasKeyword = STRUCTURED_REMARK_KEYWORDS.some(function(kw) {
-        return remark.indexOf(kw) >= 0;
-    });
-
-    if (!hasFocalPattern || !hasKeyword) return remark;
-
-    // 先用正则提取所有焦距部分（支持嵌在前缀中的情况）
-    var focalRegex = /(\d+(?:\/\d+)?[LM])删除[：:]([^；;]+)/g;
-    var focalMap = {};
-    var match;
-    while ((match = focalRegex.exec(remark)) !== null) {
-        focalMap[match[1]] = match[2].trim();
-    }
-
-    // 提取前缀（到第一个焦距模式之前）
-    var firstFocalIdx = remark.search(/\d+(?:\/\d+)?[LM]删除[：:]/);
-    var prefix = firstFocalIdx > 0 ? remark.substring(0, firstFocalIdx) : '';
-    // 如果前缀以分号结尾，去掉
-    prefix = prefix.replace(/[；;]+$/, '');
-
-    // 提取后缀（最后一个焦距部分之后的通用部分）
-    var focalParts = remark.match(/\d+(?:\/\d+)?[LM]删除[：:][^；;]+[；;]?/g);
-    var lastFocalEnd = 0;
-    if (focalParts && focalParts.length > 0) {
-        lastFocalEnd = remark.lastIndexOf(focalParts[focalParts.length - 1]) + focalParts[focalParts.length - 1].length;
-    }
-    var suffix = lastFocalEnd > 0 ? remark.substring(lastFocalEnd).replace(/^[；;]+/, '') : '';
-
-    return {
-        prefix: prefix,
-        focal: focalMap,
-        suffix: suffix
-    };
-}
 
 // ========== CSV 解析函数 ==========
 function parseCSV(csvContent) {
@@ -170,8 +121,6 @@ function main() {
         while (row.length < 10) row.push('');
         const imgVal = row[9].trim();
         row[9] = imgVal ? 'ACC/' + imgVal : '';
-        // 备注字段结构化处理
-        row[6] = convertRemarkToStructured(row[6]);
         return { Count: 10, value: row.slice(0, 10) };
     });
 
