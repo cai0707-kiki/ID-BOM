@@ -1371,7 +1371,7 @@
 
     function extractFocalFromModel(model) {
         if (!model) return null;
-        var m = model.match(/-(\d+(?:\/\d+)?)[ML]/i);
+        var m = model.match(/-(\d+(?:\/\d+)?[ML])/i);
         if (m) return m[1];
         return null;
     }
@@ -1380,8 +1380,26 @@
         if (!remark || typeof remark !== 'object' || !remark.prefix) return remark;
         var model = document.getElementById('modelSelect').value;
         var focal = extractFocalFromModel(model);
-        if (!focal || !remark.focal[focal]) return remark.prefix + remark.suffix;
-        return remark.prefix + remark.focal[focal] + '；' + remark.suffix;
+        if (!focal) return remark.prefix + remark.suffix;
+        // 查找匹配的焦距键（支持 12/16M 匹配 12M 或 16M）
+        var focalText = '';
+        var focalNum = focal.replace(/[ML]$/i, '');
+        Object.keys(remark.focal).forEach(function(k) {
+            if (k === focal) {
+                focalText = remark.focal[k];
+            } else if (k.indexOf('/') >= 0) {
+                // 处理 "12/16M" 这样的键，拆分后匹配数字部分
+                var parts = k.split('/');
+                for (var i = 0; i < parts.length; i++) {
+                    if (parts[i].replace(/[ML]$/i, '') === focalNum) {
+                        focalText = remark.focal[k];
+                        break;
+                    }
+                }
+            }
+        });
+        if (!focalText) return remark.prefix + remark.suffix;
+        return remark.prefix + focalText + '；' + remark.suffix;
     }
 
     /* ==================== 渲染配件分类按钮 ==================== */
