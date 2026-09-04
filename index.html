@@ -1378,7 +1378,7 @@
 
     function getDynamicRemark(remark) {
         if (!remark || typeof remark !== 'object' || !remark.prefix) return remark;
-        var model = document.getElementById('cameraModel').value;
+        var model = document.getElementById('modelSelect').value;
         var focal = extractFocalFromModel(model);
         if (!focal || !remark.focal[focal]) return remark.prefix + remark.suffix;
         return remark.prefix + remark.focal[focal] + '；' + remark.suffix;
