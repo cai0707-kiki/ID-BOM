@@ -2654,6 +2654,23 @@
         else s.classList.remove('has-value');
     }
 
+    /* ==================== 焦距提取与动态备注 ==================== */
+
+    function extractFocalFromModel(model) {
+        if (!model) return null;
+        var m = model.match(/-(\d+(?:\/\d+)?)[ML]/i);
+        if (m) return m[1];
+        return null;
+    }
+
+    function getDynamicRemark(remark) {
+        if (!remark || typeof remark !== 'object' || !remark.prefix) return remark;
+        var model = document.getElementById('cameraModel').value;
+        var focal = extractFocalFromModel(model);
+        if (!focal || !remark.focal[focal]) return remark.prefix + remark.suffix;
+        return remark.prefix + remark.focal[focal] + '；' + remark.suffix;
+    }
+
     /* ==================== 渲染配件分类按钮 ==================== */
 
     function renderAccessoryCategories() {
@@ -3051,7 +3068,7 @@
                     name: item.name, 
                     value: item.desc,
                     code: item.code, 
-                    remark: item.remark, 
+                    remark: getDynamicRemark(item.remark), 
                     type: 'optional'
                 });
             }
@@ -3446,7 +3463,7 @@
                 selectedAccessories.push({
                     key: '选配', subCategory: (r[1] === '扩展配件') ? (r[2] || '') : '',
                     name: name, value: r[5] || '',
-                    code: r[4] || '', remark: r[6] || '', type: 'optional'
+                    code: r[4] || '', remark: getDynamicRemark(r[6] || ''), type: 'optional'
                 });
                 renderTable();
             }
@@ -3671,7 +3688,7 @@
             var name = row[3] || '';
             var code = row[4] || '';
             var desc = row[5] || '';
-            var remark = row[6] || '';
+            var remark = getDynamicRemark(row[6] || '');
 
             html += '<tr class="' + trClass + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
