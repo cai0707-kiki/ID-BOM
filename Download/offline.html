@@ -2706,7 +2706,7 @@
             if (matchCount === 0) continue;
             if (matchCount === stdCount) continue;
 
-            var cnt = selectedAccessories.filter(function(a) { return a.key === keys[i]; }).length;
+            var cnt = selectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
             var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
             h += '<div class="accessory-category" onclick="openAccessoryModal(\'' + keys[i] + '\')">'
                +   '<div class="accessory-category-left">'
