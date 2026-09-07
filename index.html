@@ -953,6 +953,23 @@
                 font-size: 12px;
             }
         }
+        /* PDA选型页面样式 */
+        #pagePda{display:none;flex:1;min-width:0;flex-direction:column;gap:12px}
+        .pda-filter-bar{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+        .pda-filter-item{display:flex;flex-direction:column;gap:2px;min-width:120px;flex:1}
+        .pda-filter-label{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase}
+        .pda-filter-select{padding:5px 8px;border:1px solid #e2e8f0;border-radius:4px;font-size:12px;color:#333;background:white;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+        .pda-filter-select:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,0.1)}
+        .pda-table-scroll{overflow-x:auto;flex:1}
+        .pda-table{width:100%;border-collapse:collapse;font-size:12px}
+        .pda-table th,.pda-table td{padding:8px 10px;border:1px solid #e2e8f0;text-align:left;white-space:nowrap}
+        .pda-table thead{position:sticky;top:0;z-index:10;background:#1e293b;color:white}
+        .pda-table th{background:#1e293b;color:white;font-weight:600;font-size:11px;text-align:center}
+        .pda-table th:first-child{background:#f97316;text-align:left;min-width:120px}
+        .pda-table tbody tr:nth-child(even){background:#f8fafc}
+        .pda-table tbody tr:hover{background:#fff7ed}
+        .pda-table td:first-child{font-weight:600;color:#1e293b;background:#f1f5f9;white-space:nowrap}
+        .pda-table td{max-width:200px;overflow:hidden;text-overflow:ellipsis}
     </style>
 </head>
 <body>
@@ -975,9 +992,10 @@
     <!-- ====== /公告配置 ====== -->
         <div class="container">
         <div class="nav-sidebar">
-            <div class="nav-item active" onclick="switchPage('bom', event)"><span class="nav-icon">📋</span>配单表</div>
+            <div class="nav-item active" onclick="switchPage('bom', event)"><span class="nav-icon">📋</span>ID配单表</div>
             <div class="nav-item" onclick="switchPage('cmp', event)"><span class="nav-icon">📊</span>对照表</div>
             <div class="nav-item" onclick="switchPage('overview', event)"><span class="nav-icon">📦</span>系列表</div>
+            <div class="nav-item" onclick="switchPage('pda', event)"><span class="nav-icon">📱</span>PDA</div>
         </div>
         <div id="pageBom">
             <div class="sidebar">
@@ -1077,6 +1095,81 @@
             </div>
         </div>
         <!-- ====== /系列总览 ====== -->
+        <div id="pagePda" style="display:none;flex:1;min-width:0;flex-direction:column;gap:12px;">
+            <div class="content-panel" style="flex:1;">
+                <div class="content-header">
+                    <div class="content-title">
+                        <div class="content-title-icon">📱</div>
+                        PDA智能移动终端选型
+                    </div>
+                </div>
+                <div class="pda-filter-bar" id="pdaFilterBar">
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">系列</label>
+                        <select class="pda-filter-select" id="pdaFilterSeries" onchange="pdaApplyFilters()">
+                            <option value="">全部系列</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">IP防护等级</label>
+                        <select class="pda-filter-select" id="pdaFilterIp" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">NFC</label>
+                        <select class="pda-filter-select" id="pdaFilterNfc" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">蓝牙</label>
+                        <select class="pda-filter-select" id="pdaFilterBluetooth" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">操作系统</label>
+                        <select class="pda-filter-select" id="pdaFilterOs" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">屏幕尺寸</label>
+                        <select class="pda-filter-select" id="pdaFilterScreen" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">处理器</label>
+                        <select class="pda-filter-select" id="pdaFilterCpu" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">OCR</label>
+                        <select class="pda-filter-select" id="pdaFilterOcr" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="pda-filter-item">
+                        <label class="pda-filter-label">电池</label>
+                        <select class="pda-filter-select" id="pdaFilterBattery" onchange="pdaApplyFilters()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="padding:8px 12px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#64748b;" id="pdaCount">共 0 款型号</span>
+                </div>
+                <div class="pda-table-scroll" id="pdaTableScroll">
+                    <table class="pda-table" id="pdaTable">
+                        <thead id="pdaTableHead"></thead>
+                        <tbody id="pdaTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="version-bar">有任何建议和问题请及时联系蔡修钢 · 网址：<a href="https://cai0707-kiki.github.io/ID-BOM/" target="_blank" style="color:#f97316;text-decoration:none">https://cai0707-kiki.github.io/ID-BOM/</a></div>
@@ -1170,6 +1263,7 @@
     <script src="scripts/camera_data.js"></script>
     <script src="scripts/accessory_data.js"></script>
     <script src="scripts/mapping_data.js"></script>
+    <script src="scripts/pda_data.js"></script>
     <script>
     /* ==================== 配置常量 ==================== */
 
@@ -2474,6 +2568,8 @@
     var overview = document.getElementById('pageOverview');
     overview.style.display = 'none';
     overview.classList.remove('active');
+    var pda = document.getElementById('pagePda');
+    pda.style.display = 'none';
 
     if (page === 'bom') {
         document.getElementById('pageBom').style.display = 'flex';
@@ -2492,7 +2588,121 @@
         if (!document.getElementById('seriesList').children.length) {
             renderSeriesList();
         }
+    } else if (page === 'pda') {
+        pda.style.display = 'flex';
+        pdaInit();
     }
+    }
+
+    /* ==================== PDA选型功能 ==================== */
+    var pdaInitialized = false;
+    var pdaFilters = {};
+    var pdaFilteredModels = [];
+
+    function pdaInit() {
+        if (pdaInitialized) return;
+        pdaInitialized = true;
+        pdaPopulateFilters();
+        pdaApplyFilters();
+    }
+
+    function pdaPopulateFilters() {
+        var data = window.PDA_DATA;
+        if (!data) return;
+        var models = data.models;
+        var filterMap = {
+            series: function(m) { return m.main; },
+            ip: function(m) { var v = (m.params['IP防护等级'] || '').toUpperCase(); var mch = v.match(/IP\d+/); return mch ? mch[0] : v; },
+            nfc: function(m) { var v = m.params['NFC/工作频率'] || ''; return (!v || v.indexOf('不支持') !== -1) ? '不支持' : '支持'; },
+            bluetooth: function(m) { var v = (m.params['蓝牙'] || '').trim(); var match = v.match(/BT\s*(\d+(?:\.\d+)?)/i); return match ? 'BT' + match[1] : v; },
+            os: function(m) { var v = (m.params['操作系统'] || '').match(/Android\s*V?(\d+(?:\.\d+)?)/i); return v ? 'Android ' + v[1] : (m.params['操作系统'] || '').trim(); },
+            screen: function(m) { var v = (m.params['显示屏'] || '').match(/(\d+(?:\.\d+)?)英寸/); return v ? v[1] + '英寸' : ''; },
+            cpu: function(m) { var v = (m.params['处理器'] || '').match(/(\d+\.\d+)\s*GHz/); return v ? v[1] + 'GHz' : ''; },
+            ocr: function(m) { var v = (m.params['OCR'] || '').trim(); return (!v || v.indexOf('不支持') !== -1) ? '不支持' : '支持'; },
+            battery: function(m) { var v = (m.params['电池'] || '').match(/(\d+)\s*mAh/); return v ? v[1] + 'mAh' : ''; }
+        };
+        var selectIds = {
+            series: 'pdaFilterSeries', ip: 'pdaFilterIp', nfc: 'pdaFilterNfc',
+            bluetooth: 'pdaFilterBluetooth', os: 'pdaFilterOs', screen: 'pdaFilterScreen',
+            cpu: 'pdaFilterCpu', ocr: 'pdaFilterOcr', battery: 'pdaFilterBattery'
+        };
+        Object.keys(filterMap).forEach(function(key) {
+            var vals = [];
+            var seen = {};
+            models.forEach(function(m) {
+                var v = filterMap[key](m);
+                if (v && !seen[v]) { seen[v] = true; vals.push(v); }
+            });
+            var sel = document.getElementById(selectIds[key]);
+            if (sel) {
+                vals.sort().forEach(function(v) {
+                    var opt = document.createElement('option');
+                    opt.value = v; opt.textContent = v;
+                    sel.appendChild(opt);
+                });
+            }
+        });
+    }
+
+    function pdaApplyFilters() {
+        var data = window.PDA_DATA;
+        if (!data) return;
+        var models = data.models;
+        var filterGetters = {
+            series: function(m) { return m.main; },
+            ip: function(m) { var v = (m.params['IP防护等级'] || '').toUpperCase(); var mch = v.match(/IP\d+/); return mch ? mch[0] : v; },
+            nfc: function(m) { var v = m.params['NFC/工作频率'] || ''; return (!v || v.indexOf('不支持') !== -1) ? '不支持' : '支持'; },
+            bluetooth: function(m) { var v = (m.params['蓝牙'] || '').trim(); var match = v.match(/BT\s*(\d+(?:\.\d+)?)/i); return match ? 'BT' + match[1] : v; },
+            os: function(m) { var v = (m.params['操作系统'] || '').match(/Android\s*V?(\d+(?:\.\d+)?)/i); return v ? 'Android ' + v[1] : (m.params['操作系统'] || '').trim(); },
+            screen: function(m) { var v = (m.params['显示屏'] || '').match(/(\d+(?:\.\d+)?)英寸/); return v ? v[1] + '英寸' : ''; },
+            cpu: function(m) { var v = (m.params['处理器'] || '').match(/(\d+\.\d+)\s*GHz/); return v ? v[1] + 'GHz' : ''; },
+            ocr: function(m) { var v = (m.params['OCR'] || '').trim(); return (!v || v.indexOf('不支持') !== -1) ? '不支持' : '支持'; },
+            battery: function(m) { var v = (m.params['电池'] || '').match(/(\d+)\s*mAh/); return v ? v[1] + 'mAh' : ''; }
+        };
+        var selectIds = {
+            series: 'pdaFilterSeries', ip: 'pdaFilterIp', nfc: 'pdaFilterNfc',
+            bluetooth: 'pdaFilterBluetooth', os: 'pdaFilterOs', screen: 'pdaFilterScreen',
+            cpu: 'pdaFilterCpu', ocr: 'pdaFilterOcr', battery: 'pdaFilterBattery'
+        };
+        var activeFilters = {};
+        Object.keys(selectIds).forEach(function(key) {
+            var sel = document.getElementById(selectIds[key]);
+            if (sel && sel.value) activeFilters[key] = sel.value;
+        });
+        pdaFilteredModels = models.filter(function(m) {
+            for (var key in activeFilters) {
+                if (!activeFilters[key]) continue;
+                var mv = filterGetters[key](m);
+                if (mv !== activeFilters[key]) return false;
+            }
+            return true;
+        });
+        pdaRenderTable();
+    }
+
+    function pdaRenderTable() {
+        var data = window.PDA_DATA;
+        if (!data) return;
+        var head = document.getElementById('pdaTableHead');
+        var body = document.getElementById('pdaTableBody');
+        var count = document.getElementById('pdaCount');
+        count.textContent = '共 ' + pdaFilteredModels.length + ' 款型号';
+        var h = '<tr><th style="min-width:120px;text-align:left">参数项</th>';
+        pdaFilteredModels.forEach(function(m) {
+            h += '<th title="' + m.sub + '">' + m.sub + '</th>';
+        });
+        h += '</tr>';
+        head.innerHTML = h;
+        var b = '';
+        data.paramOrder.forEach(function(p) {
+            b += '<tr><td title="' + p + '">' + p + '</td>';
+            pdaFilteredModels.forEach(function(m) {
+                var val = m.params[p] || '-';
+                b += '<td title="' + val.replace(/"/g, '&quot;') + '">' + val + '</td>';
+            });
+            b += '</tr>';
+        });
+        body.innerHTML = b;
     }
 
     function initCmpFilter() {
