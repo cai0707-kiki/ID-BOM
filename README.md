@@ -27,6 +27,7 @@ ID-BOM/
 │   ├── camera_data.js      # 相机产品数据（IMG 列带 CAM/ 前缀）
 │   ├── accessory_data.js   # 配件产品数据（IMG 列带 ACC/ 前缀）
 │   ├── mapping_data.js     # 经销基线对照表
+│   ├── pda_data.js          # PDA智能移动终端选型数据
 │   └── spec-mapping.js     # 产品型号 → 官网详情页 URL 映射
 ├── IMG/                    # 产品图片
 │   ├── CAM/                # 相机原图（55 张）
@@ -153,6 +154,15 @@ var url = getSpecUrl('MV-ID2013EM-05-RBN');
 - **兼容性：** 现代浏览器（Chrome、Edge、Firefox、Safari）
 
 ## 版本更新记录
+
+### V1.5 (2026-09-08)
+**新增PDA选型功能**
+
+- 新增「PDA」页面：智能移动终端选型工具
+- 支持8维筛选：系列、IP防护等级、NFC、蓝牙、操作系统、屏幕尺寸、处理器、OCR、电池
+- 参数对比表格：39项参数横向对比，桌面端可同时显示3款产品
+- 数据来源：Code-reader-selection仓库，19款PDA型号
+- 同步更新离线版数据
 
 ### V1.4.3 (2026-09-07)
 **镜头罩图片分类 & 图片目录整理**
