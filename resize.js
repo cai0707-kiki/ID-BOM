@@ -7,6 +7,56 @@ const sharp = require('sharp');
 // 支持的图片扩展名
 const SUPPORTED_EXT = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'];
 
+// PIC 专用文件名（不含扩展名）
+const PIC_NAMES = ['dmv', 'mvlab', 'wmv'];
+
+/**
+ * 从 camera_data.js / accessory_data.js 提取 IMG 文件名集合
+ */
+function getDataImgNames() {
+    const camNames = new Set();
+    const accNames = new Set();
+
+    // 读取 camera_data.js
+    try {
+        const camSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'camera_data.js'), 'utf8');
+        const camMatch = camSrc.match(/IDBOM_CAMERA_DATA\s*=\s*(\[[\s\S]*?\]);/);
+        if (camMatch) {
+            const camData = eval(camMatch[1]);
+            camData.forEach(r => {
+                const v = (r.value[25] || '').trim();
+                if (v) camNames.add(v.replace(/^(CAM\/|ACC\/)/, ''));
+            });
+        }
+    } catch (e) {}
+
+    // 读取 accessory_data.js
+    try {
+        const accSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'accessory_data.js'), 'utf8');
+        const accMatch = accSrc.match(/IDBOM_ACCESSORY_DATA\s*=\s*(\[[\s\S]*?\]);/);
+        if (accMatch) {
+            const accData = eval(accMatch[1]);
+            accData.forEach(r => {
+                const v = (r.value[9] || '').trim();
+                if (v) accNames.add(v.replace(/^(CAM\/|ACC\/)/, ''));
+            });
+        }
+    } catch (e) {}
+
+    return { camNames, accNames };
+}
+
+/**
+ * 根据文件名判断目标子目录：CAM / ACC / PIC
+ */
+function resolveSubDir(nameNoExt, camNames, accNames) {
+    if (PIC_NAMES.includes(nameNoExt.toLowerCase())) return 'PIC';
+    if (camNames.has(nameNoExt)) return 'CAM';
+    if (accNames.has(nameNoExt)) return 'ACC';
+    // 默认放 ACC
+    return 'ACC';
+}
+
 /**
  * 递归获取所有图片文件路径
  */
@@ -34,7 +84,7 @@ function getImageFiles(dir, fileList = []) {
 }
 
 /**
- * 调整图片分辨率
+ * 调整图片分辨率（自动按文件名分发到 CAM/ACC/PIC 子目录）
  */
 async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keepRatio, overwrite) {
     if (!fs.existsSync(inputDir)) {
@@ -42,12 +92,10 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
         process.exit(1);
     }
 
-    const isOverwrite = !outputDir;
-    const outRoot = outputDir || inputDir;
+    const { camNames, accNames } = getDataImgNames();
+    console.log(`数据匹配：CAM ${camNames.size} 条，ACC ${accNames.size} 条`);
 
-    if (!isOverwrite && !fs.existsSync(outRoot)) {
-        fs.mkdirSync(outRoot, { recursive: true });
-    }
+    const outRoot = outputDir || inputDir;
 
     const files = getImageFiles(inputDir);
     if (files.length === 0) {
@@ -55,20 +103,21 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
         return;
     }
 
-    console.log(`共找到 ${files.length} 张图片，开始处理...`);
+    console.log(`共找到 ${files.length} 张图片，开始处理...\n`);
 
-    let processed = 0,
-        skipped = 0,
-        failed = 0;
+    let processed = 0, skipped = 0, failed = 0;
+    const destMap = {};
 
     for (const srcPath of files) {
-        const relDir = path.relative(inputDir, path.dirname(srcPath));
-        const destDir = isOverwrite ? path.dirname(srcPath) : path.join(outRoot, relDir);
         const fileName = path.basename(srcPath);
+        const nameNoExt = path.basename(srcPath, path.extname(srcPath));
+
+        // 判断目标子目录
+        const subDir = resolveSubDir(nameNoExt, camNames, accNames);
+        const destDir = path.join(outRoot, subDir);
         const destPath = path.join(destDir, fileName);
 
-        if (!isOverwrite && !overwrite && fs.existsSync(destPath)) {
-            console.log(`跳过已存在: ${destPath}`);
+        if (!overwrite && fs.existsSync(destPath)) {
             skipped++;
             continue;
         }
@@ -83,7 +132,6 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
 
             let pipeline;
             if (keepRatio) {
-                // 保持宽高比，不足部分用白色填充
                 pipeline = img.resize(targetWidth, targetHeight, {
                     fit: 'contain',
                     background: { r: 255, g: 255, b: 255, alpha: 1 }
@@ -95,15 +143,18 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
             }
 
             await pipeline.toFile(destPath);
-            console.log(`已处理: ${srcPath} -> ${destPath} (${metadata.width}x${metadata.height} -> ${targetWidth}x${targetHeight})`);
+            destMap[subDir] = (destMap[subDir] || 0) + 1;
             processed++;
         } catch (err) {
-            console.error(`处理失败: ${srcPath}`, err.message);
+            console.error(`  失败: ${fileName} -> ${subDir}/ - ${err.message}`);
             failed++;
         }
     }
 
     console.log(`\n处理完成！成功: ${processed}, 跳过: ${skipped}, 失败: ${failed}`);
+    for (const [dir, count] of Object.entries(destMap)) {
+        console.log(`  ${dir}/: ${count} 张`);
+    }
 }
 
 /**
@@ -198,7 +249,7 @@ if (thumbIdx !== -1) {
             console.log(`
 用法:
   node resize.js --thumb [--dir <图片根目录>]          生成缩略图
-  node resize.js -i <输入目录> -o <输出目录> -W <宽度> -H <高度> [选项]  调整图片尺寸
+  node resize.js -i <输入目录> -o <输出目录> -W <宽度> -H <高度> [选项]  调整图片尺寸并自动分发
 
 缩略图选项:
   --thumb             生成缩略图模式
@@ -213,10 +264,16 @@ resize 选项:
   -f, --force         强制覆盖已存在的文件（默认跳过）
   -h, --help          显示此帮助信息
 
+图片自动分发规则:
+  dmv/mvlab/wmv.png   → IMG/PIC/
+  camera_data.js 中的文件名 → IMG/CAM/
+  accessory_data.js 中的文件名 → IMG/ACC/
+  其他 → IMG/ACC/（默认）
+
 示例:
   node resize.js --thumb
   node resize.js --thumb --dir ./IMG
-  node resize.js -i ./OLD -o ./IMG -W 360 -H 360
+  node resize.js -i ./raw_photos -o ./IMG -W 360 -H 360
             `);
             process.exit(0);
         }
