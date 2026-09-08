@@ -4085,9 +4085,9 @@ window.PDA_DATA = {
     document.querySelectorAll('.nav-item').forEach(function(t) {
         t.classList.remove('active');
     });
-    if (evt && evt.currentTarget) {
-        evt.currentTarget.classList.add('active');
-    }
+    document.querySelectorAll('.nav-item').forEach(function(t) {
+        if (t.getAttribute('onclick').indexOf("'" + page + "'") !== -1) t.classList.add('active');
+    });
 
         // 隐藏所有页面
     document.getElementById('pageHome').style.display = 'none';
