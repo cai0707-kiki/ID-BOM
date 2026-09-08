@@ -4085,10 +4085,9 @@ window.PDA_DATA = {
     document.querySelectorAll('.nav-item').forEach(function(t) {
         t.classList.remove('active');
     });
-    var pageNavMap = {home:'首页',bom:'配单表',cmp:'对照表',overview:'系列表',pda:'PDA'};
-    document.querySelectorAll('.nav-item').forEach(function(t) {
-        if (t.textContent.trim() === pageNavMap[page]) t.classList.add('active');
-    });
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
 
         // 隐藏所有页面
     document.getElementById('pageHome').style.display = 'none';
