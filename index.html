@@ -962,15 +962,15 @@
         .pda-filter-select:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,0.1)}
         .pda-table-scroll{overflow-x:auto;flex:1}
         @media(min-width:769px){.pda-table-scroll{max-height:calc(100vh - 220px);overflow:auto}}
-        .pda-table{width:100%;border-collapse:collapse;font-size:12px}
-        .pda-table th,.pda-table td{padding:8px 10px;border:1px solid #e2e8f0;text-align:left;white-space:nowrap}
+        .pda-table{border-collapse:collapse;font-size:11px}
+        .pda-table th,.pda-table td{padding:6px 8px;border:1px solid #e2e8f0;text-align:left;white-space:normal;word-break:break-all}
         .pda-table thead{position:sticky;top:0;z-index:10;background:#1e293b;color:white}
         .pda-table th{background:#1e293b;color:white;font-weight:600;font-size:11px;text-align:center}
-        .pda-table th:first-child{background:#f97316;text-align:left;min-width:120px}
+        .pda-table th:first-child,.pda-table td:first-child{width:130px;min-width:130px;max-width:130px;white-space:normal}
         .pda-table tbody tr:nth-child(even){background:#f8fafc}
         .pda-table tbody tr:hover{background:#fff7ed}
-        .pda-table td:first-child{font-weight:600;color:#1e293b;background:#f1f5f9;white-space:nowrap}
-        .pda-table td{max-width:200px;overflow:hidden;text-overflow:ellipsis}
+        .pda-table td:first-child{font-weight:600;color:#1e293b;background:#f1f5f9}
+        .pda-table td{font-size:11px}
     </style>
 </head>
 <body>
@@ -2688,7 +2688,7 @@
         var body = document.getElementById('pdaTableBody');
         var count = document.getElementById('pdaCount');
         count.textContent = '共 ' + pdaFilteredModels.length + ' 款型号';
-        var h = '<tr><th style="min-width:120px;text-align:left">参数项</th>';
+        var h = '<tr><th>参数项</th>';
         pdaFilteredModels.forEach(function(m) {
             h += '<th title="' + m.sub + '">' + m.sub + '</th>';
         });
