@@ -173,17 +173,6 @@ function main() {
         console.log('  - mapping_data.js   (IDBOM_MAPPING_DATA)');
     }
 
-    // ===== 4. 生成缩略图 =====
-    console.log('\n生成缩略图...');
-    try {
-        require('child_process').execSync('node resize.js --thumb', {
-            cwd: __dirname,
-            stdio: 'inherit'
-        });
-    } catch (e) {
-        console.log('缩略图生成失败（可手动运行 node resize.js --thumb）');
-    }
-
     console.log('\n刷新 index.html 即可加载最新数据。');
 }
 
