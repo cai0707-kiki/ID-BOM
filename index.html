@@ -1806,7 +1806,7 @@
                 var chk = tempSelectedItems.indexOf(item.code) >= 0 ? 'checked' : '';
 
                 var imgCell = '';
-                imgCell = '<td class="col-img">' + getImageHtml(item.img, 'img-thumb', 42, 42) + '</td>';
+                imgCell = '<td class="col-img">' + getImageHtml(item.img, 'img-thumb', 42, 42, 'accessory') + '</td>';
 
                 h += '<tr class="' + (chk ? 'acc-selected' : '') + '" style="cursor:pointer" '
                    + 'onclick="var cb=document.getElementById(\'acc_' + origIdx
@@ -2031,7 +2031,7 @@
         document.getElementById('statAccessory').textContent = selectedAccessories.length;
         var h = '<table class="data-table">' + tblHead + '<tbody>';
         selectedAccessories.forEach(function(a) {
-            var imgCell2 = '<td class="img-thumb-cell">' + getImageHtml(a.img, 'img-thumb', 42, 42) + '</td>';
+            var imgCell2 = '<td class="img-thumb-cell">' + getImageHtml(a.img, 'img-thumb', 42, 42, 'accessory') + '</td>';
             // ★★★ 无主机场景：扩展配件使用 subCategory ★★★
             var typeLabel;
             if (a.key === '扩展配件') {
@@ -2128,7 +2128,7 @@
             actionBtn = '<button class="btn-remove" onclick="removeItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
         }
 
-        var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42) + '</td>';
+        var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42, item.type === 'host' ? 'camera' : 'accessory') + '</td>';
 
         // ★★★ 核心修改：主机显示"主机"，配件显示 displayType（子类别名称）★★★
         var typeLabel = (item.type === 'host') ? '主机' : (item.displayType || item.typeName);
@@ -2605,7 +2605,7 @@
             var desc = row[5] || '';
             var remark = row[6] || '';
 
-            var imgHtml = getImageHtml(img, 'img-thumb', 42, 42);
+            var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
             html += '<tr class="' + trClass + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
@@ -2867,7 +2867,7 @@
 
     /* ==================== 图片工具函数 ==================== */
 
-    function getImageHtml(imgName, className, width, height) {
+    function getImageHtml(imgName, className, width, height, imgType) {
         className = className || 'img-thumb';
         width = width || 42;
         height = height || 42;
@@ -2875,9 +2875,9 @@
             return '<span class="img-thumb-placeholder">—</span>';
         }
         imgName = imgName.replace(/\\r$/g, '').replace(/\r$/g, '');
-        // 如果没有前缀，尝试自动判断类型
+        // 如果没有前缀，根据类型自动补 CAM/ 或 ACC/
         if (imgName.indexOf('/') < 0) {
-            imgName = 'ACC/' + imgName;
+            imgName = (imgType === 'camera' ? 'CAM/' : 'ACC/') + imgName;
         }
         var safeName = imgName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         var safeJsName = imgName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
