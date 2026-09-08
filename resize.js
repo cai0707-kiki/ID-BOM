@@ -155,6 +155,10 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
     for (const [dir, count] of Object.entries(destMap)) {
         console.log(`  ${dir}/: ${count} 张`);
     }
+
+    // 自动生成缩略图
+    console.log('\n自动生成缩略图...');
+    await generateThumbs(outRoot);
 }
 
 /**
@@ -273,7 +277,7 @@ resize 选项:
 示例:
   node resize.js --thumb
   node resize.js --thumb --dir ./IMG
-  node resize.js -i ./raw_photos -o ./IMG -W 360 -H 360
+  node resize.js -i ./OLD -o ./IMG -W 360 -H 360
             `);
             process.exit(0);
         }
