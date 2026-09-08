@@ -22,3 +22,6 @@ npm-debug.log*
 
 # CSV data files (maintained locally only)
 *.csv
+
+# PowerPoint files
+*.pptx
