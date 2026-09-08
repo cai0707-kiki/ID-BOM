@@ -2875,6 +2875,10 @@
             return '<span class="img-thumb-placeholder">—</span>';
         }
         imgName = imgName.replace(/\\r$/g, '').replace(/\r$/g, '');
+        // 如果没有前缀，尝试自动判断类型
+        if (imgName.indexOf('/') < 0) {
+            imgName = 'ACC/' + imgName;
+        }
         var safeName = imgName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         var safeJsName = imgName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
         // 缩略图路径：IMG/CAM/THUMB/xxx.png 或 IMG/ACC/THUMB/xxx.png

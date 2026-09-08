@@ -267,6 +267,16 @@ function loadDataFromParent() {
     cameraData.forEach(function(r) { while (r.length < camLen) r.push(''); });
     var accLen = ACCESSORY_HEADERS.length;
     accessoryData.forEach(function(r) { while (r.length < accLen) r.push(''); });
+
+    // 去掉 IMG 列的 CAM/ 或 ACC/ 前缀（保持数据干净）
+    cameraData.forEach(function(r) {
+        var v = r[IMG_COL_CAMERA];
+        if (v && v.indexOf('CAM/') === 0) r[IMG_COL_CAMERA] = v.substring(4);
+    });
+    accessoryData.forEach(function(r) {
+        var v = r[IMG_COL_ACCESSORY];
+        if (v && v.indexOf('ACC/') === 0) r[IMG_COL_ACCESSORY] = v.substring(4);
+    });
 }
 
 // ==================== Dropdown Cache ====================
@@ -441,18 +451,20 @@ function renderTable() {
             // ===== 图片缩略图列（在第3列之后插入） =====
             if (c === IMG_INSERT_AFTER) {
                 var imgVal = (row[imgCol] || '').toString().trim().replace(/\r/g, '');
+                var imgPrefix = currentTab === 'camera' ? 'CAM/' : 'ACC/';
+                var imgKey = imgVal ? (imgVal.indexOf('/') >= 0 ? imgVal : imgPrefix + imgVal) : '';
                 bhtml += '<td class="col-img">';
-                if (imgVal) {
-                    var parts = imgVal.split('/');
+                if (imgKey) {
+                    var parts = imgKey.split('/');
                     var thumbSrc = parts.length > 1
                         ? 'IMG/' + parts[0] + '/THUMB/' + parts[1] + '.png'
-                        : 'IMG/THUMB/' + imgVal + '.png';
-                    var fullSrc = 'IMG/' + imgVal + '.png';
+                        : 'IMG/THUMB/' + imgKey + '.png';
+                    var fullSrc = 'IMG/' + imgKey + '.png';
                     bhtml += '<span class="thumb-wrap">';
                     bhtml += '<img class="thumb" src="' + escH(thumbSrc) + '" data-full="' + escH(fullSrc) + '" loading="lazy" width="48" height="48" ';
                     bhtml += 'title="' + escH(imgVal) + ' — 点击放大" ';
-                    bhtml += 'onclick="showImgPreview(\'' + escH(imgVal) + '\')" ';
-                    bhtml += 'onerror="handleThumbError(this,\'' + escH(imgVal) + '\')">';
+                    bhtml += 'onclick="showImgPreview(\'' + escH(imgKey) + '\')" ';
+                    bhtml += 'onerror="handleThumbError(this,\'' + escH(imgKey) + '\')">';
                     bhtml += '<button class="thumb-del" title="删除图片标识" onclick="event.stopPropagation();deleteImg(\'' + currentTab + '\',' + idx + ')">✕</button>';
                     bhtml += '</span>';
                 } else {
@@ -726,14 +738,7 @@ function parseAndStore(text, fname, callback) {
         for (var i = 0; i < expectedCols; i++) nr.push((r[i] || '').toString().trim());
         return nr;
     }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
-    // 补齐 IMG 列前缀（CSV 中只有文件名，需要加上 CAM/ 或 ACC/）
-    var imgColIdx = target === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY;
-    var imgPrefix = target === 'camera' ? 'CAM/' : 'ACC/';
-    normalized.forEach(function(r) {
-        if (r[imgColIdx] && r[imgColIdx].indexOf('/') < 0) {
-            r[imgColIdx] = imgPrefix + r[imgColIdx];
-        }
-    });
+    // IMG 列保持原样，不添加前缀
     if (normalized.length === 0) return;
     if (target === 'camera') pendingImports.camera = normalized;
     else pendingImports.accessory = normalized;
@@ -764,10 +769,19 @@ function confirmImport() {
 function exportCurrentCSV() {
     var headers = getHeaders();
     var data = getData();
+    var imgCol = getImgColIdx();
     var csv = '\uFEFF' + headers.map(csvEsc).join(',') + '\n';
     data.forEach(function(row) {
         var line = [];
-        for (var i = 0; i < headers.length; i++) line.push(csvEsc((row[i] || '').toString().trim()));
+        for (var i = 0; i < headers.length; i++) {
+            var val = (row[i] || '').toString().trim();
+            // IMG 列导出时去掉 CAM/ 或 ACC/ 前缀
+            if (i === imgCol && val.indexOf('/') >= 0) {
+                var parts = val.split('/');
+                val = parts[parts.length - 1];
+            }
+            line.push(csvEsc(val));
+        }
         csv += line.join(',') + '\n';
     });
     var fname = (currentTab === 'camera' ? 'camera_data.csv' : 'accessory_data.csv');
