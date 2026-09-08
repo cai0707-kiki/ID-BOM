@@ -93,7 +93,7 @@ function main() {
         row = row.map(c => (c || '').replace(/\r/g, ''));
         while (row.length < 26) row.push('');
         const imgVal = row[25].trim();
-        row[25] = imgVal ? 'CAM/' + imgVal : '';
+        row[25] = imgVal ? (imgVal.startsWith('CAM/') ? imgVal : 'CAM/' + imgVal) : '';
         return { Count: 26, value: row.slice(0, 26) };
     });
 
@@ -120,7 +120,7 @@ function main() {
         row = row.map(c => (c || '').replace(/\r/g, ''));
         while (row.length < 10) row.push('');
         const imgVal = row[9].trim();
-        row[9] = imgVal ? 'ACC/' + imgVal : '';
+        row[9] = imgVal ? (imgVal.startsWith('ACC/') ? imgVal : 'ACC/' + imgVal) : '';
 
         return { Count: 10, value: row.slice(0, 10) };
     });
