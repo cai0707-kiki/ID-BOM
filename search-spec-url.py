@@ -59,14 +59,14 @@ def clean_model(raw):
 # ==================== index.html 解析 ====================
 
 def extract_models_from_html(_html_path):
-    """从 scripts/camera_data.js 中提取所有相机具体型号，清洗去重"""
-    camera_js = os.path.join(SCRIPT_DIR, "scripts", "camera_data.js")
+    """从 scripts/id_camera_data.js 中提取所有相机具体型号，清洗去重"""
+    camera_js = os.path.join(SCRIPT_DIR, "scripts", "id_camera_data.js")
     with open(camera_js, "r", encoding="utf-8") as f:
         content = f.read()
 
     match = re.search(r'var\s+IDBOM_CAMERA_DATA\s*=\s*(\[.*?\]);', content, re.DOTALL)
     if not match:
-        print("❌ 无法从 camera_data.js 中提取数据")
+        print("❌ 无法从 id_camera_data.js 中提取数据")
         return []
 
     try:
