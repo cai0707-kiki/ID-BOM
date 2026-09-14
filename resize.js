@@ -47,14 +47,14 @@ function getDataImgNames() {
 }
 
 /**
- * 根据文件名判断目标子目录：CAM / ACC / PIC
+ * 根据文件名判断目标子目录：CAM / ACC / PIC / IMG（根目录）
  */
 function resolveSubDir(nameNoExt, camNames, accNames) {
     if (PIC_NAMES.includes(nameNoExt.toLowerCase())) return 'PIC';
     if (camNames.has(nameNoExt)) return 'CAM';
     if (accNames.has(nameNoExt)) return 'ACC';
-    // 默认放 ACC
-    return 'ACC';
+    // 找不到匹配的，放IMG根目录
+    return '';
 }
 
 /**
@@ -114,7 +114,7 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
 
         // 判断目标子目录
         const subDir = resolveSubDir(nameNoExt, camNames, accNames);
-        const destDir = path.join(outRoot, subDir);
+        const destDir = subDir ? path.join(outRoot, subDir) : outRoot;
         const destPath = path.join(destDir, fileName);
 
         if (!overwrite && fs.existsSync(destPath)) {
@@ -153,7 +153,7 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
 
     console.log(`\n处理完成！成功: ${processed}, 跳过: ${skipped}, 失败: ${failed}`);
     for (const [dir, count] of Object.entries(destMap)) {
-        console.log(`  ${dir}/: ${count} 张`);
+        console.log(`  ${dir || 'IMG/' }: ${count} 张`);
     }
 
     // 自动生成缩略图
@@ -269,10 +269,10 @@ resize 选项:
   -h, --help          显示此帮助信息
 
 图片自动分发规则:
-  dmv/mvlab/wmv.png   → IMG/PIC/
+  dmv/mvlab/wmv.png        → IMG/PIC/
   id_camera_data.js 中的文件名 → IMG/CAM/
   id_accessory_data.js 中的文件名 → IMG/ACC/
-  其他 → IMG/ACC/（默认）
+  其他 → IMG/（根目录）
 
 示例:
   node resize.js --thumb
