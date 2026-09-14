@@ -11,15 +11,15 @@ const SUPPORTED_EXT = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'
 const PIC_NAMES = ['dmv', 'mvlab', 'wmv'];
 
 /**
- * 从 camera_data.js / accessory_data.js 提取 IMG 文件名集合
+ * 从 id_camera_data.js / id_accessory_data.js 提取 IMG 文件名集合
  */
 function getDataImgNames() {
     const camNames = new Set();
     const accNames = new Set();
 
-    // 读取 camera_data.js
+    // 读取 id_camera_data.js
     try {
-        const camSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'camera_data.js'), 'utf8');
+        const camSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'id_camera_data.js'), 'utf8');
         const camMatch = camSrc.match(/IDBOM_CAMERA_DATA\s*=\s*(\[[\s\S]*?\]);/);
         if (camMatch) {
             const camData = eval(camMatch[1]);
@@ -30,9 +30,9 @@ function getDataImgNames() {
         }
     } catch (e) {}
 
-    // 读取 accessory_data.js
+    // 读取 id_accessory_data.js
     try {
-        const accSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'accessory_data.js'), 'utf8');
+        const accSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'id_accessory_data.js'), 'utf8');
         const accMatch = accSrc.match(/IDBOM_ACCESSORY_DATA\s*=\s*(\[[\s\S]*?\]);/);
         if (accMatch) {
             const accData = eval(accMatch[1]);
@@ -270,8 +270,8 @@ resize 选项:
 
 图片自动分发规则:
   dmv/mvlab/wmv.png   → IMG/PIC/
-  camera_data.js 中的文件名 → IMG/CAM/
-  accessory_data.js 中的文件名 → IMG/ACC/
+  id_camera_data.js 中的文件名 → IMG/CAM/
+  id_accessory_data.js 中的文件名 → IMG/ACC/
   其他 → IMG/ACC/（默认）
 
 示例:

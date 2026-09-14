@@ -1337,8 +1337,8 @@
       window.getSpecUrl = function() { return ''; };
     }
     </script>
-    <script src="scripts/camera_data.js"></script>
-    <script src="scripts/accessory_data.js"></script>
+    <script src="scripts/id_camera_data.js"></script>
+    <script src="scripts/id_accessory_data.js"></script>
     <script src="scripts/mapping_data.js"></script>
     <script src="scripts/pda_data.js"></script>
     <script>
@@ -1391,7 +1391,7 @@
 
     function loadData() {
         try {
-            // 合并相机数据和配件数据（来自 camera_data.js 和 accessory_data.js）
+            // 合并相机数据和配件数据（来自 id_camera_data.js 和 id_accessory_data.js）
             var raw = [];
             if (typeof IDBOM_CAMERA_DATA !== 'undefined' && Array.isArray(IDBOM_CAMERA_DATA)) {
                 raw = raw.concat(IDBOM_CAMERA_DATA);

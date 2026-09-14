@@ -66,8 +66,8 @@ function main() {
     console.log('=== CSV导入工具（生成JS数据文件）===\n');
 
     const encoding = 'GBK';
-    const cameraCsvPath = path.join(__dirname, 'camera_data.csv');
-    const accessoryCsvPath = path.join(__dirname, 'accessory_data.csv');
+    const cameraCsvPath = path.join(__dirname, 'id_camera_data.csv');
+    const accessoryCsvPath = path.join(__dirname, 'id_accessory_data.csv');
     const mappingCsvPath = path.join(__dirname, 'mapping.csv');
 
     // 确保 scripts/ 目录存在
@@ -79,7 +79,7 @@ function main() {
 
     // ===== 1. 相机数据 =====
     if (!fs.existsSync(cameraCsvPath)) {
-        console.log('错误: 未找到 camera_data.csv');
+        console.log('错误: 未找到 id_camera_data.csv');
         process.exit(1);
     }
 
@@ -97,17 +97,17 @@ function main() {
         return { Count: 26, value: row.slice(0, 26) };
     });
 
-    console.log(`  camera_data.csv: ${cameraJsonData.length} 条记录`);
+    console.log(`  id_camera_data.csv: ${cameraJsonData.length} 条记录`);
     writeDataJs(
-        path.join(__dirname, 'scripts', 'camera_data.js'),
+        path.join(__dirname, 'scripts', 'id_camera_data.js'),
         'IDBOM_CAMERA_DATA',
         cameraJsonData,
-        'ID-BOM 相机产品数据\n * 数据来源：camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 camera_data.csv 后运行 `node import_csv.js`'
+        'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`'
     );
 
     // ===== 2. 配件数据 =====
     if (!fs.existsSync(accessoryCsvPath)) {
-        console.log('错误: 未找到 accessory_data.csv');
+        console.log('错误: 未找到 id_accessory_data.csv');
         process.exit(1);
     }
 
@@ -125,12 +125,12 @@ function main() {
         return { Count: 10, value: row.slice(0, 10) };
     });
 
-    console.log(`  accessory_data.csv: ${accessoryJsonData.length} 条记录`);
+    console.log(`  id_accessory_data.csv: ${accessoryJsonData.length} 条记录`);
     writeDataJs(
-        path.join(__dirname, 'scripts', 'accessory_data.js'),
+        path.join(__dirname, 'scripts', 'id_accessory_data.js'),
         'IDBOM_ACCESSORY_DATA',
         accessoryJsonData,
-        'ID-BOM 配件产品数据\n * 数据来源：accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 accessory_data.csv 后运行 `node import_csv.js`'
+        'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`'
     );
 
     // ===== 3. 映射数据（mapping.csv）=====
@@ -167,10 +167,10 @@ function main() {
     // ===== 完成 =====
     console.log('\n导入完成！');
     console.log('已生成以下 JS 数据文件:');
-    console.log('  - camera_data.js    (IDBOM_CAMERA_DATA)');
-    console.log('  - accessory_data.js (IDBOM_ACCESSORY_DATA)');
+    console.log('  - id_camera_data.js    (IDBOM_CAMERA_DATA)');
+    console.log('  - id_accessory_data.js (IDBOM_ACCESSORY_DATA)');
     if (fs.existsSync(mappingCsvPath)) {
-        console.log('  - mapping_data.js   (IDBOM_MAPPING_DATA)');
+        console.log('  - mapping_data.js      (IDBOM_MAPPING_DATA)');
     }
 
     console.log('\n刷新 index.html 即可加载最新数据。');
