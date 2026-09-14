@@ -991,6 +991,31 @@
         .pda-table tbody tr:nth-child(even){background:#f8fafc}
         .pda-table tbody tr:hover{background:#fff7ed}
         .pda-table td:first-child{font-weight:600;color:#1e293b;background:#f1f5f9}
+
+        /* 产品动态页样式 */
+        .updates-container{display:flex;flex-direction:column;gap:12px;padding:16px;background:white;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);flex:1;min-height:0}
+        .updates-header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+        .updates-filters{display:flex;flex-wrap:wrap;gap:12px}
+        .filter-group{display:flex;align-items:center;gap:6px}
+        .filter-label{font-size:12px;font-weight:600;color:#64748b}
+        .filter-select{padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#333;background:white;cursor:pointer;min-width:100px}
+        .filter-select:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 2px rgba(249,115,22,0.1)}
+        .updates-stats{font-size:12px;color:#64748b;padding:4px 0;border-bottom:1px solid #e2e8f0}
+        .updates-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;padding-right:4px}
+        .update-item{padding:12px 16px;background:#f8fafc;border-radius:8px;border-left:4px solid #f97316;transition:all 0.2s}
+        .update-item:hover{background:#fff7ed;transform:translateX(2px)}
+        .update-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+        .update-item-date{font-size:11px;color:#94a3b8;font-weight:500}
+        .update-item-type{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;text-transform:uppercase}
+        .update-item-type.市场策略{background:#fef3c7;color:#d97706}
+        .update-item-type.产品发布{background:#dcfce7;color:#16a34a}
+        .update-item-type.产品迭代{background:#dbeafe;color:#2563eb}
+        .update-item-type.产品退市{background:#fee2e2;color:#dc2626}
+        .update-item-type.客户端更新{background:#e0e7ff;color:#4f46e5}
+        .update-item-type.固件更新{background:#f3e8ff;color:#9333ea}
+        .update-item-content{font-size:13px;color:#334155;line-height:1.6;white-space:pre-line}
+        .update-item-series{font-size:11px;color:#64748b;margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0}
+        .update-item-series span{color:#f97316;font-weight:600}
     </style>
 </head>
 <body>
@@ -1018,6 +1043,7 @@
             <div class="nav-item" onclick="switchPage('cmp', event)"><span class="nav-icon">📊</span>对照表</div>
             <div class="nav-item" onclick="switchPage('overview', event)"><span class="nav-icon">📦</span>系列表</div>
             <div class="nav-item" onclick="switchPage('pda', event)"><span class="nav-icon">📱</span>PDA</div>
+            <div class="nav-item" onclick="switchPage('updates', event)"><span class="nav-icon">📰</span>产品动态</div>
         </div>
         <div id="pageHome">
             <div class="home-section">
@@ -1250,6 +1276,40 @@
         </div>
     </div>
 
+    <!-- ====== 产品动态页 ====== -->
+    <div id="pageUpdates" style="display:none;flex:1;min-width:0;flex-direction:column;gap:12px;">
+        <div class="updates-container">
+            <div class="updates-header">
+                <div class="content-title"><div class="content-title-icon">📰</div>产品动态</div>
+                <div class="updates-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">产品动态：</label>
+                        <select id="updateTypeFilter" class="filter-select" onchange="filterUpdates()">
+                            <option value="all">全选</option>
+                            <option value="市场策略">市场策略</option>
+                            <option value="产品发布">产品发布</option>
+                            <option value="产品迭代">产品迭代</option>
+                            <option value="产品退市">产品退市</option>
+                            <option value="客户端更新">客户端更新</option>
+                            <option value="固件更新">固件更新</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">涉及系列：</label>
+                        <select id="updateSeriesFilter" class="filter-select" onchange="filterUpdates()">
+                            <option value="all">全选</option>
+                            <option value="ID">ID产品</option>
+                            <option value="SC">SC产品</option>
+                            <option value="VM">VM产品</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="updates-stats" id="updatesStats">共 0 条动态</div>
+            <div class="updates-list" id="updatesList"></div>
+        </div>
+    </div>
+
     <div class="version-bar">有任何建议和问题请及时联系蔡修钢 · 网址：<a href="https://cai0707-kiki.github.io/ID-BOM/" target="_blank" style="color:#f97316;text-decoration:none">https://cai0707-kiki.github.io/ID-BOM/</a></div>
     <button id="backToTop" class="back-to-top" title="返回顶部">↑</button>
     <!-- ====== 联系我们浮动按钮 ====== -->
@@ -1342,6 +1402,7 @@
     <script src="scripts/id_accessory_data.js"></script>
     <script src="scripts/mapping_data.js"></script>
     <script src="scripts/pda_data.js"></script>
+    <script src="scripts/product_updates.js"></script>
     <script>
     /* ==================== 配置常量 ==================== */
 
@@ -2649,6 +2710,8 @@
     overview.classList.remove('active');
     var pda = document.getElementById('pagePda');
     pda.style.display = 'none';
+    var updates = document.getElementById('pageUpdates');
+    updates.style.display = 'none';
 
     if (page === 'home') {
         document.getElementById('pageHome').style.display = 'flex';
@@ -2672,6 +2735,11 @@
     } else if (page === 'pda') {
         pda.style.display = 'flex';
         pdaInit();
+    } else if (page === 'updates') {
+        updates.style.display = 'flex';
+        if (!updatesInitialized) {
+            initUpdates();
+        }
     }
     }
 
@@ -3093,6 +3161,66 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         })();
     });
+
+    /* ==================== 产品动态功能 ==================== */
+    var updatesInitialized = false;
+    var updatesData = [];
+
+    function initUpdates() {
+        if (updatesInitialized) return;
+        updatesInitialized = true;
+
+        // 加载数据
+        if (typeof IDBOM_PRODUCT_UPDATES !== 'undefined') {
+            updatesData = IDBOM_PRODUCT_UPDATES;
+        }
+
+        // 按日期倒序排序
+        updatesData.sort(function(a, b) {
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        renderUpdatesList();
+    }
+
+    function renderUpdatesList() {
+        var list = document.getElementById('updatesList');
+        var stats = document.getElementById('updatesStats');
+        var typeFilter = document.getElementById('updateTypeFilter').value;
+        var seriesFilter = document.getElementById('updateSeriesFilter').value;
+
+        // 筛选数据
+        var filtered = updatesData.filter(function(item) {
+            var typeMatch = typeFilter === 'all' || item.type === typeFilter;
+            var seriesMatch = seriesFilter === 'all' || item.series.indexOf(seriesFilter) !== -1;
+            return typeMatch && seriesMatch;
+        });
+
+        stats.textContent = '共 ' + filtered.length + ' 条动态';
+
+        // 渲染列表
+        var html = '';
+        filtered.forEach(function(item) {
+            html += '<div class="update-item">';
+            html += '<div class="update-item-header">';
+            html += '<span class="update-item-date">' + item.date + '</span>';
+            html += '<span class="update-item-type ' + item.type + '">' + item.type + '</span>';
+            html += '</div>';
+            html += '<div class="update-item-content">' + item.content + '</div>';
+            html += '<div class="update-item-series">涉及系列：<span>' + item.series + '</span></div>';
+            html += '</div>';
+        });
+
+        if (filtered.length === 0) {
+            html = '<div style="text-align:center;padding:40px;color:#94a3b8;">暂无相关动态</div>';
+        }
+
+        list.innerHTML = html;
+    }
+
+    function filterUpdates() {
+        renderUpdatesList();
+    }
     </script>
 
     <div id="announceOverlay" class="announce-overlay">

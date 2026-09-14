@@ -164,6 +164,38 @@ function main() {
         console.log('\n跳过: 未找到 mapping.csv');
     }
 
+    // ===== 4. 产品动态（product_updates.csv）=====
+    const productUpdatesCsvPath = path.join(__dirname, 'product_updates.csv');
+    if (fs.existsSync(productUpdatesCsvPath)) {
+        console.log('\n读取 product_updates.csv...');
+        const productUpdatesBuffer = fs.readFileSync(productUpdatesCsvPath);
+        const productUpdatesCsv = iconv.decode(productUpdatesBuffer, encoding);
+        const productUpdatesRows = parseCSV(productUpdatesCsv);
+
+        const productUpdatesJsonData = [];
+        productUpdatesRows.forEach(row => {
+            if (row.length >= 5 && row[0] && row[0].trim()) {
+                productUpdatesJsonData.push({
+                    id: (row[0] || '').trim(),
+                    date: (row[1] || '').trim(),
+                    type: (row[2] || '').trim(),
+                    content: (row[3] || '').trim(),
+                    series: (row[4] || '').trim()
+                });
+            }
+        });
+
+        console.log(`  product_updates.csv: ${productUpdatesJsonData.length} 条记录`);
+        writeDataJs(
+            path.join(__dirname, 'scripts', 'product_updates.js'),
+            'IDBOM_PRODUCT_UPDATES',
+            productUpdatesJsonData,
+            'ID-BOM 产品动态数据\n * 数据来源：product_updates.csv（产品更新动态）\n * 更新方式：修改 product_updates.csv 后运行 `node import_csv.js`'
+        );
+    } else {
+        console.log('\n跳过: 未找到 product_updates.csv');
+    }
+
     // ===== 完成 =====
     console.log('\n导入完成！');
     console.log('已生成以下 JS 数据文件:');
@@ -171,6 +203,9 @@ function main() {
     console.log('  - id_accessory_data.js (IDBOM_ACCESSORY_DATA)');
     if (fs.existsSync(mappingCsvPath)) {
         console.log('  - mapping_data.js      (IDBOM_MAPPING_DATA)');
+    }
+    if (fs.existsSync(productUpdatesCsvPath)) {
+        console.log('  - product_updates.js   (IDBOM_PRODUCT_UPDATES)');
     }
 
     console.log('\n刷新 index.html 即可加载最新数据。');
