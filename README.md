@@ -27,7 +27,8 @@ ID-BOM/
 │   ├── camera_data.js      # 相机产品数据（IMG 列带 CAM/ 前缀）
 │   ├── accessory_data.js   # 配件产品数据（IMG 列带 ACC/ 前缀）
 │   ├── mapping_data.js     # 经销基线对照表
-│   ├── pda_data.js          # PDA智能移动终端选型数据
+│   ├── pda_data.js         # PDA智能移动终端选型数据
+│   ├── product_updates.js  # 产品动态数据（市场策略/产品发布/产品迭代/退市/更新）
 │   └── spec-mapping.js     # 产品型号 → 官网详情页 URL 映射
 ├── IMG/                    # 产品图片
 │   ├── CAM/                # 相机原图（55 张）
@@ -44,6 +45,7 @@ ID-BOM/
 ├── camera_data.csv         # 相机产品数据源（GBK 编码，26 列）
 ├── accessory_data.csv      # 配件产品数据源（GBK 编码，10 列）
 ├── mapping.csv             # 基线型号 ↔ 经销型号映射
+├── product_updates.csv     # 产品动态数据源（GBK 编码，6 列：序号/日期/类型/动态/描述/系列）
 ├── package.json            # 项目依赖声明
 └── README.md               # 本文件
 ```
