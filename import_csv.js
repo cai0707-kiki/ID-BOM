@@ -178,9 +178,10 @@ function main() {
                 productUpdatesJsonData.push({
                     id: (row[0] || '').trim(),
                     date: (row[1] || '').trim(),
-                    type: (row[2] || '').trim(),
-                    content: (row[3] || '').trim(),
-                    series: (row[4] || '').trim()
+                    productType: (row[2] || '').trim(),
+                    type: (row[3] || '').trim(),
+                    content: (row[4] || '').trim(),
+                    series: (row[5] || '').trim()
                 });
             }
         });

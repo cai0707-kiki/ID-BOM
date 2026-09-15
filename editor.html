@@ -780,7 +780,7 @@ function exportCurrentCSV() {
                 var parts = val.split('/');
                 val = parts[parts.length - 1];
             }
-            line.push(csvEsc(val));
+            line.push(csvEscape(val));
         }
         csv += line.join(',') + '\n';
     });
@@ -835,7 +835,7 @@ function flushPendingEdits() {
 }
 
 // ==================== Utilities ====================
-function csvEsc(s) { if (s == null) s = ''; s = String(s); return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+function csvEscape(s) { if (s == null) s = ''; s = String(s); return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 function escH(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
 function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type||'success'); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},3000); }
