@@ -3239,8 +3239,15 @@ document.addEventListener('DOMContentLoaded', function() {
             html += '<div class="update-item-footer">';
             html += '<div class="update-item-series">涉及系列：<span>' + item.series + '</span></div>';
             if (hasDoc) {
-                html += '<a class="update-item-doc" href="pdf/' + encodeURIComponent(item.docName) + '" target="_blank" title="打开文档">';
-                html += '📄 ' + item.docName;
+                var docExt = item.docName.split('.').pop().toLowerCase();
+                var docIcon = '📎';
+                if (docExt === 'pdf') {
+                    docIcon = '📄';
+                } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].indexOf(docExt) !== -1) {
+                    docIcon = '🖼️';
+                }
+                html += '<a class="update-item-doc" href="pdf/' + encodeURIComponent(item.docName) + '" target="_blank" title="打开文件">';
+                html += docIcon + ' ' + item.docName;
                 html += '</a>';
             }
             html += '</div>';
