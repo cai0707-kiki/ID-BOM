@@ -172,6 +172,13 @@
         .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;min-height:56px;background:#fff}
         .btn-cancel{padding:6px 14px;border:1px solid #e2e8f0;border-radius:4px;background:white;color:#64748b;font-size:12px;cursor:pointer}
         .btn-confirm{padding:6px 14px;border:none;border-radius:4px;background:#f97316;color:white;font-size:12px;cursor:pointer}
+        #accessoryModal .modal-close{width:30px;height:30px;font-size:16px}
+        #accessoryModal .cable-filter-btn{min-height:28px;padding:5px 12px;border-radius:6px}
+        #accessoryModal .cable-warn{line-height:1.6;padding:10px 12px}
+        #accessoryModal .accessory-table th{padding:12px 14px}
+        #accessoryModal .accessory-table td{padding:12px 14px;vertical-align:top}
+        #accessoryModal .accessory-table input[type="checkbox"]{width:16px;height:16px}
+        #accessoryModal .btn-cancel,#accessoryModal .btn-confirm{min-height:32px;padding:6px 14px}
         .accessory-table{width:100%;border-collapse:collapse;font-size:10px}
         .accessory-table th{background:#f8fafc;padding:6px 8px;text-align:left;font-size:10px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0}
         .accessory-table td{padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:10px}
@@ -931,7 +938,12 @@
         /* ====== 移动端覆盖 ====== */
         @media(max-width:768px) {
             .back-to-top {
-                bottom: 170px;
+                bottom: 120px;
+                right: 14px;
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+                border-width: 2px;
             }
             .contact-box {
                 width: 360px;
@@ -1399,7 +1411,7 @@
             <div class="modal-body">
                 <div id="cableFilterArea"></div>
                 <table class="accessory-table">
-                    <thead><tr><th style="width:40px">选择</th><th class="col-series">产品系列</th><th class="col-img">图片</th><th class="col-name">物料名称</th><th class="col-desc">描述</th><th class="col-code">物料代码</th></tr></thead>
+                    <thead><tr><th style="width:50px;white-space:nowrap">选择</th><th class="col-series">产品系列</th><th class="col-img">图片</th><th class="col-name">物料名称</th><th class="col-desc">描述</th><th class="col-code">物料代码</th></tr></thead>
                     <tbody id="modalTableBody"></tbody>
                 </table>
             </div>
