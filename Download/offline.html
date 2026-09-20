@@ -3823,28 +3823,30 @@ window.PDA_DATA = {
         var el = document.getElementById('quickSearchResults');
         if (!q) { el.style.display = 'none'; return; }
 
+        // 按优先级匹配：产品系列 > 物料名称 > 物料代码 > 描述 > 备注
+        var colPriority = [2, 3, 4, 5, 6];
         var results = [];
-        for (var i = 0; i < allRows.length; i++) {
-            var r = allRows[i];
-            var isCam = r[0] === 'ID系列';
-            var isAcc = r[0] === '配件';
-            if (!isCam && !isAcc) continue;
 
-            var series = (r[2] || '').toLowerCase();
-            var name = (r[3] || '').toLowerCase();
-            var code = (r[4] || '').toLowerCase();
-            var desc = (r[5] || '').toLowerCase();
-            var remark = (r[6] || '').toLowerCase();
+        for (var c = 0; c < colPriority.length; c++) {
+            var col = colPriority[c];
+            results = [];
+            for (var i = 0; i < allRows.length; i++) {
+                var r = allRows[i];
+                var isCam = r[0] === 'ID系列';
+                var isAcc = r[0] === '配件';
+                if (!isCam && !isAcc) continue;
 
-            if (series.indexOf(q) >= 0 || name.indexOf(q) >= 0
-                || code.indexOf(q) >= 0 || desc.indexOf(q) >= 0 || remark.indexOf(q) >= 0) {
-                results.push({
-                    idx: i, type: isCam ? 'ID系列' : '配件',
-                    cat: r[1] || '', series: r[2] || '', name: r[3] || '',
-                    code: r[4] || '', desc: r[5] || ''
-                });
-                if (results.length >= 50) break;
+                var val = (r[col] || '').toLowerCase();
+                if (val.indexOf(q) >= 0) {
+                    results.push({
+                        idx: i, type: isCam ? 'ID系列' : '配件',
+                        cat: r[1] || '', series: r[2] || '', name: r[3] || '',
+                        code: r[4] || '', desc: r[5] || ''
+                    });
+                    if (results.length >= 50) break;
+                }
             }
+            if (results.length > 0) break;
         }
 
         if (!results.length) {
