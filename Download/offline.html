@@ -833,33 +833,33 @@
                     <span class="home-section-sub">FEATURES</span>
                     <span class="home-section-line"></span>
                 </div>
-                <div class="home-grid">
+                                <div class="home-grid">
                     <button class="home-card" onclick="switchPage('bom', event)">
                         <div class="home-card-top">
                             <div class="home-card-icon">📋</div>
                             <div class="home-card-title">ID配单表</div>
                             <div class="home-card-num">01</div>
                         </div>
-                        <div class="home-card-desc">选择相机型号后自动匹配电源、安装板、线缆、镜头罩、FA镜头、扩展配件等完整BOM。</div>
+                        <div class="home-card-desc">三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">生成配单 →</span>
                         </div>
                     </button>
-                    <button class="home-card" onclick="switchPage('cmp', event)">
+                    <button class="home-card" onclick="switchPage('scbom', event)">
                         <div class="home-card-top">
-                            <div class="home-card-icon">📊</div>
-                            <div class="home-card-title">对照表</div>
+                            <div class="home-card-icon">📋</div>
+                            <div class="home-card-title">SC配单表</div>
                             <div class="home-card-num">02</div>
                         </div>
-                        <div class="home-card-desc">510条基线 ↔ 经销型号物料代码对照，含资料下载按钮可直达海康官网下载页面。</div>
+                        <div class="home-card-desc">SC产品线三级联动选型，自动匹配电源、线缆等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
-                            <span class="home-card-link">查看对照 →</span>
+                            <span class="home-card-link">生成配单 →</span>
                         </div>
                     </button>
                     <button class="home-card" onclick="switchPage('overview', event)">
                         <div class="home-card-top">
                             <div class="home-card-icon">📦</div>
-                            <div class="home-card-title">系列表</div>
+                            <div class="home-card-title">ID系列表</div>
                             <div class="home-card-num">03</div>
                         </div>
                         <div class="home-card-desc">按产品系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
@@ -867,11 +867,33 @@
                             <span class="home-card-link">浏览系列 →</span>
                         </div>
                     </button>
+                    <button class="home-card" onclick="switchPage('scoverview', event)">
+                        <div class="home-card-top">
+                            <div class="home-card-icon">📦</div>
+                            <div class="home-card-title">SC系列表</div>
+                            <div class="home-card-num">04</div>
+                        </div>
+                        <div class="home-card-desc">按产品系列分组浏览SC全部相机及关联配件，快速了解各系列完整产品线。</div>
+                        <div class="home-card-footer">
+                            <span class="home-card-link">浏览系列 →</span>
+                        </div>
+                    </button>
+                    <button class="home-card" onclick="switchPage('cmp', event)">
+                        <div class="home-card-top">
+                            <div class="home-card-icon">📊</div>
+                            <div class="home-card-title">对照表</div>
+                            <div class="home-card-num">05</div>
+                        </div>
+                        <div class="home-card-desc">510条基线 ↔ 经销型号物料代码对照，支持快速搜索筛选。</div>
+                        <div class="home-card-footer">
+                            <span class="home-card-link">查看对照 →</span>
+                        </div>
+                    </button>
                     <button class="home-card" onclick="switchPage('pda', event)">
                         <div class="home-card-top">
                             <div class="home-card-icon">📱</div>
                             <div class="home-card-title">PDA选型</div>
-                            <div class="home-card-num">04</div>
+                            <div class="home-card-num">06</div>
                         </div>
                         <div class="home-card-desc">IDP系列智能移动终端19个型号的参数对比，支持按系列、防护等级、NFC等条件筛选。</div>
                         <div class="home-card-footer">
@@ -882,15 +904,14 @@
                         <div class="home-card-top">
                             <div class="home-card-icon">📰</div>
                             <div class="home-card-title">产品动态</div>
-                            <div class="home-card-num">05</div>
+                            <div class="home-card-num">07</div>
                         </div>
                         <div class="home-card-desc">不定时更新智能ID产品线市场动态，涵盖市场策略、产品发布、产品迭代、产品退市、客户端更新、固件更新等信息。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">查看动态 →</span>
                         </div>
                     </button>
-                </div>
-            </div>
+                </div>            </div>
         </div>
         <div id="pageIdBom">
             <div class="sidebar">
