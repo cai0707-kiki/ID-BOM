@@ -253,6 +253,7 @@
     #pageScBom,
     #pageCmp,
     #pageOverview,
+    #pageScOverview,
     #pagePda,
     #pageUpdates {
         flex-direction:column;
@@ -371,7 +372,7 @@
     .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
 
     /* ====== 系列总览 ====== */
-    #pageOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
+    #pageOverview,#pageScOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
     .series-sidebar{
         width:100% !important;
         max-width:100% !important;
@@ -771,7 +772,7 @@
             color: #94a3b8;
         }
         /* ====== 系列总览 ====== */
-        #pageOverview {
+        #pageOverview,#pageScOverview {
             display: flex;
             gap: 12px;
             flex: 1;
@@ -3447,13 +3448,13 @@
     // 渲染右侧表格
     function renderOverviewTable(seriesName, el) {
         // 高亮切换
-        document.querySelectorAll('.series-item').forEach(function(item) {
+        document.querySelectorAll('#seriesList .series-item').forEach(function(item) {
             item.classList.remove('active');
         });
         if (el) {
             el.classList.add('active');
         } else {
-            document.querySelectorAll('.series-item').forEach(function(item) {
+            document.querySelectorAll('#seriesList .series-item').forEach(function(item) {
                 if (item.getAttribute('data-series') === seriesName) {
                     item.classList.add('active');
                 }
