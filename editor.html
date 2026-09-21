@@ -451,7 +451,7 @@ function renderTable() {
             // ===== 图片缩略图列（在第3列之后插入） =====
             if (c === IMG_INSERT_AFTER) {
                 var imgVal = (row[imgCol] || '').toString().trim().replace(/\r/g, '');
-                var imgPrefix = currentTab === 'camera' ? 'CAM/' : 'ACC/';
+                var imgPrefix = currentTab === 'camera' ? 'ID_CAM/' : 'ID_ACC/';
                 var imgKey = imgVal ? (imgVal.indexOf('/') >= 0 ? imgVal : imgPrefix + imgVal) : '';
                 bhtml += '<td class="col-img">';
                 if (imgKey) {

@@ -2967,13 +2967,13 @@
             return '<span class="img-thumb-placeholder">—</span>';
         }
         imgName = imgName.replace(/\\r$/g, '').replace(/\r$/g, '');
-        // 如果没有前缀，根据类型自动补 CAM/ 或 ACC/
+        // 如果没有前缀，根据类型自动补 ID_CAM/ 或 ID_ACC/
         if (imgName.indexOf('/') < 0) {
-            imgName = (imgType === 'camera' ? 'CAM/' : 'ACC/') + imgName;
+            imgName = (imgType === 'camera' ? 'ID_CAM/' : 'ID_ACC/') + imgName;
         }
         var safeName = imgName.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         var safeJsName = imgName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
-        // 缩略图路径：IMG/CAM/THUMB/xxx.png 或 IMG/ACC/THUMB/xxx.png
+        // 缩略图路径：IMG/ID_CAM/THUMB/xxx.png 或 IMG/ID_ACC/THUMB/xxx.png
         var parts = safeName.split('/');
         var thumbSrc = parts.length > 1
             ? 'IMG/' + parts[0] + '/THUMB/' + parts[1] + '.png'

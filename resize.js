@@ -25,7 +25,7 @@ function getDataImgNames() {
             const camData = eval(camMatch[1]);
             camData.forEach(r => {
                 const v = (r.value[25] || '').trim();
-                if (v) camNames.add(v.replace(/^(CAM\/|ACC\/)/, ''));
+                if (v) camNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
             });
         }
     } catch (e) {}
@@ -38,7 +38,7 @@ function getDataImgNames() {
             const accData = eval(accMatch[1]);
             accData.forEach(r => {
                 const v = (r.value[9] || '').trim();
-                if (v) accNames.add(v.replace(/^(CAM\/|ACC\/)/, ''));
+                if (v) accNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
             });
         }
     } catch (e) {}
@@ -47,12 +47,12 @@ function getDataImgNames() {
 }
 
 /**
- * 根据文件名判断目标子目录：CAM / ACC / PIC / IMG（根目录）
+ * 根据文件名判断目标子目录：ID_CAM / ID_ACC / PIC / IMG（根目录）
  */
 function resolveSubDir(nameNoExt, camNames, accNames) {
     if (PIC_NAMES.includes(nameNoExt.toLowerCase())) return 'PIC';
-    if (camNames.has(nameNoExt)) return 'CAM';
-    if (accNames.has(nameNoExt)) return 'ACC';
+    if (camNames.has(nameNoExt)) return 'ID_CAM';
+    if (accNames.has(nameNoExt)) return 'ID_ACC';
     // 找不到匹配的，放IMG根目录
     return '';
 }
@@ -162,7 +162,7 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
 }
 
 /**
- * 生成缩略图（各自目录下 THUMB/，CAM/ACC: 80x80, PIC: 120x120）
+ * 生成缩略图（各自目录下 THUMB/，ID_CAM/ID_ACC: 80x80, PIC: 120x120）
  */
 async function generateThumbs(imgRoot) {
     const sources = [
@@ -270,8 +270,8 @@ resize 选项:
 
 图片自动分发规则:
   dmv/mvlab/wmv.png        → IMG/PIC/
-  id_camera_data.js 中的文件名 → IMG/CAM/
-  id_accessory_data.js 中的文件名 → IMG/ACC/
+  id_camera_data.js 中的文件名 → IMG/ID_CAM/
+  id_accessory_data.js 中的文件名 → IMG/ID_ACC/
   其他 → IMG/（根目录）
 
 示例:
