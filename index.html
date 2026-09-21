@@ -1046,9 +1046,9 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <div class="header-logo"><span>ID</span> · <span class="logo-text">读码器配单工具</span></div>
+            <div class="header-logo"><span class="logo-text">智能产品线配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V1.6.1</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V2.0</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
         </div>
@@ -1058,7 +1058,7 @@
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、新增智能ID产品线市场动态page页，不定时更新产品动态；\n2、E10 V2.0医药一体机新出货固件3.4.0版本，优化HID传输速率；\n3、ID5050M系列新出货固件4.0.9版本，无法降级，原定制功能需要定制移植，支持老设备升级","date":"2026-09-16"}
+    {"content":"本次更新：\n1、新增SC配单表、SC系列表","date":"2026-09-21"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
@@ -1086,7 +1086,7 @@
                             <div class="home-card-title">ID配单表</div>
                             <div class="home-card-num">01</div>
                         </div>
-                        <div class="home-card-desc">三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
+                        <div class="home-card-desc">ID产品三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">生成配单 →</span>
                         </div>
@@ -1097,7 +1097,7 @@
                             <div class="home-card-title">SC配单表</div>
                             <div class="home-card-num">02</div>
                         </div>
-                        <div class="home-card-desc">SC产品线三级联动选型，自动匹配电源、线缆等选装配件，支持CSV导出。</div>
+                        <div class="home-card-desc">SC产品三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">生成配单 →</span>
                         </div>
@@ -1108,7 +1108,7 @@
                             <div class="home-card-title">ID系列表</div>
                             <div class="home-card-num">03</div>
                         </div>
-                        <div class="home-card-desc">按产品系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
+                        <div class="home-card-desc">ID产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">浏览系列 →</span>
                         </div>
@@ -1119,7 +1119,7 @@
                             <div class="home-card-title">SC系列表</div>
                             <div class="home-card-num">04</div>
                         </div>
-                        <div class="home-card-desc">按产品系列分组浏览SC全部相机及关联配件，快速了解各系列完整产品线。</div>
+                        <div class="home-card-desc">SC产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">浏览系列 →</span>
                         </div>
@@ -1130,7 +1130,7 @@
                             <div class="home-card-title">对照表</div>
                             <div class="home-card-num">05</div>
                         </div>
-                        <div class="home-card-desc">510条基线 ↔ 经销型号物料代码对照，支持快速搜索筛选。</div>
+                        <div class="home-card-desc">419条基线 ↔ 经销型号物料代码对照，支持快速搜索筛选，涵盖ID/SC产品。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">查看对照 →</span>
                         </div>
@@ -1163,7 +1163,7 @@
         <div id="pageIdBom">
             <div class="sidebar">
                 <div class="panel">
-                    <div class="panel-title" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div class="panel-title-icon">📋</div>配单配置</div><button class="btn-reset" onclick="clearAllId()" style="font-size:10px;padding:3px 8px">清除</button></div>
+                    <div class="panel-title" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div class="panel-title-icon">📋</div>ID配单配置</div><button class="btn-reset" onclick="clearAllId()" style="font-size:10px;padding:3px 8px">清除</button></div>
                     <div class="quick-search">
                         <div class="quick-search-wrap">
                             <span class="quick-search-icon">🔍</span>
@@ -1190,7 +1190,7 @@
             <div class="content">
                 <div class="content-panel">
                     <div class="content-header">
-                        <div class="content-title"><div class="content-title-icon">📊</div>配单明细</div>
+                        <div class="content-title"><div class="content-title-icon">📊</div>ID配单明细</div>
                         <div class="content-toolbar">
                             <div class="legend">
                                 <div class="legend-item"><div class="legend-dot host"></div>主机</div>
@@ -1292,7 +1292,7 @@
         <div id="pageIdOverview" style="display:none; flex:1; min-width:0;">
             <div class="series-sidebar" id="idSeriesSidebar">
                 <div class="panel">
-                    <div class="panel-title"><div class="panel-title-icon">📦</div>产品系列</div>
+                    <div class="panel-title"><div class="panel-title-icon">📦</div>ID产品系列</div>
                     <div id="idSeriesList" class="series-list"></div>
                 </div>
             </div>
