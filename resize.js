@@ -11,11 +11,13 @@ const SUPPORTED_EXT = ['.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'
 const PIC_NAMES = ['dmv', 'mvlab', 'wmv'];
 
 /**
- * 从 id_camera_data.js / id_accessory_data.js 提取 IMG 文件名集合
+ * 从 id/sc camera/accessory 数据文件中提取 IMG 文件名集合
  */
 function getDataImgNames() {
-    const camNames = new Set();
-    const accNames = new Set();
+    const idCamNames = new Set();
+    const idAccNames = new Set();
+    const scCamNames = new Set();
+    const scAccNames = new Set();
 
     // 读取 id_camera_data.js
     try {
@@ -25,7 +27,7 @@ function getDataImgNames() {
             const camData = eval(camMatch[1]);
             camData.forEach(r => {
                 const v = (r.value[25] || '').trim();
-                if (v) camNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
+                if (v) idCamNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
             });
         }
     } catch (e) {}
@@ -38,23 +40,58 @@ function getDataImgNames() {
             const accData = eval(accMatch[1]);
             accData.forEach(r => {
                 const v = (r.value[9] || '').trim();
-                if (v) accNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
+                if (v) idAccNames.add(v.replace(/^(ID_CAM\/|ID_ACC\/|CAM\/|ACC\/)/, ''));
             });
         }
     } catch (e) {}
 
-    return { camNames, accNames };
+    // 读取 sc_camera_data.js
+    try {
+        const scCamSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'sc_camera_data.js'), 'utf8');
+        const scCamMatch = scCamSrc.match(/SCBOM_CAMERA_DATA\s*=\s*(\[[\s\S]*?\]);/);
+        if (scCamMatch) {
+            const scCamData = eval(scCamMatch[1]);
+            scCamData.forEach(r => {
+                const v = (r.value[25] || '').trim();
+                if (v) scCamNames.add(v.replace(/^(SC_CAM\/|SC_ACC\/)/, ''));
+            });
+        }
+    } catch (e) {}
+
+    // 读取 sc_accessory_data.js
+    try {
+        const scAccSrc = fs.readFileSync(path.join(__dirname, 'scripts', 'sc_accessory_data.js'), 'utf8');
+        const scAccMatch = scAccSrc.match(/SCBOM_ACCESSORY_DATA\s*=\s*(\[[\s\S]*?\]);/);
+        if (scAccMatch) {
+            const scAccData = eval(scAccMatch[1]);
+            scAccData.forEach(r => {
+                const v = (r.value[9] || '').trim();
+                if (v) scAccNames.add(v.replace(/^(SC_CAM\/|SC_ACC\/)/, ''));
+            });
+        }
+    } catch (e) {}
+
+    return { idCamNames, idAccNames, scCamNames, scAccNames };
 }
 
 /**
- * 根据文件名判断目标子目录：ID_CAM / ID_ACC / PIC / IMG（根目录）
+ * 根据文件名判断目标子目录，返回数组（公共配件会返回两个目录）
+ * ID_CAM / ID_ACC / SC_CAM / SC_ACC / PIC / IMG（根目录）
  */
-function resolveSubDir(nameNoExt, camNames, accNames) {
-    if (PIC_NAMES.includes(nameNoExt.toLowerCase())) return 'PIC';
-    if (camNames.has(nameNoExt)) return 'ID_CAM';
-    if (accNames.has(nameNoExt)) return 'ID_ACC';
+function resolveSubDirs(nameNoExt, idCamNames, idAccNames, scCamNames, scAccNames) {
+    if (PIC_NAMES.includes(nameNoExt.toLowerCase())) return ['PIC'];
+    if (idCamNames.has(nameNoExt)) return ['ID_CAM'];
+    if (scCamNames.has(nameNoExt)) return ['SC_CAM'];
+    
+    // 配件：检查是否公共配件
+    const inIdAcc = idAccNames.has(nameNoExt);
+    const inScAcc = scAccNames.has(nameNoExt);
+    if (inIdAcc && inScAcc) return ['ID_ACC', 'SC_ACC'];
+    if (inIdAcc) return ['ID_ACC'];
+    if (inScAcc) return ['SC_ACC'];
+    
     // 找不到匹配的，放IMG根目录
-    return '';
+    return [''];
 }
 
 /**
@@ -92,8 +129,8 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
         process.exit(1);
     }
 
-    const { camNames, accNames } = getDataImgNames();
-    console.log(`数据匹配：CAM ${camNames.size} 条，ACC ${accNames.size} 条`);
+    const { idCamNames, idAccNames, scCamNames, scAccNames } = getDataImgNames();
+    console.log(`数据匹配：ID_CAM ${idCamNames.size} 条，ID_ACC ${idAccNames.size} 条，SC_CAM ${scCamNames.size} 条，SC_ACC ${scAccNames.size} 条`);
 
     const outRoot = outputDir || inputDir;
 
@@ -112,42 +149,45 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
         const fileName = path.basename(srcPath);
         const nameNoExt = path.basename(srcPath, path.extname(srcPath));
 
-        // 判断目标子目录
-        const subDir = resolveSubDir(nameNoExt, camNames, accNames);
-        const destDir = subDir ? path.join(outRoot, subDir) : outRoot;
-        const destPath = path.join(destDir, fileName);
+        // 判断目标子目录（返回数组，公共配件会返回两个目录）
+        const subDirs = resolveSubDirs(nameNoExt, idCamNames, idAccNames, scCamNames, scAccNames);
 
-        if (!overwrite && fs.existsSync(destPath)) {
-            skipped++;
-            continue;
-        }
+        for (const subDir of subDirs) {
+            const destDir = subDir ? path.join(outRoot, subDir) : outRoot;
+            const destPath = path.join(destDir, fileName);
 
-        if (!fs.existsSync(destDir)) {
-            fs.mkdirSync(destDir, { recursive: true });
-        }
-
-        try {
-            const img = sharp(srcPath);
-            const metadata = await img.metadata();
-
-            let pipeline;
-            if (keepRatio) {
-                pipeline = img.resize(targetWidth, targetHeight, {
-                    fit: 'contain',
-                    background: { r: 255, g: 255, b: 255, alpha: 1 }
-                });
-            } else {
-                pipeline = img.resize(targetWidth, targetHeight, {
-                    fit: 'fill'
-                });
+            if (!overwrite && fs.existsSync(destPath)) {
+                skipped++;
+                continue;
             }
 
-            await pipeline.toFile(destPath);
-            destMap[subDir] = (destMap[subDir] || 0) + 1;
-            processed++;
-        } catch (err) {
-            console.error(`  失败: ${fileName} -> ${subDir}/ - ${err.message}`);
-            failed++;
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+
+            try {
+                const img = sharp(srcPath);
+                const metadata = await img.metadata();
+
+                let pipeline;
+                if (keepRatio) {
+                    pipeline = img.resize(targetWidth, targetHeight, {
+                        fit: 'contain',
+                        background: { r: 255, g: 255, b: 255, alpha: 1 }
+                    });
+                } else {
+                    pipeline = img.resize(targetWidth, targetHeight, {
+                        fit: 'fill'
+                    });
+                }
+
+                await pipeline.toFile(destPath);
+                destMap[subDir || 'IMG/'] = (destMap[subDir || 'IMG/'] || 0) + 1;
+                processed++;
+            } catch (err) {
+                console.error(`  失败: ${fileName} -> ${subDir || 'IMG/'} - ${err.message}`);
+                failed++;
+            }
         }
     }
 
@@ -162,12 +202,14 @@ async function resizeImages(inputDir, outputDir, targetWidth, targetHeight, keep
 }
 
 /**
- * 生成缩略图（各自目录下 THUMB/，ID_CAM/ID_ACC: 80x80, PIC: 120x120）
+ * 生成缩略图（各自目录下 THUMB/，ID_CAM/ID_ACC/SC_CAM/SC_ACC: 80x80, PIC: 120x120）
  */
 async function generateThumbs(imgRoot) {
     const sources = [
-        { dir: path.join(imgRoot, 'CAM'), size: 80, label: 'CAM' },
-        { dir: path.join(imgRoot, 'ACC'), size: 80, label: 'ACC' },
+        { dir: path.join(imgRoot, 'ID_CAM'), size: 80, label: 'ID_CAM' },
+        { dir: path.join(imgRoot, 'ID_ACC'), size: 80, label: 'ID_ACC' },
+        { dir: path.join(imgRoot, 'SC_CAM'), size: 80, label: 'SC_CAM' },
+        { dir: path.join(imgRoot, 'SC_ACC'), size: 80, label: 'SC_ACC' },
         { dir: path.join(imgRoot, 'PIC'), size: 120, label: 'PIC' }
     ];
 
@@ -272,6 +314,8 @@ resize 选项:
   dmv/mvlab/wmv.png        → IMG/PIC/
   id_camera_data.js 中的文件名 → IMG/ID_CAM/
   id_accessory_data.js 中的文件名 → IMG/ID_ACC/
+  sc_camera_data.js 中的文件名 → IMG/SC_CAM/
+  sc_accessory_data.js 中的文件名 → IMG/SC_ACC/
   其他 → IMG/（根目录）
 
 示例:
