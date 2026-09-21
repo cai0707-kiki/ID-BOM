@@ -37,7 +37,7 @@
         .nav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.9)}
         .nav-item.active{background:#fff7ed;border-left-color:#f97316;color:#f97316;font-weight:600}
         .nav-icon{font-size:18px;line-height:1}
-        #pageBom{display:none;gap:12px;flex:1;min-width:0}
+        #pageIdBom{display:none;gap:12px;flex:1;min-width:0}
         #pageCmp{flex:1;min-width:0;gap:12px;max-height:none;overflow: visible;height: auto;}
         #pageCmp.active{display:flex}
         .cmp-content-header{flex-shrink:0}
@@ -113,7 +113,7 @@
 
         .table-footer{padding:6px 10px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#64748b}
         .empty-state{text-align:center;padding:40px 16px;color:#94a3b8}
-        #tableArea{overflow:auto}
+        #idTableArea{overflow:auto}
         .empty-state-icon{font-size:36px;margin-bottom:10px}
         .empty-state h3{font-size:13px;color:#64748b;margin-bottom:4px}
         .empty-state p{font-size:11px}
@@ -186,7 +186,7 @@
         .cable-filter-btn.active{border-color:#f97316;background:#f97316;color:white}
         .cable-warn{padding:8px 12px;border:1px solid #fcd34d;border-radius:6px;background:#fffbeb;color:#b45309;font-size:11px;margin-bottom:12px;line-height:1.5}
         .cable-warn em{font-style:normal;color:#f97316}
-        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageBom{flex-direction:column}}
+        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageIdBom{flex-direction:column}}
         /* ====== 对照表（桌面端基础样式，移动端通过源码顺序覆盖） ====== */
         .cmp-filter-list{display:flex;flex-direction:column;gap:3px;max-height:calc(100vh - 280px);overflow-y:auto}
         .cmp-filter-btn{display:block;width:100%;padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:11px;color:#333;background:white;cursor:pointer;transition:all .2s;text-align:left}
@@ -246,9 +246,9 @@
         border-width: 2px;
     }
     /* ====== 页面容器 ====== */
-    #pageBom,
+    #pageIdBom,
     #pageCmp,
-    #pageOverview {
+    #pageIdOverview {
         flex-direction:column;
         gap:0;
         flex:1 1 0% !important;
@@ -365,7 +365,7 @@
     .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
 
     /* ====== 系列总览 ====== */
-    #pageOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
+    #pageIdOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
     .series-sidebar{
         width:100% !important;
         max-width:100% !important;
@@ -457,7 +457,7 @@
     .stats{gap:12px}
     .stat-value{font-size:16px}
 
-    #tableArea{
+    #idTableArea{
         flex:1 1 0% !important;
         min-height:200px !important;
         height:auto !important;
@@ -605,7 +605,7 @@
             50% { transform: scale(1.3); opacity: 0.7; }
         }
         /* ====== 系列总览 ====== */
-        #pageOverview {
+        #pageIdOverview {
             display: flex;
             gap: 12px;
             flex: 1;
@@ -892,31 +892,31 @@
                 </div>
             </div>
         </div>
-        <div id="pageBom">
+        <div id="pageIdBom">
             <div class="sidebar">
                 <div class="panel">
-                    <div class="panel-title" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div class="panel-title-icon">📋</div>配单配置</div><button class="btn-reset" onclick="clearAll()" style="font-size:10px;padding:3px 8px">清除</button></div>
+                    <div class="panel-title" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><div class="panel-title-icon">📋</div>配单配置</div><button class="btn-reset" onclick="clearAllId()" style="font-size:10px;padding:3px 8px">清除</button></div>
                     <div class="quick-search">
                         <div class="quick-search-wrap">
                             <span class="quick-search-icon">🔍</span>
-                            <input type="text" id="quickSearchInput" class="quick-search-input" placeholder="输入型号名称或物料代码..." oninput="onQuickSearch()">
+                            <input type="text" id="idQuickSearchInput" class="quick-search-input" placeholder="输入型号名称或物料代码..." oninput="onIdQuickSearch()">
                         </div>
-                        <div id="quickSearchResults" class="quick-search-results"></div>
+                        <div id="idQuickSearchResults" class="quick-search-results"></div>
                     </div>
                     <div class="step-section">
                         <div class="step-label"><span class="step-number">1</span>产品大类</div>
-                        <select id="categorySelect" class="step-select" onchange="onCategoryChange()"><option value="">请选择产品大类</option></select>
+                        <select id="idCategorySelect" class="step-select" onchange="onIdCategoryChange()"><option value="">请选择产品大类</option></select>
                     </div>
                     <div class="step-section">
                         <div class="step-label"><span class="step-number">2</span>产品系列</div>
-                        <select id="seriesSelect" class="step-select" onchange="onSeriesChange()" disabled><option value="">请先选择产品大类</option></select>
+                        <select id="idSeriesSelect" class="step-select" onchange="onIdSeriesChange()" disabled><option value="">请先选择产品大类</option></select>
                     </div>
                     <div class="step-section">
                         <div class="step-label"><span class="step-number">3</span>具体型号</div>
-                        <select id="modelSelect" class="step-select" onchange="onModelChange()" disabled><option value="">请先选择产品系列</option></select>
+                        <select id="idModelSelect" class="step-select" onchange="onIdModelChange()" disabled><option value="">请先选择产品系列</option></select>
                     </div>
                     <div class="accessory-title">选装配件</div>
-                    <div id="accessoryCategories"></div>
+                    <div id="idAccessoryCategories"></div>
                 </div>
             </div>
             <div class="content">
@@ -931,16 +931,16 @@
                             </div>
                             <div class="toolbar-right">
                                 <div class="stats">
-                                    <div class="stat-item"><div class="stat-value" id="statTotal">0</div><div class="stat-label">总计</div></div>
-                                    <div class="stat-item"><div class="stat-value" id="statHost">0</div><div class="stat-label">主机</div></div>
-                                    <div class="stat-item"><div class="stat-value orange" id="statAccessory">0</div><div class="stat-label">配件</div></div>
+                                    <div class="stat-item"><div class="stat-value" id="idStatTotal">0</div><div class="stat-label">总计</div></div>
+                                    <div class="stat-item"><div class="stat-value" id="idStatHost">0</div><div class="stat-label">主机</div></div>
+                                    <div class="stat-item"><div class="stat-value orange" id="idStatAccessory">0</div><div class="stat-label">配件</div></div>
                                 </div>
-                                <button class="btn-reset" onclick="resetConfig()">重置</button>
-                                <button class="btn-export" onclick="exportCSV()">📥 导出CSV</button>
+                                <button class="btn-reset" onclick="resetIdConfig()">重置</button>
+                                <button class="btn-export" onclick="exportIdCSV()">📥 导出CSV</button>
                             </div>
                         </div>
                     </div>
-                    <div id="tableArea"><div class="empty-state"><div class="empty-state-icon">📦</div><h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div></div>
+                    <div id="idTableArea"><div class="empty-state"><div class="empty-state-icon">📦</div><h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div></div>
                 </div>
             </div>
         </div>
@@ -969,19 +969,19 @@
             </div>
         </div>
         <!-- ====== 系列总览 ====== -->
-        <div id="pageOverview" style="display:none">
-            <div class="series-sidebar" id="seriesSidebar">
+        <div id="pageIdOverview" style="display:none">
+            <div class="series-sidebar" id="idSeriesSidebar">
                 <div class="panel">
                     <div class="panel-title"><div class="panel-title-icon">📦</div>产品系列</div>
-                    <div id="seriesList" class="series-list"></div>
+                    <div id="idSeriesList" class="series-list"></div>
                 </div>
             </div>
             <div class="overview-content">
                 <div class="overview-header">
-                    <span class="overview-title" id="overviewTitle">请选择系列</span>
-                    <span class="overview-count" id="overviewCount">共 0 项</span>
+                    <span class="overview-title" id="idOverviewTitle">请选择系列</span>
+                    <span class="overview-count" id="idOverviewCount">共 0 项</span>
                 </div>
-                <div id="overviewTableWrap" class="overview-table-wrap">
+                <div id="idOverviewTableWrap" class="overview-table-wrap">
                     <div class="empty-state">
                         <div class="empty-state-icon">📦</div>
                         <h3>请选择左侧系列</h3>
@@ -2968,14 +2968,14 @@ window.PDA_DATA = {
 
     /* ==================== 全局状态 ==================== */
 
-    var allRows = [];
-    var currentMatch = null;
-    var selectedAccessories = [];
-    var currentAccessoryKey = '';
-    var currentAccessoryItems = [];
-    var tempSelectedItems = [];
-    var standardCache = {};
-    var cableFilterState = { length: 'all', material: 'all' };
+    var idAllRows = [];
+    var idCurrentMatch = null;
+    var idSelectedAccessories = [];
+    var idCurrentAccessoryKey = '';
+    var idCurrentAccessoryItems = [];
+    var idTempSelectedItems = [];
+    var idStandardCache = {};
+    var idCableFilterState = { length: 'all', material: 'all' };
 
     /* ==================== 工具函数 ==================== */
 
@@ -2993,7 +2993,7 @@ window.PDA_DATA = {
 
     /* ==================== 数据加载 ==================== */
 
-    function loadData() {
+    function loadIdData() {
         var el = document.getElementById('embeddedData');
         if (!el) return;
         try {
@@ -3008,8 +3008,8 @@ window.PDA_DATA = {
                 })
                 : [];
             if (embedded.length > 0) {
-                allRows = embedded;
-                init();
+                idAllRows = embedded;
+                initId();
             }
         } catch (e) {
             console.error('Parse error:', e);
@@ -3018,16 +3018,16 @@ window.PDA_DATA = {
 
     /* ==================== 级联选择器初始化 ==================== */
 
-    function init() {
+    function initId() {
         var seen = {};
         var catList = [];
-        allRows.forEach(function(r) {
+        idAllRows.forEach(function(r) {
             if (r.length > 1 && r[1] && r[0] && r[0].trim() === 'ID系列') {
                 var c = r[1].trim();
                 if (!seen[c]) { seen[c] = true; catList.push(c); }
             }
         });
-        var sel = document.getElementById('categorySelect');
+        var sel = document.getElementById('idCategorySelect');
         catList.forEach(function(c) {
             var o = document.createElement('option');
             o.value = c;
@@ -3036,20 +3036,20 @@ window.PDA_DATA = {
         });
     }
 
-    function onCategoryChange() {
-        var cat = document.getElementById('categorySelect').value;
-        var ss = document.getElementById('seriesSelect');
-        var ms = document.getElementById('modelSelect');
+    function onIdCategoryChange() {
+        var cat = document.getElementById('idCategorySelect').value;
+        var ss = document.getElementById('idSeriesSelect');
+        var ms = document.getElementById('idModelSelect');
         ss.innerHTML = '<option value="">请选择产品系列</option>';
         ss.disabled = true;
         ms.innerHTML = '<option value="">请先选择产品大类</option>';
         ms.disabled = true;
-        updateSelectStyle(ss); updateSelectStyle(ms); updateSelectStyle(document.getElementById('categorySelect'));
-        clearAccessoryPanel(); clearTable();
+        updateSelectStyle(ss); updateSelectStyle(ms); updateSelectStyle(document.getElementById('idCategorySelect'));
+        clearIdAccessoryPanel(); clearIdTable();
         if (!cat) return;
         var seen = {};
         var seriesList = [];
-        allRows.forEach(function(r) {
+        idAllRows.forEach(function(r) {
             if (r.length > 2 && r[1] && r[1].trim() === cat && r[2] && r[0] && r[0].trim() === 'ID系列') {
                 var s = r[2].trim();
                 if (!seen[s]) { seen[s] = true; seriesList.push(s); }
@@ -3064,18 +3064,18 @@ window.PDA_DATA = {
         ss.disabled = false;
     }
 
-    function onSeriesChange() {
-        var cat = document.getElementById('categorySelect').value;
-        var series = document.getElementById('seriesSelect').value;
-        var ms = document.getElementById('modelSelect');
+    function onIdSeriesChange() {
+        var cat = document.getElementById('idCategorySelect').value;
+        var series = document.getElementById('idSeriesSelect').value;
+        var ms = document.getElementById('idModelSelect');
         ms.innerHTML = '<option value="">请选择具体型号</option>';
         ms.disabled = true;
-        updateSelectStyle(ms); updateSelectStyle(document.getElementById('seriesSelect'));
-        clearAccessoryPanel(); clearTable();
+        updateSelectStyle(ms); updateSelectStyle(document.getElementById('idSeriesSelect'));
+        clearIdAccessoryPanel(); clearIdTable();
         if (!series) return;
         var seen = {};
         var modelList = [];
-        allRows.forEach(function(r) {
+        idAllRows.forEach(function(r) {
             if (r.length > 4 && r[1] && r[1].trim() === cat && r[2] && r[2].trim() === series
                 && r[3] && r[4] && r[0] && r[0].trim() === 'ID系列') {
                 var m = r[3].trim();
@@ -3091,22 +3091,22 @@ window.PDA_DATA = {
         ms.disabled = false;
     }
 
-    function onModelChange() {
-        var cat = document.getElementById('categorySelect').value;
-        var series = document.getElementById('seriesSelect').value;
-        var mdl = document.getElementById('modelSelect').value;
-        updateSelectStyle(document.getElementById('modelSelect'));
-        clearAccessoryPanel(); clearTable();
+    function onIdModelChange() {
+        var cat = document.getElementById('idCategorySelect').value;
+        var series = document.getElementById('idSeriesSelect').value;
+        var mdl = document.getElementById('idModelSelect').value;
+        updateSelectStyle(document.getElementById('idModelSelect'));
+        clearIdAccessoryPanel(); clearIdTable();
         if (!mdl) return;
-        for (var i = 0; i < allRows.length; i++) {
-            var r = allRows[i];
+        for (var i = 0; i < idAllRows.length; i++) {
+            var r = idAllRows[i];
             if (r.length > 4 && r[1] && r[1].trim() === cat && r[2] && r[2].trim() === series
                 && r[3] && r[3].trim() === mdl) {
-                currentMatch = r;
+                idCurrentMatch = r;
                 break;
             }
         }
-        if (currentMatch) { renderAccessoryCategories(); generateStandardAccessories(); }
+        if (idCurrentMatch) { renderIdAccessoryCategories(); generateIdStandardAccessories(); }
     }
 
     function updateSelectStyle(s) {
@@ -3116,14 +3116,14 @@ window.PDA_DATA = {
 
     /* ==================== 渲染配件分类按钮 ==================== */
 
-    function renderAccessoryCategories() {
-        var c = document.getElementById('accessoryCategories');
+    function renderIdAccessoryCategories() {
+        var c = document.getElementById('idAccessoryCategories');
         var h = '';
         var keys = Object.keys(accessoryColumns);
 
         for (var i = 0; i < keys.length; i++) {
             var cfg = accessoryColumns[keys[i]];
-            var val = currentMatch[cfg.col] || '';
+            var val = idCurrentMatch[cfg.col] || '';
             if (!val) continue;
 
             // 解析标签和标志
@@ -3131,14 +3131,14 @@ window.PDA_DATA = {
                 return s.trim().toLowerCase();
             }).filter(function(s) { return s.length > 0; });
 
-            var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+            var refFlags = (idCurrentMatch[cfg.flagCol] || '').split(';').map(function(s) {
                 return s.trim();
             });
 
             // 统计匹配到的配件总数和其中标配数
             var matchCount = 0;
             var stdCount = 0;
-            allRows.forEach(function(r) {
+            idAllRows.forEach(function(r) {
                 var accCol = getAccCol(r, cfg);
                 if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
                     var accFlagCol = getAccFlagCol(r, cfg);
@@ -3160,9 +3160,9 @@ window.PDA_DATA = {
             if (matchCount === 0) continue;
             if (matchCount === stdCount) continue;
 
-            var cnt = selectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
+            var cnt = idSelectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
             var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
-            h += '<div class="accessory-category" onclick="openAccessoryModal(\'' + keys[i] + '\')">'
+            h += '<div class="accessory-category" onclick="openIdAccessoryModal(\'' + keys[i] + '\')">'
                +   '<div class="accessory-category-left">'
                +     '<div class="accessory-icon">' + cfg.icon + '</div>'
                +     '<div>'
@@ -3196,17 +3196,17 @@ window.PDA_DATA = {
 
     /* ==================== 打开配件选择弹窗 ==================== */
 
-    function openAccessoryModal(key) {
-        currentAccessoryKey = key;
+    function openIdAccessoryModal(key) {
+        idCurrentAccessoryKey = key;
         var cfg = accessoryColumns[key];
         var catName = cfg.name;
-        var refVal = currentMatch[cfg.col] || '';
+        var refVal = idCurrentMatch[cfg.col] || '';
 
         var refTags = refVal.split(';').map(function(s) {
             return s.trim().toLowerCase();
         }).filter(function(s) { return s.length > 0; });
 
-        var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+        var refFlags = (idCurrentMatch[cfg.flagCol] || '').split(';').map(function(s) {
             return s.trim();
         });
 
@@ -3215,10 +3215,10 @@ window.PDA_DATA = {
             if (refFlags[i] === '1') camStdTags[t] = true;
         });
 
-        currentAccessoryItems = [];
+        idCurrentAccessoryItems = [];
         var _tmpItems = [];
 
-        allRows.forEach(function(r) {
+        idAllRows.forEach(function(r) {
             var accCol = getAccCol(r, cfg);
             if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[1] && r[1].trim() === cfg.name) {
                 var accFlagCol = getAccFlagCol(r, cfg);
@@ -3235,7 +3235,7 @@ window.PDA_DATA = {
                 }
 
                 if (matchTag || refTags.length === 0) {
-                    var series = currentMatch[1] || '';
+                    var series = idCurrentMatch[1] || '';
                     if (key === '一体线' && series.indexOf('ID2000XM') >= 0 && (r[4] || '') === '101515363') return;
                     var bothStd = camStdTags[matchTag] && accFlag === '1';
                     _tmpItems.push({
@@ -3253,7 +3253,7 @@ window.PDA_DATA = {
         var hasOptional = _tmpItems.some(function(x) { return !x.isStd; });
         _tmpItems.forEach(function(x) {
             if (!hasOptional || !x.isStd) {
-                currentAccessoryItems.push({
+                idCurrentAccessoryItems.push({
                     series: x.series, name: x.name, desc: x.desc,
                     code: x.code, remark: x.remark
                 });
@@ -3261,12 +3261,12 @@ window.PDA_DATA = {
         });
 
         document.getElementById('modalTitle').textContent = catName + ' - 选择配件';
-        tempSelectedItems = selectedAccessories.filter(function(a) {
+        idTempSelectedItems = idSelectedAccessories.filter(function(a) {
             return a.key === key;
         }).map(function(a) { return a.code; });
 
         if (cableCategories[key]) {
-            cableFilterState = { length: 'all', material: 'all' };
+            idCableFilterState = { length: 'all', material: 'all' };
             renderCableFilterArea();
             renderCableFilteredItems();
         } else {
@@ -3282,9 +3282,9 @@ window.PDA_DATA = {
 
     function closeModal() {
         document.getElementById('accessoryModal').classList.remove('active');
-        currentAccessoryKey = '';
-        currentAccessoryItems = [];
-        tempSelectedItems = [];
+        idCurrentAccessoryKey = '';
+        idCurrentAccessoryItems = [];
+        idTempSelectedItems = [];
         document.getElementById('cableFilterArea').innerHTML = '';
     }
 
@@ -3292,7 +3292,7 @@ window.PDA_DATA = {
 
     function extractCableLengths() {
         var lengths = {};
-        currentAccessoryItems.forEach(function(item) {
+        idCurrentAccessoryItems.forEach(function(item) {
             var s = item.series || '';
             var m = s.match(/^(\d+(?:\.\d+)?m)/);
             if (m) lengths[m[1]] = true;
@@ -3305,7 +3305,7 @@ window.PDA_DATA = {
     function extractCableMaterials(key) {
         var mats = {};
         var kw = cableCategories[key].materials;
-        currentAccessoryItems.forEach(function(item) {
+        idCurrentAccessoryItems.forEach(function(item) {
             var s = item.series || '';
             for (var i = 0; i < kw.length; i++) {
                 if (s.indexOf(kw[i]) >= 0) mats[kw[i]] = true;
@@ -3317,7 +3317,7 @@ window.PDA_DATA = {
     function renderCableFilterArea() {
         var fa = document.getElementById('cableFilterArea');
         var lengths = extractCableLengths();
-        var materials = extractCableMaterials(currentAccessoryKey);
+        var materials = extractCableMaterials(idCurrentAccessoryKey);
         var h = '<div class="cable-filter">';
         h += '<div class="cable-warn"><em>⚠️ 7m线缆无法配置下单，须订单备注删除标配线缆，再额外下单！</em></div>';
         h += '<div class="cable-filter-row"><span class="cable-filter-label">长度</span><div class="cable-filter-btns">';
@@ -3339,7 +3339,7 @@ window.PDA_DATA = {
     }
 
     function setCableFilter(type, value, btn) {
-        cableFilterState[type] = value;
+        idCableFilterState[type] = value;
         var row = btn.parentNode;
         var btns = row.querySelectorAll('.cable-filter-btn');
         btns.forEach(function(b) { b.classList.remove('active'); });
@@ -3353,7 +3353,7 @@ window.PDA_DATA = {
         var mat = '';
         var m = s.match(/^(\d+(?:\.\d+)?m)/);
         if (m) len = m[1];
-        var kw = cableCategories[currentAccessoryKey].materials;
+        var kw = cableCategories[idCurrentAccessoryKey].materials;
         for (var i = 0; i < kw.length; i++) {
             if (s.indexOf(kw[i]) >= 0) { mat = kw[i]; break; }
         }
@@ -3365,13 +3365,13 @@ window.PDA_DATA = {
     function renderCableFilteredItems() {
         var tb = document.getElementById('modalTableBody');
         var filtered = [];
-        var isCable = !!cableCategories[currentAccessoryKey];
+        var isCable = !!cableCategories[idCurrentAccessoryKey];
 
-        currentAccessoryItems.forEach(function(item) {
+        idCurrentAccessoryItems.forEach(function(item) {
             if (isCable) {
                 var info = parseCableSeriesInfo(item.series);
-                if (cableFilterState.length !== 'all' && info.length !== cableFilterState.length) return;
-                if (cableFilterState.material !== 'all' && info.material !== cableFilterState.material) return;
+                if (idCableFilterState.length !== 'all' && info.length !== idCableFilterState.length) return;
+                if (idCableFilterState.material !== 'all' && info.material !== idCableFilterState.material) return;
             }
             filtered.push(item);
         });
@@ -3381,8 +3381,8 @@ window.PDA_DATA = {
         } else {
             var h = '';
             filtered.forEach(function(item) {
-                var origIdx = currentAccessoryItems.indexOf(item);
-                var chk = tempSelectedItems.indexOf(item.code) >= 0 ? 'checked' : '';
+                var origIdx = idCurrentAccessoryItems.indexOf(item);
+                var chk = idTempSelectedItems.indexOf(item.code) >= 0 ? 'checked' : '';
 
                 h += '<tr class="' + (chk ? 'acc-selected' : '') + '" style="cursor:pointer" '
                    + 'onclick="var cb=document.getElementById(\'acc_' + origIdx
@@ -3405,16 +3405,16 @@ window.PDA_DATA = {
     /* ==================== 配件选择/取消逻辑 ==================== */
 
     function toggleTempItem(idx) {
-        var item = currentAccessoryItems[idx];
+        var item = idCurrentAccessoryItems[idx];
         var cb = document.getElementById('acc_' + idx);
         var tr = cb.parentNode.parentNode;
-        var key = currentAccessoryKey;
+        var key = idCurrentAccessoryKey;
 
         if (cb.checked) {
             // 非扩展配件：单选互斥
             if (key !== '扩展配件') {
-                tempSelectedItems = [];
-                currentAccessoryItems.forEach(function(_, i) {
+                idTempSelectedItems = [];
+                idCurrentAccessoryItems.forEach(function(_, i) {
                     var c = document.getElementById('acc_' + i);
                     if (c) {
                         c.checked = false;
@@ -3424,42 +3424,42 @@ window.PDA_DATA = {
                 cb.checked = true;
             }
             tr.classList.add('acc-selected');
-            if (tempSelectedItems.indexOf(item.code) < 0) tempSelectedItems.push(item.code);
+            if (idTempSelectedItems.indexOf(item.code) < 0) idTempSelectedItems.push(item.code);
 
             // 电源自动配对逻辑
             if (key === '电源') {
                 var ms = item.series;
                 if (ms === '电源适配器') {
-                    var b = currentAccessoryItems.find(function(x) { return x.series === '电源适配器线缆'; });
-                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
-                        tempSelectedItems.push(b.code);
-                        var bi = currentAccessoryItems.indexOf(b);
+                    var b = idCurrentAccessoryItems.find(function(x) { return x.series === '电源适配器线缆'; });
+                    if (b && idTempSelectedItems.indexOf(b.code) < 0) {
+                        idTempSelectedItems.push(b.code);
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
                     }
                 } else if (ms === '电源适配器线缆') {
-                    var b = currentAccessoryItems.find(function(x) { return x.series === '电源适配器'; });
-                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
-                        tempSelectedItems.push(b.code);
-                        var bi = currentAccessoryItems.indexOf(b);
+                    var b = idCurrentAccessoryItems.find(function(x) { return x.series === '电源适配器'; });
+                    if (b && idTempSelectedItems.indexOf(b.code) < 0) {
+                        idTempSelectedItems.push(b.code);
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
                     }
                 } else if (ms.indexOf('开关电源') === 0 && ms.indexOf('线缆') < 0) {
-                    var b = currentAccessoryItems.find(function(x) { return x.series.indexOf('开关电源线缆') >= 0; });
-                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
-                        tempSelectedItems.push(b.code);
-                        var bi = currentAccessoryItems.indexOf(b);
+                    var b = idCurrentAccessoryItems.find(function(x) { return x.series.indexOf('开关电源线缆') >= 0; });
+                    if (b && idTempSelectedItems.indexOf(b.code) < 0) {
+                        idTempSelectedItems.push(b.code);
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
                     }
                 } else if (ms.indexOf('开关电源线缆') >= 0) {
-                    var b = currentAccessoryItems.find(function(x) {
+                    var b = idCurrentAccessoryItems.find(function(x) {
                         return x.series.indexOf('开关电源') === 0 && x.series.indexOf('线缆') < 0;
                     });
-                    if (b && tempSelectedItems.indexOf(b.code) < 0) {
-                        tempSelectedItems.push(b.code);
-                        var bi = currentAccessoryItems.indexOf(b);
+                    if (b && idTempSelectedItems.indexOf(b.code) < 0) {
+                        idTempSelectedItems.push(b.code);
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = true; bc.parentNode.parentNode.classList.add('acc-selected'); }
                     }
@@ -3468,25 +3468,25 @@ window.PDA_DATA = {
         } else {
             // 取消选择
             tr.classList.remove('acc-selected');
-            tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== item.code; });
+            idTempSelectedItems = idTempSelectedItems.filter(function(n) { return n !== item.code; });
 
             if (key === '电源') {
                 var ms = item.series;
                 if (ms === '电源适配器' || ms === '电源适配器线缆') {
                     var bs = ms === '电源适配器' ? '电源适配器线缆' : '电源适配器';
-                    var b = currentAccessoryItems.find(function(x) { return x.series === bs; });
+                    var b = idCurrentAccessoryItems.find(function(x) { return x.series === bs; });
                     if (b) {
-                        tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== b.code; });
-                        var bi = currentAccessoryItems.indexOf(b);
+                        idTempSelectedItems = idTempSelectedItems.filter(function(n) { return n !== b.code; });
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = false; bc.parentNode.parentNode.classList.remove('acc-selected'); }
                     }
                 } else if (ms.indexOf('开关电源') === 0) {
                     var bs = ms.indexOf('开关电源线缆') >= 0 ? '开关电源' : '开关电源线缆';
-                    var b = currentAccessoryItems.find(function(x) { return x.series.indexOf(bs) === 0; });
+                    var b = idCurrentAccessoryItems.find(function(x) { return x.series.indexOf(bs) === 0; });
                     if (b) {
-                        tempSelectedItems = tempSelectedItems.filter(function(n) { return n !== b.code; });
-                        var bi = currentAccessoryItems.indexOf(b);
+                        idTempSelectedItems = idTempSelectedItems.filter(function(n) { return n !== b.code; });
+                        var bi = idCurrentAccessoryItems.indexOf(b);
                         var bc = document.getElementById('acc_' + bi);
                         if (bc) { bc.checked = false; bc.parentNode.parentNode.classList.remove('acc-selected'); }
                     }
@@ -3498,14 +3498,14 @@ window.PDA_DATA = {
     /* ==================== 确认配件选择 ==================== */
 
     function confirmAccessories() {
-        var key = currentAccessoryKey;
-        selectedAccessories = selectedAccessories.filter(function(a) {
+        var key = idCurrentAccessoryKey;
+        idSelectedAccessories = idSelectedAccessories.filter(function(a) {
             return a.key !== key || (key === '扩展配件' && a.type === 'standard');
         });
-        tempSelectedItems.forEach(function(code) {
-            var item = currentAccessoryItems.find(function(i) { return i.code === code; });
+        idTempSelectedItems.forEach(function(code) {
+            var item = idCurrentAccessoryItems.find(function(i) { return i.code === code; });
             if (item) {
-                selectedAccessories.push({
+                idSelectedAccessories.push({
                     key: key, 
                     subCategory: (key === '扩展配件') ? (item.series || '') : '',  // ← 新增
                     name: item.name, 
@@ -3517,28 +3517,28 @@ window.PDA_DATA = {
             }
         });
         closeModal();
-        renderTable();
-        renderAccessoryCategories();
+        renderIdTable();
+        renderIdAccessoryCategories();
     }
 
     /* ==================== 生成标配配件 ==================== */
 
-    function generateStandardAccessories() {
-        if (!currentMatch) { alert('请先选择产品型号'); return; }
-        selectedAccessories = [];
-        standardCache = {};
+    function generateIdStandardAccessories() {
+        if (!idCurrentMatch) { alert('请先选择产品型号'); return; }
+        idSelectedAccessories = [];
+        idStandardCache = {};
         var keys = Object.keys(accessoryColumns);
 
         for (var i = 0; i < keys.length; i++) {
             var cfg = accessoryColumns[keys[i]];
-            var val = currentMatch[cfg.col] || '';
+            var val = idCurrentMatch[cfg.col] || '';
             if (!val) continue;
 
             var refTags = val.split(';').map(function(s) {
                 return s.trim().toLowerCase();
             }).filter(function(s) { return s.length > 0; });
 
-            var refFlags = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+            var refFlags = (idCurrentMatch[cfg.flagCol] || '').split(';').map(function(s) {
                 return s.trim();
             });
 
@@ -3549,8 +3549,8 @@ window.PDA_DATA = {
 
             if (Object.keys(camStdTags).length === 0) continue;
 
-            for (var j = 0; j < allRows.length; j++) {
-                var r = allRows[j];
+            for (var j = 0; j < idAllRows.length; j++) {
+                var r = idAllRows[j];
                 var accCol = getAccCol(r, cfg);
                 if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
                     var accFlagCol = getAccFlagCol(r, cfg);
@@ -3573,20 +3573,20 @@ window.PDA_DATA = {
                                 remark: r[6] || '', 
                                 type: 'standard'
                             };
-                            selectedAccessories.push(item);
-                            standardCache[keys[i]] = item;
+                            idSelectedAccessories.push(item);
+                            idStandardCache[keys[i]] = item;
                             break;
                         }
                     }
                 }
             }
         }
-        renderTable();
+        renderIdTable();
     }
 
     /* ==================== 渲染配单明细表 ==================== */
 
-    function renderTable() {
+    function renderIdTable() {
     var tblHead = '<thead><tr>'
         + '<th style="width:70px">类型</th>'
         + '<th style="width:260px">物料名称</th>'
@@ -3597,12 +3597,12 @@ window.PDA_DATA = {
         + '</tr></thead>';
 
     // 无主机但有选配件的场景
-    if (!currentMatch && selectedAccessories.length > 0) {
-        document.getElementById('statTotal').textContent = selectedAccessories.length;
-        document.getElementById('statHost').textContent = 0;
-        document.getElementById('statAccessory').textContent = selectedAccessories.length;
+    if (!idCurrentMatch && idSelectedAccessories.length > 0) {
+        document.getElementById('idStatTotal').textContent = idSelectedAccessories.length;
+        document.getElementById('idStatHost').textContent = 0;
+        document.getElementById('idStatAccessory').textContent = idSelectedAccessories.length;
         var h = '<table class="data-table">' + tblHead + '<tbody>';
-        selectedAccessories.forEach(function(a) {
+        idSelectedAccessories.forEach(function(a) {
             // ★★★ 无主机场景：扩展配件使用 subCategory ★★★
             var typeLabel;
             if (a.key === '扩展配件') {
@@ -3616,23 +3616,23 @@ window.PDA_DATA = {
                + '<td class="material-desc">' + a.desc + '</td>'
                + '<td class="material-code">' + (a.code || '-') + '</td>'
                + '<td>' + (a.remark || '') + '</td>'
-               + '<td><button class="btn-remove" onclick="removeItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
+               + '<td><button class="btn-remove" onclick="removeIdItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
                + '</tr>';
         });
-        h += '</tbody></table><div class="table-footer"><span>共 ' + selectedAccessories.length + ' 行</span></div>';
-        document.getElementById('tableArea').innerHTML = h;
+        h += '</tbody></table><div class="table-footer"><span>共 ' + idSelectedAccessories.length + ' 行</span></div>';
+        document.getElementById('idTableArea').innerHTML = h;
         return;
     }
 
-    if (!currentMatch) { clearTable(); return; }
+    if (!idCurrentMatch) { clearIdTable(); return; }
 
     var items = [];
 
     // 主机行
     items.push({
         type: 'host', typeName: '主机',
-        name: currentMatch[3] || '-', desc: currentMatch[5] || '-',
-        code: currentMatch[4] || '-', remark: currentMatch[6] || ''
+        name: idCurrentMatch[3] || '-', desc: idCurrentMatch[5] || '-',
+        code: idCurrentMatch[4] || '-', remark: idCurrentMatch[6] || ''
     });
 
     // 线缆标配判断
@@ -3641,14 +3641,14 @@ window.PDA_DATA = {
     Object.keys(cableKeys).forEach(function(k) {
         var cfg = accessoryColumns[k];
         if (cfg && cfg.flagCol) {
-            cableIsStd[k] = (currentMatch[cfg.flagCol] || '').split(';').map(function(s) {
+            cableIsStd[k] = (idCurrentMatch[cfg.flagCol] || '').split(';').map(function(s) {
                 return s.trim();
             }).some(function(f) { return f === '1'; });
         }
     });
 
     // 选配排序：选配在前
-    var sorted = selectedAccessories.slice().sort(function(a, b) {
+    var sorted = idSelectedAccessories.slice().sort(function(a, b) {
         if (a.type === 'optional' && b.type !== 'optional') return -1;
         if (a.type !== 'optional' && b.type === 'optional') return 1;
         return 0;
@@ -3679,9 +3679,9 @@ window.PDA_DATA = {
         });
     });
 
-    document.getElementById('statTotal').textContent = items.length;
-    document.getElementById('statHost').textContent = 1;
-    document.getElementById('statAccessory').textContent = items.length - 1;
+    document.getElementById('idStatTotal').textContent = items.length;
+    document.getElementById('idStatHost').textContent = 1;
+    document.getElementById('idStatAccessory').textContent = items.length - 1;
 
     var h = '<table class="data-table">' + tblHead + '<tbody>';
 
@@ -3690,7 +3690,7 @@ window.PDA_DATA = {
         if (item.type === 'host') {
             actionBtn = '';
         } else if (item.type === 'optional') {
-            actionBtn = '<button class="btn-remove" onclick="removeItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
+            actionBtn = '<button class="btn-remove" onclick="removeIdItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
         }
 
         // ★★★ 核心修改：主机显示"主机"，配件显示 displayType（子类别名称）★★★
@@ -3707,68 +3707,68 @@ window.PDA_DATA = {
     });
 
     h += '</tbody></table><div class="table-footer"><span>共 ' + items.length + ' 行</span></div>';
-    document.getElementById('tableArea').innerHTML = h;
+    document.getElementById('idTableArea').innerHTML = h;
 }
 
     /* ==================== 移除选配项 ==================== */
 
-    function removeItem(name) {
-        var idx = selectedAccessories.findIndex(function(a) { return a.name === name; });
+    function removeIdItem(name) {
+        var idx = idSelectedAccessories.findIndex(function(a) { return a.name === name; });
         if (idx === -1) return;
-        var removed = selectedAccessories[idx];
-        selectedAccessories.splice(idx, 1);
+        var removed = idSelectedAccessories[idx];
+        idSelectedAccessories.splice(idx, 1);
 
         // 移除选配后恢复对应标配
-        if (removed && removed.type === 'optional' && standardCache[removed.key]) {
+        if (removed && removed.type === 'optional' && idStandardCache[removed.key]) {
             if (removed.key === '扩展配件') {
-                var alreadyHasStd = selectedAccessories.some(function(a) {
+                var alreadyHasStd = idSelectedAccessories.some(function(a) {
                     return a.key === removed.key && a.type === 'standard';
                 });
                 if (!alreadyHasStd) {
-                    selectedAccessories.push(JSON.parse(JSON.stringify(standardCache[removed.key])));
+                    idSelectedAccessories.push(JSON.parse(JSON.stringify(idStandardCache[removed.key])));
                 }
             } else {
-                selectedAccessories.push(JSON.parse(JSON.stringify(standardCache[removed.key])));
+                idSelectedAccessories.push(JSON.parse(JSON.stringify(idStandardCache[removed.key])));
             }
         }
-        renderTable();
-        renderAccessoryCategories();
+        renderIdTable();
+        renderIdAccessoryCategories();
     }
 
     /* ==================== 清空/重置 ==================== */
 
-    function clearAccessoryPanel() {
-        document.getElementById('accessoryCategories').innerHTML = '';
-        selectedAccessories = [];
-        currentMatch = null;
+    function clearIdAccessoryPanel() {
+        document.getElementById('idAccessoryCategories').innerHTML = '';
+        idSelectedAccessories = [];
+        idCurrentMatch = null;
     }
 
-    function clearTable() {
-        document.getElementById('tableArea').innerHTML =
+    function clearIdTable() {
+        document.getElementById('idTableArea').innerHTML =
             '<div class="empty-state"><div class="empty-state-icon">📦</div>'
             + '<h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div>';
-        document.getElementById('statTotal').textContent = '0';
-        document.getElementById('statHost').textContent = '0';
-        document.getElementById('statAccessory').textContent = '0';
+        document.getElementById('idStatTotal').textContent = '0';
+        document.getElementById('idStatHost').textContent = '0';
+        document.getElementById('idStatAccessory').textContent = '0';
     }
 
-    function resetConfig() {
-        if (currentMatch) { generateStandardAccessories(); renderAccessoryCategories(); }
+    function resetIdConfig() {
+        if (idCurrentMatch) { generateIdStandardAccessories(); renderIdAccessoryCategories(); }
     }
 
-    function clearAll() {
-        selectedAccessories = [];
-        currentMatch = null;
-        standardCache = {};
-        document.getElementById('categorySelect').selectedIndex = 0;
-        document.getElementById('seriesSelect').innerHTML = '<option value="">请先选择产品大类</option>';
-        document.getElementById('seriesSelect').disabled = true;
-        document.getElementById('modelSelect').innerHTML = '<option value="">请先选择产品系列</option>';
-        document.getElementById('modelSelect').disabled = true;
-        document.getElementById('accessoryCategories').innerHTML = '';
-        document.getElementById('quickSearchInput').value = '';
-        document.getElementById('quickSearchResults').style.display = 'none';
-        clearTable();
+    function clearAllId() {
+        idSelectedAccessories = [];
+        idCurrentMatch = null;
+        idStandardCache = {};
+        document.getElementById('idCategorySelect').selectedIndex = 0;
+        document.getElementById('idSeriesSelect').innerHTML = '<option value="">请先选择产品大类</option>';
+        document.getElementById('idSeriesSelect').disabled = true;
+        document.getElementById('idModelSelect').innerHTML = '<option value="">请先选择产品系列</option>';
+        document.getElementById('idModelSelect').disabled = true;
+        document.getElementById('idAccessoryCategories').innerHTML = '';
+        document.getElementById('idQuickSearchInput').value = '';
+        document.getElementById('idQuickSearchResults').style.display = 'none';
+        clearIdTable();
     }
 
     /* ==================== CSV 导出 ==================== */
@@ -3782,16 +3782,16 @@ window.PDA_DATA = {
         return s;
     }
 
-    function exportCSV() {
-        if (!currentMatch) { alert('请先生成配单'); return; }
+    function exportIdCSV() {
+        if (!idCurrentMatch) { alert('请先生成配单'); return; }
 
         var csv = '\uFEFF类型,物料名称,描述,物料代码,备注\n';
-        csv += '主机,' + csvEscape(currentMatch[3] || '-') + ','
-              + csvEscape(currentMatch[5] || '-') + ','
-              + csvEscape(currentMatch[4] || '-') + ','
-              + csvEscape(currentMatch[6] || '') + '\n';
+        csv += '主机,' + csvEscape(idCurrentMatch[3] || '-') + ','
+              + csvEscape(idCurrentMatch[5] || '-') + ','
+              + csvEscape(idCurrentMatch[4] || '-') + ','
+              + csvEscape(idCurrentMatch[6] || '') + '\n';
 
-        selectedAccessories.forEach(function(a) {
+        idSelectedAccessories.forEach(function(a) {
             if (a.type === 'optional') {
                 csv += '选配,' + csvEscape(a.name) + ','
                      + csvEscape(a.value) + ','
@@ -3818,9 +3818,9 @@ window.PDA_DATA = {
 
     /* ==================== 快速搜索 ==================== */
 
-    function onQuickSearch() {
-        var q = document.getElementById('quickSearchInput').value.trim().toLowerCase();
-        var el = document.getElementById('quickSearchResults');
+    function onIdQuickSearch() {
+        var q = document.getElementById('idQuickSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('idQuickSearchResults');
         if (!q) { el.style.display = 'none'; return; }
 
         // 按优先级匹配：产品系列 > 物料名称 > 物料代码 > 描述 > 备注
@@ -3830,8 +3830,8 @@ window.PDA_DATA = {
         for (var c = 0; c < colPriority.length; c++) {
             var col = colPriority[c];
             results = [];
-            for (var i = 0; i < allRows.length; i++) {
-                var r = allRows[i];
+            for (var i = 0; i < idAllRows.length; i++) {
+                var r = idAllRows[i];
                 var isCam = r[0] === 'ID系列';
                 var isAcc = r[0] === '配件';
                 if (!isCam && !isAcc) continue;
@@ -3858,7 +3858,7 @@ window.PDA_DATA = {
         var h = '';
         results.forEach(function(r) {
             var tagText = r.type + ' · ' + r.cat;
-            h += '<div class="quick-search-item" onclick="selectQuickSearch(' + r.idx + ')">'
+            h += '<div class="quick-search-item" onclick="selectIdQuickSearch(' + r.idx + ')">'
                +   '<div class="qs-row1">'
                +     '<span class="qs-name">' + r.name + '</span>'
                +     '<span class="qs-tag">' + tagText + '</span>'
@@ -3875,42 +3875,42 @@ window.PDA_DATA = {
         el.style.display = 'block';
     }
 
-    function selectQuickSearch(idx) {
-        var r = allRows[idx];
+    function selectIdQuickSearch(idx) {
+        var r = idAllRows[idx];
         if (!r) return;
-        document.getElementById('quickSearchInput').value = '';
-        document.getElementById('quickSearchResults').style.display = 'none';
+        document.getElementById('idQuickSearchInput').value = '';
+        document.getElementById('idQuickSearchResults').style.display = 'none';
 
         if (r[0] === 'ID系列') {
             var cat = r[1], series = r[2], model = r[3];
-            var catSel = document.getElementById('categorySelect');
+            var catSel = document.getElementById('idCategorySelect');
             for (var i = 0; i < catSel.options.length; i++) {
                 if (catSel.options[i].value === cat) { catSel.selectedIndex = i; break; }
             }
-            onCategoryChange();
+            onIdCategoryChange();
 
-            var serSel = document.getElementById('seriesSelect');
+            var serSel = document.getElementById('idSeriesSelect');
             for (var i = 0; i < serSel.options.length; i++) {
                 if (serSel.options[i].value === series) { serSel.selectedIndex = i; break; }
             }
-            onSeriesChange();
+            onIdSeriesChange();
 
-            var modSel = document.getElementById('modelSelect');
+            var modSel = document.getElementById('idModelSelect');
             for (var i = 0; i < modSel.options.length; i++) {
                 if (modSel.options[i].value === model) { modSel.selectedIndex = i; break; }
             }
-            onModelChange();
+            onIdModelChange();
 
         } else if (r[0] === '配件') {
             var name = r[3] || '';
-            var exists = selectedAccessories.some(function(a) { return a.name === name; });
+            var exists = idSelectedAccessories.some(function(a) { return a.name === name; });
             if (!exists) {
-                selectedAccessories.push({
+                idSelectedAccessories.push({
                     key: '选配', subCategory: (r[1] === '扩展配件') ? (r[2] || '') : '',
                     name: name, value: r[5] || '',
                     code: r[4] || '', remark: r[6] || '', type: 'optional'
                 });
-                renderTable();
+                renderIdTable();
             }
         }
     }
@@ -3989,10 +3989,10 @@ window.PDA_DATA = {
     /* ==================== 系列总览 ==================== */
 
     // 获取系列分组数据
-    function getSeriesMap() {
+    function getIdSeriesMap() {
     var map = {};
     var order = [];
-    allRows.forEach(function(row) {
+    idAllRows.forEach(function(row) {
         if (row[0] !== 'ID系列') return;
         var key = row[1];
         if (!map[key]) {
@@ -4005,10 +4005,10 @@ window.PDA_DATA = {
     return { map: map, order: order };
     }
 
-    function getAccessoriesForSeries(seriesName) {
+    function getIdAccessoriesForSeries(seriesName) {
     var accMap = {};
     // 1. 获取该系列所有相机
-    var cameraRows = allRows.filter(function(r) {
+    var cameraRows = idAllRows.filter(function(r) {
         return r[0] === 'ID系列' && r[1] === seriesName;
     });
     // 2. 收集所有引用标签（相机行的配件列）
@@ -4025,7 +4025,7 @@ window.PDA_DATA = {
     });
     refTags = [...new Set(refTags)];
     // 3. 匹配配件行（配件行的标签在索引7）
-    allRows.forEach(function(row) {
+    idAllRows.forEach(function(row) {
         if (row[0] !== '配件') return;
         var accTag = (row[7] || '').toLowerCase();
         var parts = accTag.split(';').map(function(s) { return s.trim(); });
@@ -4039,16 +4039,16 @@ window.PDA_DATA = {
             }
         }
     });
-    // 返回配件行数组（顺序按照遍历 allRows 的顺序，即枚举顺序）
+    // 返回配件行数组（顺序按照遍历 idAllRows 的顺序，即枚举顺序）
     return Object.values(accMap);
     }
 
     // 渲染左侧系列列表
-    function renderSeriesList() {
-    var result = getSeriesMap();
+    function renderIdSeriesList() {
+    var result = getIdSeriesMap();
     var map = result.map;
     var seriesNames = result.order;
-    var container = document.getElementById('seriesList');
+    var container = document.getElementById('idSeriesList');
     if (!container) return;
     if (seriesNames.length === 0) {
         container.innerHTML = '<div style="padding:12px;color:#94a3b8;font-size:12px;text-align:center;">暂无数据</div>';
@@ -4057,14 +4057,14 @@ window.PDA_DATA = {
     var html = '';
     seriesNames.forEach(function(name, index) {
         var active = index === 0 ? ' active' : '';
-        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
+        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderIdOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
     });
     container.innerHTML = html;
     var first = container.querySelector('.series-item');
-    if (first) renderOverviewTable(first.getAttribute('data-series'), first);
+    if (first) renderIdOverviewTable(first.getAttribute('data-series'), first);
     }
     // 渲染右侧表格
-    function renderOverviewTable(seriesName, el) {
+    function renderIdOverviewTable(seriesName, el) {
         // 高亮切换
         document.querySelectorAll('.series-item').forEach(function(item) {
             item.classList.remove('active');
@@ -4080,24 +4080,24 @@ window.PDA_DATA = {
         }
 
         // 获取该系列的相机行
-        var cameraRows = allRows.filter(function(r) {
+        var cameraRows = idAllRows.filter(function(r) {
             return r[0] === 'ID系列' && r[1] === seriesName;
         });
         // 获取该系列关联的配件行
-        var accessoryRows = getAccessoriesForSeries(seriesName);
-        // 配件按枚举顺序（allRows 中的索引）排序
+        var accessoryRows = getIdAccessoriesForSeries(seriesName);
+        // 配件按枚举顺序（idAllRows 中的索引）排序
         accessoryRows.sort(function(a, b) {
-            return allRows.indexOf(a) - allRows.indexOf(b);
+            return idAllRows.indexOf(a) - idAllRows.indexOf(b);
         });
         // 相机在前，配件在后
         var rows = cameraRows.concat(accessoryRows);
 
         // 更新标题和计数
-        document.getElementById('overviewTitle').textContent = seriesName;
-        document.getElementById('overviewCount').textContent = '共 ' + rows.length + ' 项';
+        document.getElementById('idOverviewTitle').textContent = seriesName;
+        document.getElementById('idOverviewCount').textContent = '共 ' + rows.length + ' 项';
 
         if (rows.length === 0) {
-            document.getElementById('overviewTableWrap').innerHTML =
+            document.getElementById('idOverviewTableWrap').innerHTML =
                 '<div class="empty-state"><div class="empty-state-icon">📭</div><h3>该系列暂无数据</h3></div>';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
@@ -4147,7 +4147,7 @@ window.PDA_DATA = {
         html += '</tbody></table>';
 
         // 更新表格内容
-        var wrap = document.getElementById('overviewTableWrap');
+        var wrap = document.getElementById('idOverviewTableWrap');
         wrap.innerHTML = html;
 
         // 重置滚动容器到顶部，确保从序号1开始显示
@@ -4166,11 +4166,11 @@ window.PDA_DATA = {
         // 隐藏所有页面
     document.getElementById('pageHome').style.display = 'none';
     // 隐藏所有页面
-    document.getElementById('pageBom').style.display = 'none';
+    document.getElementById('pageIdBom').style.display = 'none';
     var cmp = document.getElementById('pageCmp');
     cmp.style.display = 'none';
     cmp.classList.remove('active');
-    var overview = document.getElementById('pageOverview');
+    var overview = document.getElementById('pageIdOverview');
     overview.style.display = 'none';
     overview.classList.remove('active');
     var pda = document.getElementById('pagePda');
@@ -4181,7 +4181,7 @@ window.PDA_DATA = {
         if (page === 'home') {
         document.getElementById('pageHome').style.display = 'flex';
     } else if (page === 'bom') {
-        document.getElementById('pageBom').style.display = 'flex';
+        document.getElementById('pageIdBom').style.display = 'flex';
     } else if (page === 'cmp') {
         cmp.style.display = 'flex';
         cmp.classList.add('active');
@@ -4195,8 +4195,8 @@ window.PDA_DATA = {
         overview.style.display = 'flex';
         overview.classList.add('active');
         // 如果系列列表还未渲染，则渲染
-        if (!document.getElementById('seriesList').children.length) {
-            renderSeriesList();
+        if (!document.getElementById('idSeriesList').children.length) {
+            renderIdSeriesList();
         }
     } else if (page === 'pda') {
         pda.style.display = 'flex';
@@ -4388,7 +4388,7 @@ window.PDA_DATA = {
     /* ==================== 页面初始化 ==================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadData();
+    loadIdData();
     setTimeout(showAnnounce, 500);
 
         // ===== 从公告配置读取数据更新日期 =====
