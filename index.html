@@ -410,7 +410,6 @@
     .vm-table td{border-bottom:1px solid #f1f5f9}
     .vm-table tr:hover td{background:#f8fafc}
     .vm-table .col-num{width:35px;min-width:35px;text-align:center}
-    .vm-table .col-scene{width:100px;min-width:100px}
     .vm-table .col-name{width:140px;min-width:140px;font-weight:500}
     .vm-table .col-code{width:90px;min-width:90px;font-family:monospace;font-size:10px}
     .vm-table .col-swname{width:130px;min-width:130px}
@@ -419,10 +418,6 @@
     .vm-table .col-remark{width:280px;min-width:280px}
     .vm-table .cell-expand{cursor:pointer;color:#7c3aed;font-size:10px;margin-top:2px;display:inline-block}
     .vm-table .cell-full{white-space:pre-wrap;word-break:break-all;font-size:10px;line-height:1.4}
-    .vm-table .scene-tag{
-        display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;
-        background:#f5f3ff;color:#7c3aed;font-weight:500;white-space:nowrap;
-    }
 
         /* VM选型 覆盖样式 */
         .vm-sidebar{width:200px;flex-shrink:0;position:sticky;top:52px;align-self:flex-start;max-height:calc(100vh - 52px);overflow-y:auto}
@@ -446,7 +441,6 @@
         .vm-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;font-size:10px;font-weight:500;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
         .vm-table tr:hover{background:#f8fafc}
         .vm-table .col-num{width:36px;text-align:center;color:#94a3b8;font-size:10px}
-        .vm-table .col-scene{width:10%}
         .vm-table .col-name{width:15%}
         .vm-table .col-code{width:10%}
         .vm-table .col-swname{width:14%}
@@ -1359,7 +1353,7 @@
                 </div>
             </div>
         </div>
-        <div id="pageVm" style="display:none;flex:1;min-width:0;flex-direction:column;gap:0">
+        <div id="pageVm" style="display:none;flex:1;min-width:0">
             <div class="vm-sidebar">
                 <div class="panel">
                     <div class="panel-title"><div class="panel-title-icon">🔍</div>搜索筛选</div>
@@ -3938,7 +3932,7 @@
     function renderVmTable() {
         var data = vmFilteredData;
         var h = '<table class="vm-table"><thead><tr>';
-        h += '<th class="col-num">序号</th><th class="col-scene">应用场景</th><th class="col-name">加密狗名称</th>';
+        h += '<th class="col-num">序号</th><th class="col-name">加密狗名称</th>';
         h += '<th class="col-code">代码(标配)</th><th class="col-code">代码(中性)</th>';
         h += '<th class="col-swname">软加密名称</th><th class="col-swcode">软加密代码</th>';
         h += '<th class="col-modules">支持模块</th><th class="col-remark">备注</th>';
@@ -3947,7 +3941,6 @@
         data.forEach(function(item, i) {
             h += '<tr>';
             h += '<td class="col-num">' + (i + 1) + '</td>';
-            h += '<td class="col-scene"><span class="scene-tag">' + item.scene + '</span></td>';
             h += '<td class="col-name">' + item.name + '</td>';
             h += '<td class="col-code">' + item.codeStd + '</td>';
             h += '<td class="col-code">' + item.codeNeu + '</td>';
@@ -3969,7 +3962,7 @@
         });
 
         if (data.length === 0) {
-            h += '<tr><td colspan="9" class="vm-empty">无匹配数据</td></tr>';
+            h += '<tr><td colspan="8" class="vm-empty">无匹配数据</td></tr>';
         }
 
         h += '</tbody></table>';
