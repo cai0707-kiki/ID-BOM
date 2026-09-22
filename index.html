@@ -197,7 +197,7 @@
         .cable-filter-btn.active{border-color:#f97316;background:#f97316;color:white}
         .cable-warn{padding:8px 12px;border:1px solid #fcd34d;border-radius:6px;background:#fffbeb;color:#b45309;font-size:11px;margin-bottom:12px;line-height:1.5}
         .cable-warn em{font-style:normal;color:#f97316}
-        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageIdBom,#pageScBom{flex-direction:column}}
+        @media(max-width:1024px) and (min-width:769px){.container{flex-direction:column}.sidebar{width:100%}#pageIdBom,#pageScBom,#pageVm{flex-direction:column}}
         /* ====== 响应式：移动端 — 配单配置自适应 + 明细横向滑动 ======
            TODO: 以下部分 CSS 属性与桌面端重复（如 .cmp-filter-btn, .series-item 等）
            可考虑将公共属性提取到桌面端，移动端只保留差异属性以减少代码量。
@@ -249,6 +249,7 @@
     /* ====== 页面容器 ====== */
     #pageIdBom,
     #pageScBom,
+    #pageVm,
     #pageCmp,
     #pageIdOverview,
     #pageScOverview,
@@ -368,6 +369,59 @@
     .cmp-table .col-num{width:30px;min-width:30px}
     .cmp-table .col-base,.cmp-table .col-dist{width:auto;min-width:130px}
     .cmp-table .col-basecode,.cmp-table .col-distcode{width:auto;min-width:140px}
+
+    /* ====== VM选型 ====== */
+    .vm-sidebar{
+        width:100% !important;max-width:100% !important;min-width:0 !important;
+        flex-shrink:0 !important;position:sticky;top:0;z-index:5;
+        background:#f0f2f5;padding:8px 12px !important;margin-bottom:4px;
+        border-radius:0;max-height:none !important;overflow:visible !important;
+    }
+    .vm-search-wrap{width:100%;margin-bottom:6px}
+    .vm-search-input{width:100%;font-size:14px;padding:8px 10px;box-sizing:border-box}
+    .vm-filter-title{font-size:12px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+    .vm-filter-all{font-size:11px;padding:3px 12px;flex-shrink:0}
+    .vm-filter-list{
+        display:flex !important;flex-direction:row !important;flex-wrap:wrap !important;
+        gap:5px !important;max-height:none !important;overflow-y:visible !important;
+        padding:2px 0 4px 0;width:100%;
+    }
+    .vm-filter-btn{
+        display:inline-block !important;width:auto !important;padding:4px 12px !important;
+        border-radius:14px !important;font-size:11px !important;white-space:nowrap;flex-shrink:0;
+        border:1px solid #e2e8f0;background:white;color:#333;cursor:pointer;transition:all 0.2s;
+    }
+    .vm-filter-btn.active{border-color:#7c3aed;background:#f5f3ff;color:#7c3aed;font-weight:600}
+    .vm-content{
+        flex:1 1 0% !important;min-height:0 !important;height:auto !important;
+        overflow:visible !important;max-height:none !important;padding:0 10px;
+    }
+    .vm-content-header{padding:6px 0}
+    .vm-stats{font-size:12px;color:#888}
+    .vm-body{
+        flex:1 1 0% !important;min-height:200px !important;height:auto !important;
+        max-height:none !important;overflow-x:auto !important;overflow-y:visible !important;
+        display:block !important;padding:0 10px 60px 10px !important;
+    }
+    .vm-table{font-size:11px;min-width:900px;width:100%;table-layout:auto;display:table !important}
+    .vm-table th,.vm-table td{padding:6px 8px;font-size:11px;vertical-align:top}
+    .vm-table th{background:#f8fafc;font-weight:600;color:#475569;border-bottom:2px solid #e2e8f0;white-space:nowrap;position:sticky;top:0;z-index:1}
+    .vm-table td{border-bottom:1px solid #f1f5f9}
+    .vm-table tr:hover td{background:#f8fafc}
+    .vm-table .col-num{width:35px;min-width:35px;text-align:center}
+    .vm-table .col-scene{width:100px;min-width:100px}
+    .vm-table .col-name{width:140px;min-width:140px;font-weight:500}
+    .vm-table .col-code{width:90px;min-width:90px;font-family:monospace;font-size:10px}
+    .vm-table .col-swname{width:130px;min-width:130px}
+    .vm-table .col-swcode{width:90px;min-width:90px;font-family:monospace;font-size:10px}
+    .vm-table .col-modules{width:220px;min-width:220px}
+    .vm-table .col-remark{width:280px;min-width:280px}
+    .vm-table .cell-expand{cursor:pointer;color:#7c3aed;font-size:10px;margin-top:2px;display:inline-block}
+    .vm-table .cell-full{white-space:pre-wrap;word-break:break-all;font-size:10px;line-height:1.4}
+    .vm-table .scene-tag{
+        display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;
+        background:#f5f3ff;color:#7c3aed;font-weight:500;white-space:nowrap;
+    }
 
     /* ====== 系列总览 ====== */
     #pageIdOverview,#pageScOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
@@ -1061,6 +1115,7 @@
             <div class="nav-item active" onclick="switchPage('home', event)"><span class="nav-icon">🏠</span>首页</div>
             <div class="nav-item" onclick="switchPage('bom', event)"><span class="nav-icon">📋</span>ID配单表</div>
             <div class="nav-item" onclick="switchPage('scbom', event)"><span class="nav-icon">📋</span>SC配单表</div>
+            <div class="nav-item" onclick="switchPage('vm', event)"><span class="nav-icon">🔐</span>VM选型</div>
             <div class="nav-item" onclick="switchPage('overview', event)"><span class="nav-icon">📦</span>ID系列表</div>
             <div class="nav-item" onclick="switchPage('scoverview', event)"><span class="nav-icon">📦</span>SC系列表</div>
             <div class="nav-item" onclick="switchPage('cmp', event)"><span class="nav-icon">📊</span>对照表</div>
@@ -1097,11 +1152,22 @@
                             <span class="home-card-link">生成配单 →</span>
                         </div>
                     </button>
+                    <button class="home-card" onclick="switchPage('vm', event)">
+                        <div class="home-card-top">
+                            <div class="home-card-icon">🔐</div>
+                            <div class="home-card-title">VM选型</div>
+                            <div class="home-card-num">03</div>
+                        </div>
+                        <div class="home-card-desc">VisionMaster加密狗及软加密选型，覆盖读码、缺陷检测、定位测量、深度学习等8大应用场景。</div>
+                        <div class="home-card-footer">
+                            <span class="home-card-link">查看选型 →</span>
+                        </div>
+                    </button>
                     <button class="home-card" onclick="switchPage('overview', event)">
                         <div class="home-card-top">
                             <div class="home-card-icon">📦</div>
                             <div class="home-card-title">ID系列表</div>
-                            <div class="home-card-num">03</div>
+                            <div class="home-card-num">04</div>
                         </div>
                         <div class="home-card-desc">ID产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
                         <div class="home-card-footer">
@@ -1112,7 +1178,7 @@
                         <div class="home-card-top">
                             <div class="home-card-icon">📦</div>
                             <div class="home-card-title">SC系列表</div>
-                            <div class="home-card-num">04</div>
+                            <div class="home-card-num">05</div>
                         </div>
                         <div class="home-card-desc">SC产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
                         <div class="home-card-footer">
@@ -1123,7 +1189,7 @@
                         <div class="home-card-top">
                             <div class="home-card-icon">📊</div>
                             <div class="home-card-title">对照表</div>
-                            <div class="home-card-num">05</div>
+                            <div class="home-card-num">06</div>
                         </div>
                         <div class="home-card-desc">419条基线 ↔ 经销型号物料代码对照，支持快速搜索筛选，涵盖ID/SC产品。</div>
                         <div class="home-card-footer">
@@ -1134,7 +1200,7 @@
                         <div class="home-card-top">
                             <div class="home-card-icon">📱</div>
                             <div class="home-card-title">PDA选型</div>
-                            <div class="home-card-num">06</div>
+                            <div class="home-card-num">07</div>
                         </div>
                         <div class="home-card-desc">IDP系列智能移动终端19个型号的参数对比，支持按系列、防护等级、NFC等条件筛选。</div>
                         <div class="home-card-footer">
@@ -1145,7 +1211,7 @@
                         <div class="home-card-top">
                             <div class="home-card-icon">📰</div>
                             <div class="home-card-title">产品动态</div>
-                            <div class="home-card-num">07</div>
+                            <div class="home-card-num">08</div>
                         </div>
                         <div class="home-card-desc">不定时更新智能ID产品线市场动态，涵盖市场策略、产品发布、产品迭代、产品退市、客户端更新、固件更新等信息。</div>
                         <div class="home-card-footer">
@@ -1257,6 +1323,29 @@
                     </div>
                     <div id="scTableArea"><div class="empty-state"><div class="empty-state-icon">📦</div><h3>请选择产品配置</h3><p>在左侧选择产品后，自动生成配单</p></div></div>
                 </div>
+            </div>
+        </div>
+        <div id="pageVm" style="display:none;flex:1;min-width:0;flex-direction:column;gap:0">
+            <div class="vm-sidebar">
+                <div class="panel">
+                    <div class="panel-title"><div class="panel-title-icon">🔍</div>搜索筛选</div>
+                    <div class="vm-search-wrap">
+                        <input type="text" id="vmSearchInput" class="vm-search-input" placeholder="输入加密狗名称、物料代码或软加密名称..." oninput="vmSearch()">
+                    </div>
+                    <div class="vm-filter-title">应用场景 <button class="vm-filter-all active" id="vmFilterAll" onclick="filterVmAll(this)">全部</button></div>
+                    <div id="vmSceneFilter" class="vm-filter-list"></div>
+                </div>
+            </div>
+            <div class="vm-content">
+                <div class="vm-content-header">
+                    <div class="content-title"><div class="content-title-icon">🔐</div>VM加密狗/软加密选型</div>
+                    <div class="content-toolbar">
+                        <div class="toolbar-right">
+                            <span id="vmStats" class="vm-stats">共 0 条</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="vmTableArea" class="vm-body"></div>
             </div>
         </div>
         <div id="pageCmp" style="display:none">
@@ -1537,6 +1626,7 @@
     <script src="scripts/sc_camera_data.js"></script>
     <script src="scripts/sc_accessory_data.js"></script>
     <script src="scripts/mapping_data.js"></script>
+    <script src="scripts/vm_dongle_data.js"></script>
     <script src="scripts/pda_data.js"></script>
     <script src="scripts/product_updates.js"></script>
     <script>
@@ -3689,6 +3779,8 @@
     document.getElementById('pageHome').style.display = 'none';
     document.getElementById('pageIdBom').style.display = 'none';
     document.getElementById('pageScBom').style.display = 'none';
+    var vm = document.getElementById('pageVm');
+    vm.style.display = 'none';
     var cmp = document.getElementById('pageCmp');
     cmp.style.display = 'none';
     cmp.classList.remove('active');
@@ -3710,6 +3802,9 @@
     } else if (page === 'scbom') {
         document.getElementById('pageScBom').style.display = 'flex';
         if (!scDataLoaded) loadScData();
+    } else if (page === 'vm') {
+        vm.style.display = 'flex';
+        if (!vmInitialized) initVmPage();
     } else if (page === 'cmp') {
         cmp.style.display = 'flex';
         cmp.classList.add('active');
@@ -3740,6 +3835,108 @@
             initUpdates();
         }
     }
+    }
+
+    /* ==================== VM选型功能 ==================== */
+    var vmInitialized = false;
+    var vmFilteredData = [];
+    var vmActiveScene = '';
+
+    function initVmPage() {
+        vmInitialized = true;
+        vmFilteredData = VM_DONGLE_DATA.slice();
+        initVmSceneFilter();
+        renderVmTable();
+    }
+
+    function initVmSceneFilter() {
+        var scenes = [];
+        VM_DONGLE_DATA.forEach(function(item) {
+            if (scenes.indexOf(item.scene) === -1) scenes.push(item.scene);
+        });
+        var html = '';
+        scenes.forEach(function(s) {
+            html += '<button class="vm-filter-btn" onclick="filterVmScene(this, \'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
+        });
+        document.getElementById('vmSceneFilter').innerHTML = html;
+    }
+
+    function filterVmAll(btn) {
+        vmActiveScene = '';
+        document.querySelectorAll('.vm-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('vmFilterAll').classList.add('active');
+        vmSearch();
+    }
+
+    function filterVmScene(btn, scene) {
+        vmActiveScene = scene;
+        document.querySelectorAll('.vm-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('vmFilterAll').classList.remove('active');
+        vmSearch();
+    }
+
+    function vmSearch() {
+        var q = (document.getElementById('vmSearchInput').value || '').trim().toLowerCase();
+        vmFilteredData = VM_DONGLE_DATA.filter(function(item) {
+            if (vmActiveScene && item.scene !== vmActiveScene) return false;
+            if (q) {
+                var hay = (item.name + ' ' + item.codeStd + ' ' + item.codeNeu + ' ' + item.swName + ' ' + item.swCode).toLowerCase();
+                return hay.indexOf(q) !== -1;
+            }
+            return true;
+        });
+        renderVmTable();
+    }
+
+    function vmExpandCell(id, field) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var full = el.getAttribute('data-full');
+        if (el.classList.contains('cell-full')) {
+            el.outerHTML = '<div class="cell-expand" id="' + id + '" data-full="' + full.replace(/"/g, '&quot;') + '" onclick="vmExpandCell(\'' + id + '\',\'' + field + '\')">' + full.substring(0, 40) + '...</div>';
+        } else {
+            el.outerHTML = '<div class="cell-full" id="' + id + '" data-full="' + full.replace(/"/g, '&quot;') + '" onclick="vmExpandCell(\'' + id + '\',\'' + field + '\')">' + nl2br(full) + '</div>';
+        }
+    }
+
+    function renderVmTable() {
+        var data = vmFilteredData;
+        var h = '<table class="vm-table"><thead><tr>';
+        h += '<th class="col-num">序号</th><th class="col-scene">应用场景</th><th class="col-name">加密狗名称</th>';
+        h += '<th class="col-code">代码(标配)</th><th class="col-code">代码(中性)</th>';
+        h += '<th class="col-swname">软加密名称</th><th class="col-swcode">软加密代码</th>';
+        h += '<th class="col-modules">支持模块</th><th class="col-remark">备注</th>';
+        h += '</tr></thead><tbody>';
+
+        data.forEach(function(item, i) {
+            h += '<tr>';
+            h += '<td class="col-num">' + (i + 1) + '</td>';
+            h += '<td class="col-scene"><span class="scene-tag">' + item.scene + '</span></td>';
+            h += '<td class="col-name">' + item.name + '</td>';
+            h += '<td class="col-code">' + item.codeStd + '</td>';
+            h += '<td class="col-code">' + item.codeNeu + '</td>';
+            h += '<td class="col-swname">' + (item.swName || '-') + '</td>';
+            h += '<td class="col-swcode">' + (item.swCode || '-') + '</td>';
+            var modId = 'vmMod_' + i;
+            var remId = 'vmRem_' + i;
+            if (item.modules && item.modules.length > 40) {
+                h += '<td class="col-modules"><div class="cell-expand" id="' + modId + '" data-full="' + item.modules.replace(/"/g, '&quot;') + '" onclick="vmExpandCell(\'' + modId + '\',\'modules\')">' + item.modules.substring(0, 40) + '...</div></td>';
+            } else {
+                h += '<td class="col-modules">' + nl2br(item.modules || '-') + '</td>';
+            }
+            if (item.remark && item.remark.length > 40) {
+                h += '<td class="col-remark"><div class="cell-expand" id="' + remId + '" data-full="' + item.remark.replace(/"/g, '&quot;') + '" onclick="vmExpandCell(\'' + remId + '\',\'remark\')">' + item.remark.substring(0, 40) + '...</div></td>';
+            } else {
+                h += '<td class="col-remark">' + nl2br(item.remark || '-') + '</td>';
+            }
+            h += '</tr>';
+        });
+
+        h += '</tbody></table>';
+        document.getElementById('vmTableArea').innerHTML = h;
+        document.getElementById('vmStats').textContent = '共 ' + data.length + ' 条';
     }
 
     /* ==================== PDA选型功能 ==================== */
