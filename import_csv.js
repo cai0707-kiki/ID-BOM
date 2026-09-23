@@ -2,46 +2,165 @@ const fs = require('fs');
 const path = require('path');
 const iconv = require('iconv-lite');
 
+// ========== 通用配置 ==========
+const encoding = 'GBK';
+
 // ========== CSV 解析函数 ==========
+/**
+ * 解析 CSV 文本，返回去掉表头后的行数组（二维数组）
+ *
+ * 支持标准 CSV 语法：
+ *   - 引号内可含逗号、换行、双引号（以 "" 转义）
+ *   - 兼容 \r\n / \r / \n 三种行尾
+ *   - 自动去掉 UTF-8 BOM
+ *   - 跳过空行
+ *
+ * 注意：不能先按换行切行再逐行解析——物料描述/备注等字段里含真实换行，
+ * 那样会把一行数据切碎（SC 数据里就有多处）。
+ */
 function parseCSV(csvContent) {
-    const lines = csvContent.split('\n').filter(line => line.trim() !== '');
-    const data = [];
+    const rows = [];
+    let cur = [];
+    let field = '';
+    let inQuotes = false;
 
-    // 跳过表头
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i];
-        const row = [];
-        let current = '';
-        let inQuotes = false;
+    // 去掉 BOM
+    if (csvContent.charCodeAt(0) === 0xFEFF) csvContent = csvContent.slice(1);
 
-        for (let j = 0; j < line.length; j++) {
-            const char = line[j];
+    for (let i = 0; i < csvContent.length; i++) {
+        const ch = csvContent[i];
 
-            if (char === '"') {
-                if (inQuotes && j + 1 < line.length && line[j + 1] === '"') {
-                    current += '"';
-                    j++;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-            } else if (char === ',' && !inQuotes) {
-                row.push(current);
-                current = '';
+        if (inQuotes) {
+            if (ch === '"') {
+                // "" 转义为一个引号，否则结束引号
+                if (csvContent[i + 1] === '"') { field += '"'; i++; }
+                else inQuotes = false;
             } else {
-                current += char;
+                field += ch;
             }
+        } else if (ch === '"') {
+            inQuotes = true;
+        } else if (ch === ',') {
+            cur.push(field);
+            field = '';
+        } else if (ch === '\n' || ch === '\r') {
+            if (ch === '\r' && csvContent[i + 1] === '\n') i++;
+            cur.push(field);
+            field = '';
+            if (!(cur.length === 1 && cur[0] === '')) rows.push(cur); // 跳过空行
+            cur = [];
+        } else {
+            field += ch;
         }
-        row.push(current);
-
-        // 移除 BOM
-        if (row[0] && row[0].charCodeAt(0) === 0xFEFF) {
-            row[0] = row[0].substring(1);
-        }
-
-        data.push(row);
+    }
+    if (field || cur.length) {
+        cur.push(field);
+        if (!(cur.length === 1 && cur[0] === '')) rows.push(cur);
     }
 
-    return data;
+    // 跳过表头
+    return rows.slice(1);
+}
+
+// ========== 表格数据集定义 ==========
+// 相机/配件 4 个数据集统一在这里声明，避免复制粘贴。
+//   colCount : 数据列数（相机 26 / 配件 10）
+//   imgCol   : 图片字段所在列（相机 25 / 配件 9）
+//   imgDir   : 图片目录。CSV 里的图片字段若不含 '/'，自动补 `${imgDir}/` 前缀。
+//              设为 null 表示原样保留（ID 系列沿用历史行为，
+//              由前端 getImageHtml 按类型补 ID_CAM/ 或 ID_ACC/）。
+//   required : true 时缺 CSV 直接退出；false 时缺 CSV 跳过并提示。
+const TABLE_DATASETS = [
+    {
+        csv: 'id_camera_data.csv',
+        out: 'id_camera_data.js',
+        variable: 'IDBOM_CAMERA_DATA',
+        colCount: 26,
+        imgCol: 25,
+        imgDir: null,
+        required: true,
+        label: 'ID相机',
+        description: 'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`'
+    },
+    {
+        csv: 'id_accessory_data.csv',
+        out: 'id_accessory_data.js',
+        variable: 'IDBOM_ACCESSORY_DATA',
+        colCount: 10,
+        imgCol: 9,
+        imgDir: null,
+        required: true,
+        label: 'ID配件',
+        description: 'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`'
+    },
+    {
+        csv: 'sc_camera_data.csv',
+        out: 'sc_camera_data.js',
+        variable: 'SCBOM_CAMERA_DATA',
+        colCount: 26,
+        imgCol: 25,
+        imgDir: 'SC_CAM',
+        required: false,
+        label: 'SC相机',
+        description: 'SC-BOM 智能相机产品数据\n * 数据来源：sc_camera_data.csv（海康机器人智能相机产品清单）\n * 更新方式：修改 sc_camera_data.csv 后运行 `node import_csv.js`'
+    },
+    {
+        csv: 'sc_accessory_data.csv',
+        out: 'sc_accessory_data.js',
+        variable: 'SCBOM_ACCESSORY_DATA',
+        colCount: 10,
+        imgCol: 9,
+        imgDir: 'SC_ACC',
+        required: false,
+        label: 'SC配件',
+        description: 'SC-BOM 配件产品数据\n * 数据来源：sc_accessory_data.csv（SC 智能相机配件产品清单）\n * 更新方式：修改 sc_accessory_data.csv 后运行 `node import_csv.js`'
+    }
+];
+
+/**
+ * 转换单个表格 CSV → JS 数据文件
+ * 返回生成的记录数，CSV 不存在时返回 null
+ */
+function buildTableDataset(ds) {
+    const csvPath = path.join(__dirname, ds.csv);
+    if (!fs.existsSync(csvPath)) {
+        if (ds.required) {
+            console.error(`错误: 未找到 ${ds.csv}`);
+            process.exit(1);
+        }
+        console.log(`\n跳过: 未找到 ${ds.csv}`);
+        return null;
+    }
+
+    const csv = iconv.decode(fs.readFileSync(csvPath), encoding);
+    const rows = parseCSV(csv);
+
+    const jsonData = rows.map(row => {
+        // 清理所有字段的 \r
+        row = row.map(c => (c || '').replace(/\r/g, ''));
+        while (row.length < ds.colCount) row.push('');
+
+        // 图片字段：去掉历史遗留的 CAM/ 、ACC/ 前缀；
+        // 若仍不含目录（裸文件名）且该数据集有约定目录，则补上，
+        // 保证前端 getImageHtml 不会把 SC 的图错拼到 ID_CAM/ID_ACC/ 下。
+        let imgVal = row[ds.imgCol].trim();
+        imgVal = imgVal.replace(/^(CAM\/|ACC\/)/, '');
+        if (imgVal && imgVal.indexOf('/') < 0 && ds.imgDir) {
+            imgVal = ds.imgDir + '/' + imgVal;
+        }
+        row[ds.imgCol] = imgVal;
+
+        return { Count: ds.colCount, value: row.slice(0, ds.colCount) };
+    });
+
+    console.log(`  ${ds.csv}: ${jsonData.length} 条记录`);
+    writeDataJs(
+        path.join(__dirname, 'scripts', ds.out),
+        ds.variable,
+        jsonData,
+        ds.description
+    );
+    return jsonData.length;
 }
 
 // ========== 生成 JS 数据文件 ==========
@@ -65,9 +184,6 @@ function writeDataJs(filePath, variableName, jsonData, description) {
 function main() {
     console.log('=== CSV导入工具（生成JS数据文件）===\n');
 
-    const encoding = 'GBK';
-    const cameraCsvPath = path.join(__dirname, 'id_camera_data.csv');
-    const accessoryCsvPath = path.join(__dirname, 'id_accessory_data.csv');
     const mappingCsvPath = path.join(__dirname, 'mapping.csv');
 
     // 确保 scripts/ 目录存在
@@ -77,63 +193,14 @@ function main() {
         console.log('创建 scripts/ 目录');
     }
 
-    // ===== 1. 相机数据 =====
-    if (!fs.existsSync(cameraCsvPath)) {
-        console.log('错误: 未找到 id_camera_data.csv');
-        process.exit(1);
-    }
-
+    // ===== 1~4. 相机/配件数据（ID_CAM / ID_ACC / SC_CAM / SC_ACC）=====
     console.log('读取 CSV 文件:');
-    const cameraBuffer = fs.readFileSync(cameraCsvPath);
-    const cameraCsv = iconv.decode(cameraBuffer, encoding);
-    const cameraRows = parseCSV(cameraCsv);
-
-    const cameraJsonData = cameraRows.map(row => {
-        // 清理所有字段的 \r
-        row = row.map(c => (c || '').replace(/\r/g, ''));
-        while (row.length < 26) row.push('');
-        const imgVal = row[25].trim();
-        row[25] = imgVal ? imgVal.replace(/^(CAM\/|ACC\/)/, '') : '';
-        return { Count: 26, value: row.slice(0, 26) };
+    const built = {};
+    TABLE_DATASETS.forEach(ds => {
+        built[ds.variable] = buildTableDataset(ds);
     });
 
-    console.log(`  id_camera_data.csv: ${cameraJsonData.length} 条记录`);
-    writeDataJs(
-        path.join(__dirname, 'scripts', 'id_camera_data.js'),
-        'IDBOM_CAMERA_DATA',
-        cameraJsonData,
-        'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`'
-    );
-
-    // ===== 2. 配件数据 =====
-    if (!fs.existsSync(accessoryCsvPath)) {
-        console.log('错误: 未找到 id_accessory_data.csv');
-        process.exit(1);
-    }
-
-    const accessoryBuffer = fs.readFileSync(accessoryCsvPath);
-    const accessoryCsv = iconv.decode(accessoryBuffer, encoding);
-    const accessoryRows = parseCSV(accessoryCsv);
-
-    const accessoryJsonData = accessoryRows.map(row => {
-        // 清理所有字段的 \r
-        row = row.map(c => (c || '').replace(/\r/g, ''));
-        while (row.length < 10) row.push('');
-        const imgVal = row[9].trim();
-        row[9] = imgVal ? imgVal.replace(/^(CAM\/|ACC\/)/, '') : '';
-
-        return { Count: 10, value: row.slice(0, 10) };
-    });
-
-    console.log(`  id_accessory_data.csv: ${accessoryJsonData.length} 条记录`);
-    writeDataJs(
-        path.join(__dirname, 'scripts', 'id_accessory_data.js'),
-        'IDBOM_ACCESSORY_DATA',
-        accessoryJsonData,
-        'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`'
-    );
-
-    // ===== 3. 映射数据（mapping.csv）=====
+    // ===== 5. 映射数据（mapping.csv）=====
     if (fs.existsSync(mappingCsvPath)) {
         console.log('\n读取 mapping.csv...');
         const mappingBuffer = fs.readFileSync(mappingCsvPath);
@@ -164,7 +231,7 @@ function main() {
         console.log('\n跳过: 未找到 mapping.csv');
     }
 
-    // ===== 4. 产品动态（product_updates.csv）=====
+    // ===== 6. 产品动态（product_updates.csv）=====
     const productUpdatesCsvPath = path.join(__dirname, 'product_updates.csv');
     let productUpdatesJsonData = [];
     if (fs.existsSync(productUpdatesCsvPath)) {
@@ -202,13 +269,18 @@ function main() {
     // ===== 完成 =====
     console.log('\n导入完成！');
     console.log('已生成以下 JS 数据文件:');
-    console.log('  - id_camera_data.js    (IDBOM_CAMERA_DATA)');
-    console.log('  - id_accessory_data.js (IDBOM_ACCESSORY_DATA)');
+    TABLE_DATASETS.forEach(ds => {
+        const n = built[ds.variable];
+        const name = ds.out.padEnd(21);
+        console.log(n === null
+            ? `  - ${name} (跳过：未找到 ${ds.csv})`
+            : `  - ${name} (${ds.variable}, ${n} 条)`);
+    });
     if (fs.existsSync(mappingCsvPath)) {
-        console.log('  - mapping_data.js      (IDBOM_MAPPING_DATA)');
+        console.log('  - mapping_data.js       (IDBOM_MAPPING_DATA)');
     }
     if (fs.existsSync(productUpdatesCsvPath)) {
-        console.log('  - product_updates.js   (IDBOM_PRODUCT_UPDATES)');
+        console.log('  - product_updates.js    (IDBOM_PRODUCT_UPDATES)');
     }
 
     console.log('\n刷新 index.html 即可加载最新数据。');

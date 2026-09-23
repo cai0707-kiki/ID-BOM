@@ -3,7 +3,7 @@
 海康机器人：按具体型号去官网搜索，获取对应产品页链接，保存到 spec-mapping.js
 
 工作流程：
-  1. 从 index.html 提取所有相机具体型号
+  1. 从 id_camera_data.js 和 sc_camera_data.js 提取所有相机具体型号
   2. 清洗型号：去掉 (国内标配)(国内中性) 等后缀和版本号
   3. 通过海康官网 API 搜索每个型号，获取产品页 URL
   4. 保存到 spec-mapping.js
@@ -31,7 +31,6 @@ except ImportError:
 
 # ==================== 配置 ====================
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_HTML = os.path.join(SCRIPT_DIR, "index.html")
 OUTPUT_JS  = os.path.join(SCRIPT_DIR, "scripts", "spec-mapping.js")
 
 # 海康官网 API（可用，不会被 WAF 拦截）
@@ -47,43 +46,70 @@ def clean_model(raw):
     示例：
       MV-ID803M-03S-WBN-SR-U(国内标配) → MV-ID803M-03S-WBN-SR-U
       MV-ID2013EMI-05-RBN(国内标配)V2.0 → MV-ID2013EMI-05-RBN
-      MV-ID3040RM-00C-NNN)              → MV-ID3040RM-00C-NNN
+      MV-SC5020XC-12M-WBN(国内中性     → MV-SC5020XC-12M-WBN（缺右括号）
+      MV-SVC2506-08G60-128G(国内标配）  → MV-SVC2506-08G60-128G（中文右括号）
     """
-    cleaned = re.sub(r'\([^)]*\)', '', raw).strip()
+    cleaned = raw
+    # 去掉英文括号及其内容：(xxx)
+    cleaned = re.sub(r'\([^)]*\)', '', cleaned)
+    # 去掉中文括号及其内容：（xxx） 或 (xxx）（右括号为中文）
+    cleaned = re.sub(r'（[^）]*）', '', cleaned)
+    # 处理缺右括号的异常情况：(xxx 后面没有右括号就截断
+    cleaned = re.sub(r'\([^(\)]*$', '', cleaned)
+    # 处理中文右括号残留：xxx） 开头无左括号
+    cleaned = re.sub(r'^[^(（]*[）\)]', '', cleaned)
+    # 去掉版本号后缀
     cleaned = re.sub(r'\s*V?\d+(\.\d+)?$', '', cleaned).strip()
-    # 去掉末尾残留的右括号
-    cleaned = cleaned.rstrip(')')
+    # 去掉末尾残留的括号
+    cleaned = cleaned.rstrip(')').rstrip('）')
     return cleaned
 
 
 # ==================== index.html 解析 ====================
 
-def extract_models_from_html(_html_path):
-    """从 scripts/id_camera_data.js 中提取所有相机具体型号，清洗去重"""
-    camera_js = os.path.join(SCRIPT_DIR, "scripts", "id_camera_data.js")
-    with open(camera_js, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    match = re.search(r'var\s+IDBOM_CAMERA_DATA\s*=\s*(\[.*?\]);', content, re.DOTALL)
-    if not match:
-        print("❌ 无法从 id_camera_data.js 中提取数据")
-        return []
-
-    try:
-        data = json.loads(match.group(1))
-    except json.JSONDecodeError as e:
-        print(f"❌ JSON 解析失败: {e}")
-        return []
-
+def extract_models_from_data():
+    """从 id_camera_data.js 和 sc_camera_data.js 中提取所有相机具体型号，清洗去重"""
     models = {}  # cleaned → original（保留一个原始名用于日志）
-    for item in data:
-        row = item.get("value", item)
-        if isinstance(row, list) and len(row) > 3:
-            if row[0] and row[0].strip() == "相机" and row[3]:
-                raw = row[3].strip()
-                cleaned = clean_model(raw)
-                if cleaned and cleaned.startswith("MV-") and cleaned not in models:
-                    models[cleaned] = raw
+
+    # ID 相机数据
+    id_camera_js = os.path.join(SCRIPT_DIR, "scripts", "id_camera_data.js")
+    if os.path.exists(id_camera_js):
+        with open(id_camera_js, "r", encoding="utf-8") as f:
+            content = f.read()
+        match = re.search(r'var\s+IDBOM_CAMERA_DATA\s*=\s*(\[.*?\]);', content, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(1))
+                for item in data:
+                    row = item.get("value", item)
+                    if isinstance(row, list) and len(row) > 3:
+                        if row[0] and row[0].strip() == "相机" and row[3]:
+                            raw = row[3].strip()
+                            cleaned = clean_model(raw)
+                            if cleaned and cleaned.startswith("MV-") and cleaned not in models:
+                                models[cleaned] = raw
+            except json.JSONDecodeError:
+                pass
+
+    # SC 相机数据
+    sc_camera_js = os.path.join(SCRIPT_DIR, "scripts", "sc_camera_data.js")
+    if os.path.exists(sc_camera_js):
+        with open(sc_camera_js, "r", encoding="utf-8") as f:
+            content = f.read()
+        match = re.search(r'var\s+SCBOM_CAMERA_DATA\s*=\s*(\[.*?\]);', content, re.DOTALL)
+        if match:
+            try:
+                data = json.loads(match.group(1))
+                for item in data:
+                    row = item.get("value", item)
+                    if isinstance(row, list) and len(row) > 3:
+                        if row[0] and row[0].strip() == "SC系列" and row[3]:
+                            raw = row[3].strip()
+                            cleaned = clean_model(raw)
+                            if cleaned and cleaned.startswith("MV-") and cleaned not in models:
+                                models[cleaned] = raw
+            except json.JSONDecodeError:
+                pass
 
     return models  # {cleaned_model: original_model}
 
@@ -245,9 +271,9 @@ def main():
     print("  海康机器人：按型号搜索官网，获取产品页链接")
     print("=" * 55)
 
-    # ──────────── 1. 从 index.html 提取型号 ────────────
-    print(f"\n📖 从 index.html 提取相机型号...")
-    html_models = extract_models_from_html(INDEX_HTML)  # {cleaned: original}
+    # ──────────── 1. 从数据文件提取型号 ────────────
+    print(f"\n📖 从 id_camera_data.js 和 sc_camera_data.js 提取相机型号...")
+    html_models = extract_models_from_data()  # {cleaned: original}
     print(f"   共 {len(html_models)} 个唯一型号（已清洗去重）")
 
     # 显示前5个示例
