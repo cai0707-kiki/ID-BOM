@@ -12,6 +12,10 @@
         .editor-header-left{display:flex;align-items:center;gap:12px}
         .editor-title{font-size:18px;font-weight:700}.editor-title span{color:#f97316}
         .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:12px}
+        .product-switch{display:flex;background:#0f172a;border-radius:6px;padding:2px;gap:2px;margin-left:4px}
+        .ps-btn{padding:4px 12px;border:none;border-radius:4px;background:transparent;color:#94a3b8;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
+        .ps-btn:hover{color:#e2e8f0}
+        .ps-btn.active{background:#f97316;color:white;font-weight:600}
         .editor-header-right{display:flex;gap:8px}
         .btn{padding:6px 14px;border:none;border-radius:4px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .2s}
         .btn-primary{background:#f97316;color:white}.btn-primary:hover{background:#ea580c}
@@ -128,12 +132,17 @@
 <body>
     <div class="editor-header">
         <div class="editor-header-left">
-            <div class="editor-title"><span>ID</span> · 数据编辑器</div>
+            <div class="editor-title"><span id="titleProduct">ID</span> · 数据编辑器</div>
             <div class="editor-badge">BETA</div>
+            <div class="product-switch">
+                <button type="button" class="ps-btn active" data-p="id" onclick="switchProduct('id')">ID 产品</button>
+                <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">SC 产品</button>
+            </div>
         </div>
         <div class="editor-header-right">
             <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
             <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
+            <button class="btn btn-success" onclick="exportCurrentJS()">📤 导出JS</button>
         </div>
     </div>
     <div class="tab-bar">
@@ -236,8 +245,10 @@ var ACCESSORY_COMBO_COLS = [0, 1, 2];
 
 // ==================== State ====================
 var currentTab = 'camera';
-var cameraData = [];
-var accessoryData = [];
+var currentProduct = 'id'; // 'id' | 'sc'
+var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] } };
+var cameraData = dataStore.id.camera;
+var accessoryData = dataStore.id.accessory;
 var filteredIndices = [];
 var selectedRows = {};
 var modifiedCells = {};
@@ -246,10 +257,10 @@ var imgUploadTarget = null; // { type, idx }
 // ==================== Init ====================
 function init() {
     loadDataFromParent();
+    updateProductUI();
     rebuildDropdownCache();
     renderTable();
     updateStats();
-
 }
 
 function loadDataFromParent() {
@@ -257,26 +268,39 @@ function loadDataFromParent() {
     if (saved) {
         try {
             var d = JSON.parse(saved);
-            cameraData = d.camera || [];
-            accessoryData = d.accessory || [];
+            if (d && d.store) {
+                ['id', 'sc'].forEach(function(p) {
+                    var b = d.store[p] || {};
+                    dataStore[p] = { camera: b.camera || [], accessory: b.accessory || [] };
+                });
+                currentProduct = d.currentProduct === 'sc' ? 'sc' : 'id';
+            } else {
+                // 旧格式单套数据 → 视为 ID 产品
+                dataStore.id = { camera: (d && d.camera) || [], accessory: (d && d.accessory) || [] };
+                dataStore.sc = { camera: [], accessory: [] };
+                currentProduct = 'id';
+            }
         } catch(e) {}
     }
 
-    // 兼容旧数据：补齐列
+    // 兼容旧数据：补齐列 + 去掉 IMG 列的 CAM/ 或 ACC/ 前缀（保持数据干净）
     var camLen = CAMERA_HEADERS.length;
-    cameraData.forEach(function(r) { while (r.length < camLen) r.push(''); });
     var accLen = ACCESSORY_HEADERS.length;
-    accessoryData.forEach(function(r) { while (r.length < accLen) r.push(''); });
+    ['id', 'sc'].forEach(function(p) {
+        dataStore[p].camera.forEach(function(r) {
+            while (r.length < camLen) r.push('');
+            var v = r[IMG_COL_CAMERA];
+            if (v && v.indexOf('CAM/') === 0) r[IMG_COL_CAMERA] = v.substring(4);
+        });
+        dataStore[p].accessory.forEach(function(r) {
+            while (r.length < accLen) r.push('');
+            var v = r[IMG_COL_ACCESSORY];
+            if (v && v.indexOf('ACC/') === 0) r[IMG_COL_ACCESSORY] = v.substring(4);
+        });
+    });
 
-    // 去掉 IMG 列的 CAM/ 或 ACC/ 前缀（保持数据干净）
-    cameraData.forEach(function(r) {
-        var v = r[IMG_COL_CAMERA];
-        if (v && v.indexOf('CAM/') === 0) r[IMG_COL_CAMERA] = v.substring(4);
-    });
-    accessoryData.forEach(function(r) {
-        var v = r[IMG_COL_ACCESSORY];
-        if (v && v.indexOf('ACC/') === 0) r[IMG_COL_ACCESSORY] = v.substring(4);
-    });
+    cameraData = dataStore[currentProduct].camera;
+    accessoryData = dataStore[currentProduct].accessory;
 }
 
 // ==================== Dropdown Cache ====================
@@ -331,6 +355,31 @@ function switchTab(tab) {
     document.getElementById('searchBox').value = '';
     renderTable();
     updateStats();
+}
+
+// ==================== Product Switch ====================
+function updateProductUI() {
+    document.getElementById('titleProduct').textContent = currentProduct.toUpperCase();
+    var btns = document.querySelectorAll('.ps-btn');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].dataset.p === currentProduct);
+    }
+}
+
+function switchProduct(p) {
+    if (p === currentProduct) return;
+    currentProduct = p;
+    cameraData = dataStore[p].camera;
+    accessoryData = dataStore[p].accessory;
+    selectedRows = {};
+    modifiedCells = {};
+    document.getElementById('searchBox').value = '';
+    updateProductUI();
+    rebuildDropdownCache();
+    renderTable();
+    updateStats();
+    autoSave();
+    showToast('已切换到 ' + p.toUpperCase() + ' 产品', 'success');
 }
 
 // ==================== Render Table ====================
@@ -451,7 +500,7 @@ function renderTable() {
             // ===== 图片缩略图列（在第3列之后插入） =====
             if (c === IMG_INSERT_AFTER) {
                 var imgVal = (row[imgCol] || '').toString().trim().replace(/\r/g, '');
-                var imgPrefix = currentTab === 'camera' ? 'ID_CAM/' : 'ID_ACC/';
+                var imgPrefix = (currentProduct === 'sc' ? 'SC_' : 'ID_') + (currentTab === 'camera' ? 'CAM/' : 'ACC/');
                 var imgKey = imgVal ? (imgVal.indexOf('/') >= 0 ? imgVal : imgPrefix + imgVal) : '';
                 bhtml += '<td class="col-img">';
                 if (imgKey) {
@@ -492,7 +541,7 @@ function updateStats() {
 
 // ==================== Auto Save ====================
 function autoSave() {
-    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ currentProduct: currentProduct, store: dataStore }));
 }
 
 // ==================== Cell Edit ====================
@@ -662,7 +711,8 @@ function closeImgPreview() {
 
 // ==================== CSV Import ====================
 function showImportModal() {
-    pendingImports = {camera: null, accessory: null};
+    pendingImports = {};
+    ambiguousFiles = [];
     document.getElementById('importInfo').style.display = 'none';
     document.getElementById('btnImport').disabled = true;
     document.getElementById('csvFileInput').value = '';
@@ -670,29 +720,53 @@ function showImportModal() {
 }
 function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
 
-var pendingImports = {camera: null, accessory: null};
+var pendingImports = {}; // key: id_camera / id_accessory / sc_camera / sc_accessory
+var ambiguousFiles = []; // { name, rows, target, assigned }
 
 function onFileSelected(e) {
     var files = e.target.files;
     if (!files.length) return;
-    pendingImports = {camera: null, accessory: null};
+    pendingImports = {};
+    ambiguousFiles = [];
     var remaining = files.length;
     var infoLines = [];
+    var done = function() {
+        remaining--;
+        if (remaining === 0) {
+            var infoEl = document.getElementById('importInfo');
+            infoEl.innerHTML = infoLines.join('<br>') || '未识别到可导入的数据';
+            infoEl.style.display = 'block';
+            infoEl.style.color = infoLines.length ? '#166534' : '#b91c1c';
+            updateImportBtn();
+        }
+    };
     for (var i = 0; i < files.length; i++) {
         (function(f) {
-            readFile(f, function(target, count, fname) {
-                infoLines.push((target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + fname + ' · ' + count + ' 行');
-                remaining--;
-                if (remaining === 0) {
-                    var infoEl = document.getElementById('importInfo');
-                    infoEl.innerHTML = infoLines.join('<br>');
-                    infoEl.style.display = 'block';
-                    infoEl.style.color = '#166534';
-                    document.getElementById('btnImport').disabled = !(pendingImports.camera || pendingImports.accessory);
+            readFile(f, function(target, count, fname, slot, ambIdx) {
+                if (target === null) { done(); return; }
+                if (ambIdx >= 0) {
+                    infoLines.push('❓ ' + escH(fname) + ' · ' + count + ' 行 · 归属 <select onchange="assignAmbiguous(' + ambIdx + ',this.value)"><option value="">请选择</option><option value="id">ID 产品</option><option value="sc">SC 产品</option></select>');
+                } else {
+                    var prodLabel = slot ? slot.split('_')[0].toUpperCase() + ' · ' : '';
+                    infoLines.push(prodLabel + (target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + escH(fname) + ' · ' + count + ' 行');
                 }
+                done();
             });
         })(files[i]);
     }
+}
+
+function assignAmbiguous(idx, val) {
+    if (ambiguousFiles[idx]) ambiguousFiles[idx].assigned = val || '';
+    updateImportBtn();
+}
+
+function updateImportBtn() {
+    var hasResolved = Object.keys(pendingImports).some(function(k) { return !!pendingImports[k]; });
+    var ambTotal = ambiguousFiles.length;
+    var allAssigned = ambTotal === 0 || ambiguousFiles.every(function(a) { return !!a.assigned; });
+    var ready = (hasResolved || ambTotal > 0) && allAssigned;
+    document.getElementById('btnImport').disabled = !ready;
 }
 
 function readFile(file, callback) {
@@ -715,7 +789,7 @@ function readFile(file, callback) {
 
 function parseAndStore(text, fname, callback) {
     var rows = parseCSV(text);
-    if (!rows.length) return;
+    if (!rows.length) { callback(null, 0, fname); return; }
     var target = '';
     if (fname.indexOf('camera') >= 0) target = 'camera';
     else if (fname.indexOf('accessory') >= 0) target = 'accessory';
@@ -731,6 +805,12 @@ function parseAndStore(text, fname, callback) {
         }
     }
     if (!target) target = (first.length >= 20) ? 'camera' : 'accessory';
+
+    // 产品归属：按文件名前缀 id_/sc_ 识别；无前缀 → 列入待询问
+    var prod = '';
+    if (fname.indexOf('id_') === 0) prod = 'id';
+    else if (fname.indexOf('sc_') === 0) prod = 'sc';
+
     var headers = target === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS;
     var expectedCols = headers.length;
     var normalized = rows.map(function(r) {
@@ -739,30 +819,59 @@ function parseAndStore(text, fname, callback) {
         return nr;
     }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
     // IMG 列保持原样，不添加前缀
-    if (normalized.length === 0) return;
-    if (target === 'camera') pendingImports.camera = normalized;
-    else pendingImports.accessory = normalized;
-    callback(target, normalized.length, fname);
+    if (normalized.length === 0) { callback(null, 0, fname); return; }
+
+    if (!prod) {
+        var ambIdx = ambiguousFiles.length;
+        ambiguousFiles.push({ name: fname, rows: normalized, target: target, assigned: '' });
+        callback(target, normalized.length, fname, '', ambIdx);
+        return;
+    }
+
+    var slot = prod + '_' + target;
+    pendingImports[slot] = normalized;
+    callback(target, normalized.length, fname, slot, -1);
 }
 
 function confirmImport() {
+    var batch = {};
+    Object.keys(pendingImports).forEach(function(k) {
+        if (pendingImports[k]) batch[k] = pendingImports[k];
+    });
+    ambiguousFiles.forEach(function(a) {
+        if (a.assigned) batch[a.assigned + '_' + a.target] = a.rows;
+    });
+    var keys = Object.keys(batch);
+    if (!keys.length) return;
+
+    var productsTouched = {};
     var imported = [];
-    if (pendingImports.camera && Array.isArray(pendingImports.camera)) {
-        cameraData = pendingImports.camera;
-        imported.push('\u76f8\u673a ' + cameraData.length + ' \u884c');
+    keys.forEach(function(k) {
+        var parts = k.split('_');
+        var p = parts[0], t = parts[1];
+        dataStore[p][t] = batch[k];
+        productsTouched[p] = true;
+        imported.push(p.toUpperCase() + '·' + (t === 'camera' ? '相机' : '配件') + ' ' + batch[k].length + ' 行');
+    });
+
+    // 单一产品时自动切换视图到该产品
+    var prods = Object.keys(productsTouched);
+    if (prods.length === 1 && prods[0] !== currentProduct) {
+        currentProduct = prods[0];
+        updateProductUI();
     }
-    if (pendingImports.accessory && Array.isArray(pendingImports.accessory)) {
-        accessoryData = pendingImports.accessory;
-        imported.push('\u914d\u4ef6 ' + accessoryData.length + ' \u884c');
-    }
-    if (!imported.length) return;
+    cameraData = dataStore[currentProduct].camera;
+    accessoryData = dataStore[currentProduct].accessory;
+
     modifiedCells = {}; selectedRows = {};
     rebuildDropdownCache();
     closeImportModal();
-    switchTab(pendingImports.camera ? 'camera' : 'accessory');
+    var showTab = (batch[currentProduct + '_camera'] || !batch[currentProduct + '_accessory']) ? 'camera' : 'accessory';
+    switchTab(showTab);
     autoSave();
-    showToast('\u6210\u529f\u5bfc\u5165 ' + imported.join('\uff0c'), 'success');
-    pendingImports = {camera: null, accessory: null};
+    showToast('成功导入 ' + imported.join('，'), 'success');
+    pendingImports = {};
+    ambiguousFiles = [];
 }
 
 // ==================== CSV Export ====================
@@ -784,22 +893,78 @@ function exportCurrentCSV() {
         }
         csv += line.join(',') + '\n';
     });
-    var fname = (currentTab === 'camera' ? 'camera_data.csv' : 'accessory_data.csv');
+    var fname = currentProduct + '_' + (currentTab === 'camera' ? 'camera' : 'accessory') + '_data.csv';
     dl(csv, fname, 'text/csv;charset=utf-8;');
     showToast('已导出 ' + data.length + ' 行', 'success');
+}
+
+// ==================== JS Export ====================
+// 与 import_csv.js 的 TABLE_DATASETS + writeDataJs 完全对齐（格式/命名/描述文案一致）
+var JS_EXPORT_DATASETS = {
+    id: {
+        camera: {
+            file: 'id_camera_data.js', variable: 'IDBOM_CAMERA_DATA',
+            colCount: 26, imgCol: 25, imgDir: null,
+            description: 'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`'
+        },
+        accessory: {
+            file: 'id_accessory_data.js', variable: 'IDBOM_ACCESSORY_DATA',
+            colCount: 10, imgCol: 9, imgDir: null,
+            description: 'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`'
+        }
+    },
+    sc: {
+        camera: {
+            file: 'sc_camera_data.js', variable: 'SCBOM_CAMERA_DATA',
+            colCount: 26, imgCol: 25, imgDir: 'SC_CAM',
+            description: 'SC-BOM 智能相机产品数据\n * 数据来源：sc_camera_data.csv（海康机器人智能相机产品清单）\n * 更新方式：修改 sc_camera_data.csv 后运行 `node import_csv.js`'
+        },
+        accessory: {
+            file: 'sc_accessory_data.js', variable: 'SCBOM_ACCESSORY_DATA',
+            colCount: 10, imgCol: 9, imgDir: 'SC_ACC',
+            description: 'SC-BOM 配件产品数据\n * 数据来源：sc_accessory_data.csv（SC 智能相机配件产品清单）\n * 更新方式：修改 sc_accessory_data.csv 后运行 `node import_csv.js`'
+        }
+    }
+};
+
+function exportCurrentJS() {
+    flushPendingEdits();
+    var ds = JS_EXPORT_DATASETS[currentProduct][currentTab];
+    var data = getData();
+    if (!data.length) { showToast('当前视图无数据可导出', 'warning'); return; }
+
+    // 行转换：对齐 import_csv.js buildTableDataset（\r 清除、补列、IMG 前缀、slice）
+    var jsonData = data.map(function(row) {
+        var r = [];
+        for (var i = 0; i < ds.colCount; i++) r.push((row[i] || '').toString().replace(/\r/g, ''));
+        var imgVal = (r[ds.imgCol] || '').trim().replace(/^(CAM\/|ACC\/)/, '');
+        if (imgVal && imgVal.indexOf('/') < 0 && ds.imgDir) imgVal = ds.imgDir + '/' + imgVal;
+        r[ds.imgCol] = imgVal;
+        return { Count: ds.colCount, value: r.slice(0, ds.colCount) };
+    });
+
+    // 对齐 import_csv.js writeDataJs：每行 JSON，末行无逗号，/\n 分隔
+    var lines = jsonData.map(function(item, i) {
+        var line = JSON.stringify(item);
+        return i < jsonData.length - 1 ? line + ',' : line;
+    });
+    var content = '/**\n * ' + ds.description + '\n */\nvar ' + ds.variable + ' = [\n' + lines.join('\n') + '\n];\n';
+
+    dl(content, ds.file, 'text/javascript;charset=utf-8;');
+    showToast('已导出 ' + ds.file + '（' + data.length + ' 行），请放入 scripts/ 目录', 'success');
 }
 
 // ==================== Save ====================
 function saveChanges() {
     flushPendingEdits();
-    localStorage.setItem('idbom_editor_data', JSON.stringify({ camera: cameraData, accessory: accessoryData }));
+    localStorage.setItem('idbom_editor_data', JSON.stringify({ currentProduct: currentProduct, store: dataStore }));
     modifiedCells = {};
     renderTable();
     updateStats();
     fetch('http://127.0.0.1:18088', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ camera: cameraData, accessory: accessoryData })
+        body: JSON.stringify({ product: currentProduct, camera: cameraData, accessory: accessoryData })
     }).then(function(r) { return r.json(); }).then(function(d) {
         if (d.ok) showToast('数据已同步到CSV和index.html！', 'success');
         else showToast('同步失败', 'error');
