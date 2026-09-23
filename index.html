@@ -2386,7 +2386,7 @@
         var key = _modalGet('accessoryKey');
 
         if (cb.checked) {
-            if (key !== '扩展配件') {
+            if (key !== '扩展配件' && !(modalSource === 'sc' && key === '电源')) {
                 _modalSet('tempSelectedItems', []);
                 curItems.forEach(function(_, i) {
                     var c = document.getElementById('acc_' + i);
@@ -3203,7 +3203,12 @@
                     scSelectedAccessories.push(JSON.parse(JSON.stringify(scStandardCache[removed.key])));
                 }
             } else {
-                scSelectedAccessories.push(JSON.parse(JSON.stringify(scStandardCache[removed.key])));
+                var stillHasOptional = scSelectedAccessories.some(function(a) {
+                    return a.key === removed.key && a.type === 'optional';
+                });
+                if (!stillHasOptional) {
+                    scSelectedAccessories.push(JSON.parse(JSON.stringify(scStandardCache[removed.key])));
+                }
             }
         }
         renderScTable();
