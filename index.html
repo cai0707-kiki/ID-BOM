@@ -2402,6 +2402,19 @@
             if (curTemp.indexOf(item.code) < 0) curTemp.push(item.code);
 
             if (key === '电源') {
+                if (modalSource === 'sc') {
+                    var scCableFor = { '310100901': '310100844', '310100905': '310100843', '310100904': '310100843' };
+                    var autoCode = scCableFor[item.code];
+                    if (autoCode) {
+                        var ab = curItems.find(function(x) { return x.code === autoCode; });
+                        if (ab && curTemp.indexOf(ab.code) < 0) {
+                            curTemp.push(ab.code);
+                            var abi = curItems.indexOf(ab);
+                            var abc = document.getElementById('acc_' + abi);
+                            if (abc) { abc.checked = true; abc.parentNode.parentNode.classList.add('acc-selected'); }
+                        }
+                    }
+                }
                 var ms = item.series;
                 if (ms === '电源适配器') {
                     var b = curItems.find(function(x) { return x.series === '电源适配器线缆'; });
@@ -2445,6 +2458,25 @@
             curTemp = _modalGet('tempSelectedItems');
 
             if (key === '电源') {
+                if (modalSource === 'sc') {
+                    var scCableFor = { '310100901': '310100844', '310100905': '310100843', '310100904': '310100843' };
+                    var autoCode = scCableFor[item.code];
+                    if (autoCode) {
+                        var stillNeeded = curTemp.some(function(n) {
+                            return n !== item.code && scCableFor[n] === autoCode;
+                        });
+                        if (!stillNeeded && curTemp.indexOf(autoCode) >= 0) {
+                            _modalSet('tempSelectedItems', curTemp.filter(function(n) { return n !== autoCode; }));
+                            curTemp = _modalGet('tempSelectedItems');
+                            var ab = curItems.find(function(x) { return x.code === autoCode; });
+                            if (ab) {
+                                var abi = curItems.indexOf(ab);
+                                var abc = document.getElementById('acc_' + abi);
+                                if (abc) { abc.checked = false; abc.parentNode.parentNode.classList.remove('acc-selected'); }
+                            }
+                        }
+                    }
+                }
                 var ms = item.series;
                 if (ms === '电源适配器' || ms === '电源适配器线缆') {
                     var bs = ms === '电源适配器' ? '电源适配器线缆' : '电源适配器';
@@ -3095,7 +3127,7 @@
                    + '<td class="material-desc">' + nl2br(a.value || '') + '</td>'
                    + '<td class="material-code">' + (a.code || '-') + '</td>'
                    + '<td>' + renderRemark(a.remark || '') + '</td>'
-                   + '<td><button class="btn-remove" onclick="removeScItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
+                   + '<td><button class="btn-remove" onclick="removeScItem(\'' + ('' + a.code).replace(/'/g, "\\'") + '\')">✕</button></td>'
                    + '</tr>';
             });
             h += '</tbody></table><div class="table-footer"><span>共 ' + scSelectedAccessories.length + ' 行</span></div>';
@@ -3148,7 +3180,7 @@
                 displayType: displayType,
                 name: a.name,
                 desc: a.value,
-                code: a.code || '-',
+                code: a.code,
                 remark: remark,
                 img: a.img || ''
             });
@@ -3168,7 +3200,7 @@
                     ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
                     : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
             } else if (item.type === 'optional') {
-                actionBtn = '<button class="btn-remove" onclick="removeScItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
+                actionBtn = '<button class="btn-remove" onclick="removeScItem(\'' + ('' + item.code).replace(/'/g, "\\'") + '\')">✕</button>';
             }
 
             var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42, item.type === 'host' ? 'camera' : 'accessory') + '</td>';
@@ -3179,7 +3211,7 @@
                + '<td class="material-name">' + nl2br(item.name) + '</td>'
                + imgCell
                + '<td class="material-desc">' + nl2br(item.desc) + '</td>'
-               + '<td class="material-code">' + item.code + '</td>'
+               + '<td class="material-code">' + (item.code || '-') + '</td>'
                + '<td>' + renderRemark(item.remark) + '</td>'
                + '<td>' + actionBtn + '</td>'
                + '</tr>';
@@ -3188,8 +3220,8 @@
         document.getElementById('scTableArea').innerHTML = h;
     }
 
-    function removeScItem(name) {
-        var idx = scSelectedAccessories.findIndex(function(a) { return a.name === name; });
+    function removeScItem(code) {
+        var idx = scSelectedAccessories.findIndex(function(a) { return a.code === code; });
         if (idx === -1) return;
         var removed = scSelectedAccessories[idx];
         scSelectedAccessories.splice(idx, 1);
@@ -3307,11 +3339,12 @@
 
         } else if (r[0] === '配件') {
             var name = r[3] || '';
-            var exists = scSelectedAccessories.some(function(a) { return a.name === name; });
+            var code = r[4] || '';
+            var exists = code && scSelectedAccessories.some(function(a) { return a.code === code; });
             if (!exists) {
                 scSelectedAccessories.push({
                     key: '选配', name: name, value: r[5] || '',
-                    code: r[4] || '', remark: r[6] || '', img: r[9] || '', type: 'optional'
+                    code: code, remark: r[6] || '', img: r[9] || '', type: 'optional'
                 });
                 renderScTable();
             }
