@@ -515,6 +515,11 @@
         font-weight:600;
     }
     .series-item:hover{background:#f1f5f9}
+    @keyframes rowCenterFlash{
+        0%,55%{box-shadow:inset 0 0 0 9999px rgba(249,115,22,.16)}
+        100%{box-shadow:inset 0 0 0 9999px rgba(249,115,22,0)}
+    }
+    .data-table tr.row-flash td{animation:rowCenterFlash 1.8s ease-out forwards}
     .overview-content{
         overflow:visible;
         flex:1 1 0% !important;
@@ -1451,6 +1456,13 @@
             <div class="series-sidebar" id="idSeriesSidebar">
                 <div class="panel">
                     <div class="panel-title"><div class="panel-title-icon">📦</div>ID产品系列</div>
+                    <div class="quick-search" style="max-width:360px">
+                        <div class="quick-search-wrap">
+                            <span class="quick-search-icon">🔍</span>
+                            <input type="text" id="idOverviewSearchInput" class="quick-search-input" placeholder="输入型号名称或物料代码..." oninput="onIdOverviewQuickSearch()">
+                        </div>
+                        <div id="idOverviewSearchResults" class="quick-search-results"></div>
+                    </div>
                     <div id="idSeriesList" class="series-list"></div>
                 </div>
             </div>
@@ -1473,6 +1485,13 @@
             <div class="series-sidebar" id="scSeriesSidebar">
                 <div class="panel">
                     <div class="panel-title"><div class="panel-title-icon">📦</div>SC产品系列</div>
+                    <div class="quick-search" style="max-width:360px">
+                        <div class="quick-search-wrap">
+                            <span class="quick-search-icon">🔍</span>
+                            <input type="text" id="scOverviewSearchInput" class="quick-search-input" placeholder="输入型号名称或物料代码..." oninput="onScOverviewQuickSearch()">
+                        </div>
+                        <div id="scOverviewSearchResults" class="quick-search-results"></div>
+                    </div>
                     <div id="scSeriesList" class="series-list"></div>
                 </div>
             </div>
@@ -3249,14 +3268,9 @@
 
     /* ==================== SC 快速搜索 ==================== */
 
-    function onScQuickSearch() {
-        var q = document.getElementById('scQuickSearchInput').value.trim().toLowerCase();
-        var el = document.getElementById('scQuickSearchResults');
-        if (!q) { el.style.display = 'none'; return; }
-
+    function matchScQuickSearch(q) {
         var colPriority = [2, 3, 4, 5, 6];
         var results = [];
-
         for (var c = 0; c < colPriority.length; c++) {
             var col = colPriority[c];
             results = [];
@@ -3265,7 +3279,6 @@
                 var isCam = r[0] === 'SC系列';
                 var isAcc = r[0] === '配件';
                 if (!isCam && !isAcc) continue;
-
                 var val = (r[col] || '').toLowerCase();
                 if (val.indexOf(q) >= 0) {
                     results.push({
@@ -3278,17 +3291,19 @@
             }
             if (results.length > 0) break;
         }
+        return results;
+    }
 
+    function renderQuickSearchResults(el, results, selectFn, row3Text) {
         if (!results.length) {
             el.innerHTML = '<div style="padding:12px;font-size:11px;color:#94a3b8;text-align:center">无匹配结果</div>';
             el.style.display = 'block';
             return;
         }
-
         var h = '';
         results.forEach(function(r) {
             var tagText = r.type + ' · ' + r.cat;
-            h += '<div class="quick-search-item" onclick="selectScQuickSearch(' + r.idx + ')">'
+            h += '<div class="quick-search-item" onclick="' + selectFn + '(' + r.idx + ')">'
                +   '<div class="qs-row1">'
                +     '<span class="qs-name">' + r.name + '</span>'
                +     '<span class="qs-tag">' + tagText + '</span>'
@@ -3298,11 +3313,18 @@
                +     '<span>|</span>'
                +     '<span class="qs-desc">' + r.desc + '</span>'
                +   '</div>'
-               +   '<div class="qs-row3">点击加入配单</div>'
+               +   '<div class="qs-row3">' + row3Text + '</div>'
                + '</div>';
         });
         el.innerHTML = h;
         el.style.display = 'block';
+    }
+
+    function onScQuickSearch() {
+        var q = document.getElementById('scQuickSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('scQuickSearchResults');
+        if (!q) { el.style.display = 'none'; return; }
+        renderQuickSearchResults(el, matchScQuickSearch(q), 'selectScQuickSearch', '点击加入配单');
     }
 
     function selectScQuickSearch(idx) {
@@ -3388,15 +3410,10 @@
 
     /* ==================== 快速搜索 ==================== */
 
-    function onIdQuickSearch() {
-        var q = document.getElementById('idQuickSearchInput').value.trim().toLowerCase();
-        var el = document.getElementById('idQuickSearchResults');
-        if (!q) { el.style.display = 'none'; return; }
-
+    function matchIdQuickSearch(q) {
         // 按优先级匹配：产品系列 > 物料名称 > 物料代码 > 描述 > 备注
         var colPriority = [2, 3, 4, 5, 6];
         var results = [];
-
         for (var c = 0; c < colPriority.length; c++) {
             var col = colPriority[c];
             results = [];
@@ -3405,7 +3422,6 @@
                 var isCam = r[0] === 'ID系列';
                 var isAcc = r[0] === '配件';
                 if (!isCam && !isAcc) continue;
-
                 var val = (r[col] || '').toLowerCase();
                 if (val.indexOf(q) >= 0) {
                     results.push({
@@ -3418,31 +3434,14 @@
             }
             if (results.length > 0) break;
         }
+        return results;
+    }
 
-        if (!results.length) {
-            el.innerHTML = '<div style="padding:12px;font-size:11px;color:#94a3b8;text-align:center">无匹配结果</div>';
-            el.style.display = 'block';
-            return;
-        }
-
-        var h = '';
-        results.forEach(function(r) {
-            var tagText = r.type + ' · ' + r.cat;
-            h += '<div class="quick-search-item" onclick="selectIdQuickSearch(' + r.idx + ')">'
-               +   '<div class="qs-row1">'
-               +     '<span class="qs-name">' + r.name + '</span>'
-               +     '<span class="qs-tag">' + tagText + '</span>'
-               +   '</div>'
-               +   '<div class="qs-row2">'
-               +     '<span class="qs-code">' + r.code + '</span>'
-               +     '<span>|</span>'
-               +     '<span class="qs-desc">' + r.desc + '</span>'
-               +   '</div>'
-               +   '<div class="qs-row3">点击加入配单</div>'
-               + '</div>';
-        });
-        el.innerHTML = h;
-        el.style.display = 'block';
+    function onIdQuickSearch() {
+        var q = document.getElementById('idQuickSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('idQuickSearchResults');
+        if (!q) { el.style.display = 'none'; return; }
+        renderQuickSearchResults(el, matchIdQuickSearch(q), 'selectIdQuickSearch', '点击加入配单');
     }
 
     function selectIdQuickSearch(idx) {
@@ -3483,6 +3482,87 @@
             }
         }
     }
+
+    /* ==================== 系列总览快速搜索跳转 ==================== */
+
+    function findFirstSeriesForAccessory(mapOrder, getAccsFn, code) {
+        for (var i = 0; i < mapOrder.length; i++) {
+            var accs = getAccsFn(mapOrder[i]);
+            for (var j = 0; j < accs.length; j++) {
+                if ((accs[j][4] || '') === code) return mapOrder[i];
+            }
+        }
+        return '';
+    }
+
+    function centerOverviewRow(wrap, target) {
+        var rows = wrap.querySelectorAll('tr[data-code]');
+        var tr = null;
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].getAttribute('data-code') === target.code
+                && rows[i].getAttribute('data-kind') === target.kind) { tr = rows[i]; break; }
+        }
+        if (!tr) { wrap.scrollTop = 0; window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        var rect = tr.getBoundingClientRect();
+        var targetY = window.scrollY + rect.top - (window.innerHeight - rect.height) / 2;
+        var maxY = document.documentElement.scrollHeight - window.innerHeight;
+        if (targetY > maxY) targetY = maxY;
+        if (targetY < 0) targetY = 0;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+        tr.classList.add('row-flash');
+        tr.addEventListener('animationend', function handler() {
+            tr.classList.remove('row-flash');
+            tr.removeEventListener('animationend', handler);
+        });
+    }
+
+    function jumpOverviewToProduct(side, idx) {
+        var rows = side === 'id' ? idAllRows : scAllRows;
+        var r = rows[idx];
+        if (!r) return;
+        var inputEl = document.getElementById(side === 'id' ? 'idOverviewSearchInput' : 'scOverviewSearchInput');
+        var resultsEl = document.getElementById(side === 'id' ? 'idOverviewSearchResults' : 'scOverviewSearchResults');
+        if (inputEl) inputEl.value = '';
+        if (resultsEl) resultsEl.style.display = 'none';
+
+        var isCam = side === 'id' ? r[0] === 'ID系列' : r[0] === 'SC系列';
+        var code = r[4] || '';
+        var targetSeries = '';
+        if (isCam) {
+            targetSeries = r[1] || '';
+        } else {
+            var sm = side === 'id' ? getIdSeriesMap() : getScSeriesMap();
+            targetSeries = findFirstSeriesForAccessory(sm.order,
+                side === 'id' ? getIdAccessoriesForSeries : getScAccessoriesForSeries, code);
+            if (!targetSeries) { alert('该配件未关联到任何' + (side === 'id' ? 'ID' : 'SC') + '系列'); return; }
+        }
+        var listId = side === 'id' ? 'idSeriesList' : 'scSeriesList';
+        var chip = null;
+        var items = document.querySelectorAll('#' + listId + ' .series-item');
+        for (var k = 0; k < items.length; k++) {
+            if (items[k].getAttribute('data-series') === targetSeries) { chip = items[k]; break; }
+        }
+        if (!chip) { alert('未找到系列：' + targetSeries); return; }
+        chip.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        var renderFn = side === 'id' ? renderIdOverviewTable : renderScOverviewTable;
+        renderFn(targetSeries, chip, { centerOn: { code: code, kind: isCam ? 'host' : 'acc' } });
+    }
+
+    function onIdOverviewQuickSearch() {
+        var q = document.getElementById('idOverviewSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('idOverviewSearchResults');
+        if (!q) { el.style.display = 'none'; return; }
+        renderQuickSearchResults(el, matchIdQuickSearch(q), 'selectIdOverviewJump', '点击跳转至该产品');
+    }
+    function selectIdOverviewJump(idx) { jumpOverviewToProduct('id', idx); }
+
+    function onScOverviewQuickSearch() {
+        var q = document.getElementById('scOverviewSearchInput').value.trim().toLowerCase();
+        var el = document.getElementById('scOverviewSearchResults');
+        if (!q) { el.style.display = 'none'; return; }
+        renderQuickSearchResults(el, matchScQuickSearch(q), 'selectScOverviewJump', '点击跳转至该产品');
+    }
+    function selectScOverviewJump(idx) { jumpOverviewToProduct('sc', idx); }
 
     /* ==================== 公告系统 ==================== */
     var announceData = { content: '', date: '' };
@@ -3632,7 +3712,7 @@
     if (first) renderIdOverviewTable(first.getAttribute('data-series'), first);
     }
     // 渲染右侧表格
-    function renderIdOverviewTable(seriesName, el) {
+    function renderIdOverviewTable(seriesName, el, opts) {
         // 高亮切换
         document.querySelectorAll('#idSeriesList .series-item').forEach(function(item) {
             item.classList.remove('active');
@@ -3706,7 +3786,7 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '">'
+            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
                 +  '<td>' + nl2br(name) + '</td>'
@@ -3722,9 +3802,13 @@
         var wrap = document.getElementById('idOverviewTableWrap');
         wrap.innerHTML = html;
 
-        // 重置滚动容器到顶部，确保从序号1开始显示
-        wrap.scrollTop = 0;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (opts && opts.centerOn) {
+            centerOverviewRow(wrap, opts.centerOn);
+        } else {
+            // 重置滚动容器到顶部，确保从序号1开始显示
+            wrap.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     /* ==================== SC 系列表逻辑 ==================== */
@@ -3796,7 +3880,7 @@
         if (first) renderScOverviewTable(first.getAttribute('data-series'), first);
     }
 
-    function renderScOverviewTable(seriesName, el) {
+    function renderScOverviewTable(seriesName, el, opts) {
         document.querySelectorAll('#scSeriesList .series-item').forEach(function(item) {
             item.classList.remove('active');
         });
@@ -3861,7 +3945,7 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '">'
+            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
                 +  '<td>' + nl2br(name) + '</td>'
@@ -3875,8 +3959,12 @@
         html += '</tbody></table>';
         var wrap = document.getElementById('scOverviewTableWrap');
         wrap.innerHTML = html;
-        wrap.scrollTop = 0;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (opts && opts.centerOn) {
+            centerOverviewRow(wrap, opts.centerOn);
+        } else {
+            wrap.scrollTop = 0;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     function switchPage(page, evt) {
