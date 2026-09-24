@@ -919,6 +919,10 @@
             flex-direction: column;
         }
         .series-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
             padding: 6px 10px;
             cursor: pointer;
             font-size: 12px;
@@ -935,6 +939,34 @@
             border-left-color: #f97316;
             color: #f97316;
             font-weight: 600;
+        }
+        .series-count{
+            display:inline-block;
+            margin-left:6px;
+            padding:1px 7px;
+            border-radius:9px;
+            background:#f1f5f9;
+            color:#94a3b8;
+            font-size:10px;
+            font-weight:600;
+            line-height:1.5;
+            flex-shrink:0;
+        }
+        .series-item.active .series-count{
+            background:#ffedd5;
+            color:#f97316;
+        }
+        .dblclick-hint{
+            display:block;
+            margin-top:2px;
+            color:#f97316;
+            font-size:10px;
+            font-weight:600;
+            opacity:0;
+            transition:opacity .15s;
+        }
+        tr[data-kind="host"]:hover .dblclick-hint{
+            opacity:1;
         }
         .row-accessory td {
             background: #eff6ff;
@@ -3718,7 +3750,7 @@
     var html = '';
     seriesNames.forEach(function(name, index) {
         var active = index === 0 ? ' active' : '';
-        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderIdOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
+        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderIdOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)"><span>' + name + '</span><span class="series-count">' + map[name].length + '</span></div>';
     });
     container.innerHTML = html;
     var first = container.querySelector('.series-item');
@@ -3799,10 +3831,10 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '">'
+            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
-                +  '<td>' + nl2br(name) + '</td>'
+                +  '<td>' + nl2br(name) + (isCamera ? '<small class="dblclick-hint">双击打开配单表</small>' : '') + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
                 +  '<td class="material-code">' + code + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
@@ -3876,6 +3908,7 @@
 
     function renderScSeriesList() {
         var result = getScSeriesMap();
+        var map = result.map;
         var seriesNames = result.order;
         var container = document.getElementById('scSeriesList');
         if (!container) return;
@@ -3886,7 +3919,7 @@
         var html = '';
         seriesNames.forEach(function(name, index) {
             var active = index === 0 ? ' active' : '';
-            html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderScOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</div>';
+            html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderScOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)"><span>' + name + '</span><span class="series-count">' + map[name].length + '</span></div>';
         });
         container.innerHTML = html;
         var first = container.querySelector('.series-item');
@@ -3958,10 +3991,10 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '">'
+            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
-                +  '<td>' + nl2br(name) + '</td>'
+                +  '<td>' + nl2br(name) + (isCamera ? '<small class="dblclick-hint">双击打开配单表</small>' : '') + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
                 +  '<td class="material-code">' + code + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
@@ -3978,6 +4011,46 @@
             wrap.scrollTop = 0;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+    }
+
+    function jumpOverviewToBom(side, tr) {
+        var cat = tr.getAttribute('data-cat');
+        var ser = tr.getAttribute('data-ser');
+        var mdl = tr.getAttribute('data-model');
+        if (!cat || !ser || !mdl) return;
+        var cs, ss, ms;
+        if (side === 'id') {
+            switchPage('bom');
+            cs = document.getElementById('idCategorySelect');
+            ss = document.getElementById('idSeriesSelect');
+            ms = document.getElementById('idModelSelect');
+            cs.value = cat; onIdCategoryChange();
+            ss.value = ser; onIdSeriesChange();
+            ms.value = mdl; onIdModelChange();
+        } else {
+            switchPage('scbom');
+            cs = document.getElementById('scCategorySelect');
+            ss = document.getElementById('scSeriesSelect');
+            ms = document.getElementById('scModelSelect');
+            cs.value = cat; onScCategoryChange();
+            ss.value = ser; onScSeriesChange();
+            ms.value = mdl; onScModelChange();
+        }
+        if (ms.value !== mdl) alert('当前型号未找到对应配单数据');
+    }
+
+    function initOverviewBomJump() {
+        var cfgs = [['idOverviewTableWrap', 'id'], ['scOverviewTableWrap', 'sc']];
+        cfgs.forEach(function(cfg) {
+            var wrap = document.getElementById(cfg[0]);
+            if (!wrap) return;
+            wrap.addEventListener('dblclick', function(e) {
+                if (e.target.closest('img')) return;
+                var tr = e.target.closest('tr[data-kind]');
+                if (!tr || tr.getAttribute('data-kind') !== 'host') return;
+                jumpOverviewToBom(cfg[1], tr);
+            });
+        });
     }
 
     function switchPage(page, evt) {
@@ -4536,6 +4609,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadIdData();
     loadScData();
+    initOverviewBomJump();
     setTimeout(showAnnounce, 500);
 
         // ===== 从公告配置读取数据更新日期 =====
