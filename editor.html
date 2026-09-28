@@ -8,7 +8,7 @@
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
-        .editor-header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+        .editor-header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
         .editor-header-left{display:flex;align-items:center;gap:12px}
         .editor-title{font-size:18px;font-weight:700}.editor-title span{color:#f97316}
         .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:12px}
@@ -43,22 +43,32 @@
         .data-editor-table tr:hover{background:#f8fafc}
         .data-editor-table tr.editing{background:#eff6ff}
         .col-fixed{position:sticky;z-index:5;background:#fff}
+        /* 表头固定列需高于普通表头(z-index:10)，否则横向滚动时后续列名会盖住产品大类等粘性表头 */
+        .data-editor-table th.col-fixed{z-index:12}
         .col-num{left:0;width:36px;min-width:36px}
         .col-act{left:36px;width:72px;min-width:72px}
-        /* 修改后 */
+        /* 粘性列偏移由 renderTable 按当前 tab 列宽动态计算（--sticky-f1/f2/f3） */
         .col-f1{
-            left:60px;
-            white-space:nowrap;  /* 第1列（数据分类/配件类别）数据很短，保持单行 */
+            left:var(--sticky-f1,108px);
+            white-space:nowrap;  /* 第1数据列（产品大类/配件类别）数据很短，保持单行 */
         }
         .col-f2{
-            white-space:nowrap;  /* 第2列（产品大类）数据很短，保持单行 */
+            left:var(--sticky-f2,216px);
+            white-space:nowrap;  /* 第2数据列（产品系列）数据很短，保持单行 */
         }
         .col-f3{
-            left:108px;
-            white-space:normal;          /* 改为允许换行 */
+            left:var(--sticky-f3,344px);
+            white-space:normal;          /* 允许换行 */
             word-break:break-word;       /* 强制长单词/代码换行 */
         }
         .cell-textarea {
+        width:100%;
+        min-height:28px;
+        padding:3px 5px;
+        font-family:inherit;
+        font-size:12px;
+        box-sizing:border-box;
+        resize:vertical;
         border: 1px solid transparent;
         border-radius: 3px;
         background: transparent;
@@ -77,11 +87,6 @@
             border-color: #fbbf24;
         }
         .col-auto { white-space: normal; word-break: break-word; }
-        .col-auto-wrap { white-space: normal; word-break: break-word; line-height: 1.5; }
-        .col-resize{position:relative}
-        .col-resize .resize-handle{position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;user-select:none;z-index:20}
-        .col-resize .resize-handle:hover,.col-resize .resize-handle.active{background:#f97316}
-        .col-resize input{width:100%;min-width:0}
         .btn-row.del:hover{background:#fee2e2;color:#ef4444}
         .btn-row{width:20px;height:20px;border:none;background:transparent;border-radius:3px;color:#94a3b8;cursor:pointer;font-size:11px;padding:0}
         .btn-row:hover{background:#f1f5f9;color:#333}
@@ -90,7 +95,7 @@
         .cell-combo:focus,.cell-input:focus{outline:none;border-color:#f97316;background:white;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
         .cell-combo.modified,.cell-input.modified{background:#fef3c7;border-color:#fbbf24}
         .status-bar{background:#1e293b;color:#94a3b8;padding:4px 20px;font-size:12px;display:flex;justify-content:space-between;flex-shrink:0}
-        .status-bar .unsaved{color:#fbbf24}.status-bar .saved{color:#10b981}
+        .stats-bar .unsaved{color:#fbbf24}.stats-bar .saved{color:#10b981}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
         .modal-overlay.active{display:flex}
         .modal{background:white;border-radius:12px;width:520px;max-height:80vh;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -100,8 +105,8 @@
         .modal-close:hover{background:#e2e8f0}
         .modal-body{padding:18px}
         .modal-footer{padding:10px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px}
-        .toast{position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:6px;font-size:13px;color:white;z-index:2000;transform:translateX(120%);transition:transform .3s ease}
-        .toast.show{transform:translateX(0)}.toast.success{background:#10b981}.toast.error{background:#ef4444}.toast.warning{background:#f59e0b}
+        .toast{position:absolute;top:50%;left:50%;padding:6px 18px;border-radius:6px;font-size:13px;color:white;z-index:2000;white-space:nowrap;transform:translate(-50%,-50%) scale(.9);opacity:0;transition:opacity .3s ease,transform .3s ease;pointer-events:none}
+        .toast.show{transform:translate(-50%,-50%) scale(1);opacity:1}.toast.success{background:#10b981}.toast.error{background:#ef4444}.toast.warning{background:#f59e0b}
         .confirm-dialog{text-align:center}.confirm-dialog p{font-size:14px;color:#64748b;margin-bottom:8px}.confirm-dialog .warn{color:#ef4444;font-weight:600}
         #csvFileInput{display:none}
         #imgFileInput{display:none}
@@ -144,6 +149,7 @@
             <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
             <button class="btn btn-success" onclick="exportCurrentJS()">📤 导出JS</button>
         </div>
+        <div class="toast" id="toast"></div>
     </div>
     <div class="tab-bar">
         <div class="tab active" data-tab="camera" onclick="switchTab('camera')">📷 相机数据 <span class="tab-count" id="cameraCount">0</span></div>
@@ -174,10 +180,8 @@
         <div class="modal" style="width:380px">
             <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
             <div class="modal-body" style="text-align:center">
-                <div id="importDropzone">
-                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
-                    <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)" style="display:none">
-                </div>
+                <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
+                <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)" style="display:none">
                 <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
             </div>
             <div class="modal-footer">
@@ -204,8 +208,6 @@
             <div id="previewBigName" class="preview-name"></div>
         </div>
     </div>
-
-    <div class="toast" id="toast"></div>
 
 <script>
 // ==================== Column Definitions ====================
@@ -240,8 +242,8 @@ var COL_WIDTHS = {
     }
 };
 
-var CAMERA_COMBO_COLS = [0, 1, 2];
-var ACCESSORY_COMBO_COLS = [0, 1, 2];
+var CAMERA_COMBO_COLS = [1, 2];
+var ACCESSORY_COMBO_COLS = [1, 2];
 
 // ==================== State ====================
 var currentTab = 'camera';
@@ -253,17 +255,18 @@ var filteredIndices = [];
 var selectedRows = {};
 var modifiedCells = {};
 var imgUploadTarget = null; // { type, idx }
+var deleteSnapshot = null; // 单行删除弹窗打开前的选区快照（取消时恢复）
 
 // ==================== Init ====================
 function init() {
-    loadDataFromParent();
+    loadInitialData();
     updateProductUI();
     rebuildDropdownCache();
     renderTable();
     updateStats();
 }
 
-function loadDataFromParent() {
+function loadInitialData() {
     var saved = localStorage.getItem('idbom_editor_data');
     if (saved) {
         try {
@@ -314,7 +317,7 @@ function rebuildDropdownCache() {
 
 function buildDropdownCache(data, colCount) {
     var cache = {};
-    for (var c = 0; c < colCount; c++) {
+    for (var c = 1; c < colCount; c++) { // 列0不渲染，无需下拉缓存
         var seen = {};
         var list = [];
         data.forEach(function(row) {
@@ -345,14 +348,18 @@ function updateDropdownValue(colIdx, newVal) {
 }
 
 // ==================== Tab ====================
+function resetViewState() {
+    selectedRows = {};
+    modifiedCells = {};
+    document.getElementById('searchBox').value = '';
+}
+
 function switchTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(function(t) {
         t.classList.toggle('active', t.dataset.tab === tab);
     });
-    selectedRows = {};
-    modifiedCells = {};
-    document.getElementById('searchBox').value = '';
+    resetViewState();
     renderTable();
     updateStats();
 }
@@ -371,9 +378,7 @@ function switchProduct(p) {
     currentProduct = p;
     cameraData = dataStore[p].camera;
     accessoryData = dataStore[p].accessory;
-    selectedRows = {};
-    modifiedCells = {};
-    document.getElementById('searchBox').value = '';
+    resetViewState();
     updateProductUI();
     rebuildDropdownCache();
     renderTable();
@@ -412,19 +417,21 @@ function renderTable() {
     th += '<th class="col-fixed col-num">#</th>';
     th += '<th class="col-fixed col-act"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>';
     var cw = COL_WIDTHS[currentTab] || {};
+    // 粘性列偏移：序号列36 + 操作列72，随后各固定列按当前 tab 列宽累加
+    var stickyBase = 36 + 72;
+    var sticky = { f1: stickyBase };
+    sticky.f2 = sticky.f1 + (cw[1] || 0);
+    sticky.f3 = sticky.f2 + (cw[2] || 0);
+    var tableEl = document.getElementById('editorTable');
+    tableEl.style.setProperty('--sticky-f1', sticky.f1 + 'px');
+    tableEl.style.setProperty('--sticky-f2', sticky.f2 + 'px');
+    tableEl.style.setProperty('--sticky-f3', sticky.f3 + 'px');
     for (var c = 1; c < headers.length; c++) {
         var isFixed = fixedCols.indexOf(c) >= 0;
         var w = cw[c];
-        var isAuto = (w === 'auto');
-        var cls = '';
-        if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
-        else if (isAuto) cls = 'col-resize';
-        else cls = 'col-auto';
-        var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
-        var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
-        var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
-        var resizeHtml = isAuto ? '<div class="resize-handle" onmousedown="startResize(event)"></div>' : '';
-        th += '<th class="' + cls + '"' + style + autoStyle + '>' + headers[c] + resizeHtml + '</th>';
+        var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-auto';
+        var style = w ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+        th += '<th class="' + cls + '"' + style + '>' + headers[c] + '</th>';
         // 在 col3（具体型号/物料名称）之后插入图片列头
         if (c === IMG_INSERT_AFTER) {
             th += '<th class="col-img" style="width:72px;min-width:72px">图片</th>';
@@ -437,18 +444,14 @@ function renderTable() {
     var totalW = 36 + 72;
     for (var c = 1; c < headers.length; c++) {
         var w = cw[c];
-        if (w === 'auto') totalW += ((COL_MIN_WIDTH[currentTab]||{})[c] || 120);
-        else if (w) totalW += w;
-        else totalW += 80;
+        totalW += w ? w : 80;
         if (c === IMG_INSERT_AFTER) totalW += 72;
     }
-    document.getElementById('editorTable').style.width = totalW + 'px';
+    tableEl.style.width = totalW + 'px';
 
     // ===== Datalists =====
     var datalists = '';
     comboCols.forEach(function(ci) {
-        // 第2列保留下拉，但第3列已排除，所以组合框只有第0、1、2列（0,1,2）但第3列排除，所以这里仍生成第2列的下拉
-        // 但我们只对第2列（c=2）使用组合框，第0、1列也是组合框，所以保留所有 comboCols 的 datalist
         var items = cache[ci] || [];
         datalists += '<datalist id="dl_' + ci + '">';
         items.forEach(function(v) { datalists += '<option value="' + escH(v) + '">'; });
@@ -474,24 +477,17 @@ function renderTable() {
             var mc = modifiedCells[ck] ? ' modified' : '';
             var isFixed = fixedCols.indexOf(c) >= 0;
             var w = cw[c];
-            var isAuto = (w === 'auto');
-            var cls = '';
-            if (isFixed) cls = 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)];
-            else if (isAuto) cls = 'col-resize';
-            else cls = 'col-auto';
+            var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-auto';
             // 多行列：第3、5、6列
             if (c === 3 || c === 5 || c === 6) cls += ' col-wrap';
-            var style = (!isAuto && w) ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
-            var minW = isAuto ? (COL_MIN_WIDTH[currentTab]||{})[c] : 0;
-            var autoStyle = isAuto && minW ? ' style="width:'+minW+'px;min-width:'+minW+'px"' : '';
+            var style = w ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
 
-            // 判断：组合框保留（第2列），第3列不组合框
-            if (comboCols.indexOf(c) >= 0 && c !== 3) {
+            if (comboCols.indexOf(c) >= 0) {
                 // 组合框（单行输入框 + datalist）
-                bhtml += '<td class="' + cls + '"' + style + autoStyle + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             } else if (c === 3 || c === 5 || c === 6) {
                 // 多行文本列 → textarea
-                bhtml += '<td class="' + cls + '"' + style + '><textarea class="cell-textarea' + mc + '" rows="2" style="width:100%;resize:vertical;font-family:inherit;font-size:12px;padding:3px 5px;border:1px solid transparent;border-radius:3px;background:transparent;box-sizing:border-box;min-height:28px;" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
+                bhtml += '<td class="' + cls + '"' + style + '><textarea class="cell-textarea' + mc + '" rows="2" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
             } else {
                 // 普通单行输入框
                 bhtml += '<td class="' + cls + '"' + style + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
@@ -512,8 +508,8 @@ function renderTable() {
                     bhtml += '<span class="thumb-wrap">';
                     bhtml += '<img class="thumb" src="' + escH(thumbSrc) + '" data-full="' + escH(fullSrc) + '" loading="lazy" width="48" height="48" ';
                     bhtml += 'title="' + escH(imgVal) + ' — 点击放大" ';
-                    bhtml += 'onclick="showImgPreview(\'' + escH(imgKey) + '\')" ';
-                    bhtml += 'onerror="handleThumbError(this,\'' + escH(imgKey) + '\')">';
+                    bhtml += 'onclick="showImgPreview(\'' + escJS(imgKey) + '\')" ';
+                    bhtml += 'onerror="handleThumbError(this,\'' + escJS(imgKey) + '\')">';
                     bhtml += '<button class="thumb-del" title="删除图片标识" onclick="event.stopPropagation();deleteImg(\'' + currentTab + '\',' + idx + ')">✕</button>';
                     bhtml += '</span>';
                 } else {
@@ -525,6 +521,8 @@ function renderTable() {
         bhtml += '</tr>';
     });
     document.getElementById('editorBody').innerHTML = datalists + bhtml;
+    var sa = document.getElementById('selectAll');
+    if (sa) sa.checked = filteredIndices.length > 0 && filteredIndices.every(function(i) { return !!selectedRows[i]; });
     document.getElementById('visibleCount').textContent = filteredIndices.length;
     document.getElementById('totalCount').textContent = data.length;
     document.getElementById('cameraCount').textContent = cameraData.length;
@@ -535,8 +533,8 @@ function updateStats() {
     var n = Object.keys(modifiedCells).length;
     var el = document.getElementById('modifiedIndicator');
     el.innerHTML = n > 0
-        ? ' · <span class="unsaved">' + n + ' 处未保存修改</span>'
-        : ' · <span class="saved">无未保存修改</span>';
+        ? ' · <span class="unsaved">' + n + ' 处修改未确认同步</span>'
+        : ' · <span class="saved">全部修改已确认</span>';
 }
 
 // ==================== Auto Save ====================
@@ -613,6 +611,8 @@ function copyRow(idx) {
 }
 
 function deleteSingleRow(idx) {
+    deleteSnapshot = {};
+    Object.keys(selectedRows).forEach(function(k) { deleteSnapshot[k] = true; });
     selectedRows = {};
     selectedRows[idx] = true;
     document.getElementById('deleteCount').textContent = '1';
@@ -632,6 +632,7 @@ function confirmDelete() {
     indices.forEach(function(i) { data.splice(i, 1); });
     selectedRows = {};
     modifiedCells = {};
+    deleteSnapshot = null;
     closeDeleteModal();
     rebuildDropdownCache();
     renderTable();
@@ -640,7 +641,18 @@ function confirmDelete() {
     showToast('已删除 ' + indices.length + ' 行', 'success');
 }
 
-function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+    if (deleteSnapshot) {
+        selectedRows = deleteSnapshot;
+        deleteSnapshot = null;
+        var sa = document.getElementById('selectAll');
+        if (sa) sa.checked = filteredIndices.length > 0 && filteredIndices.every(function(i) { return !!selectedRows[i]; });
+        document.querySelectorAll('#editorBody input[type="checkbox"]').forEach(function(cb) {
+            cb.checked = !!selectedRows[parseInt(cb.closest('tr').dataset.idx)];
+        });
+    }
+}
 
 // ==================== Search ====================
 function onSearch() { renderTable(); }
@@ -721,7 +733,7 @@ function showImportModal() {
 function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
 
 var pendingImports = {}; // key: id_camera / id_accessory / sc_camera / sc_accessory
-var ambiguousFiles = []; // { name, rows, target, assigned }
+var ambiguousFiles = []; // { rows, target, assigned }
 
 function onFileSelected(e) {
     var files = e.target.files;
@@ -729,10 +741,20 @@ function onFileSelected(e) {
     pendingImports = {};
     ambiguousFiles = [];
     var remaining = files.length;
-    var infoLines = [];
+    var entries = []; // { target, count, fname, slot, ambIdx }
     var done = function() {
         remaining--;
         if (remaining === 0) {
+            var slotCount = {};
+            entries.forEach(function(en) { if (en.slot) slotCount[en.slot] = (slotCount[en.slot] || 0) + 1; });
+            var infoLines = entries.map(function(en) {
+                if (en.ambIdx >= 0) {
+                    return '❓ ' + escH(en.fname) + ' · ' + en.count + ' 行 · 归属 <select onchange="assignAmbiguous(' + en.ambIdx + ',this.value)"><option value="">请选择</option><option value="id">ID 产品</option><option value="sc">SC 产品</option></select>';
+                }
+                var prodLabel = en.slot ? en.slot.split('_')[0].toUpperCase() + ' · ' : '';
+                var dupNote = en.slot && slotCount[en.slot] > 1 ? ' <span style="color:#b91c1c">⚠ 同目标多文件，仅保留最后完成解析的一份</span>' : '';
+                return prodLabel + (en.target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + escH(en.fname) + ' · ' + en.count + ' 行' + dupNote;
+            });
             var infoEl = document.getElementById('importInfo');
             infoEl.innerHTML = infoLines.join('<br>') || '未识别到可导入的数据';
             infoEl.style.display = 'block';
@@ -744,12 +766,7 @@ function onFileSelected(e) {
         (function(f) {
             readFile(f, function(target, count, fname, slot, ambIdx) {
                 if (target === null) { done(); return; }
-                if (ambIdx >= 0) {
-                    infoLines.push('❓ ' + escH(fname) + ' · ' + count + ' 行 · 归属 <select onchange="assignAmbiguous(' + ambIdx + ',this.value)"><option value="">请选择</option><option value="id">ID 产品</option><option value="sc">SC 产品</option></select>');
-                } else {
-                    var prodLabel = slot ? slot.split('_')[0].toUpperCase() + ' · ' : '';
-                    infoLines.push(prodLabel + (target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + escH(fname) + ' · ' + count + ' 行');
-                }
+                entries.push({ target: target, count: count, fname: fname, slot: slot, ambIdx: ambIdx });
                 done();
             });
         })(files[i]);
@@ -823,7 +840,7 @@ function parseAndStore(text, fname, callback) {
 
     if (!prod) {
         var ambIdx = ambiguousFiles.length;
-        ambiguousFiles.push({ name: fname, rows: normalized, target: target, assigned: '' });
+        ambiguousFiles.push({ rows: normalized, target: target, assigned: '' });
         callback(target, normalized.length, fname, '', ambIdx);
         return;
     }
@@ -879,7 +896,7 @@ function exportCurrentCSV() {
     var headers = getHeaders();
     var data = getData();
     var imgCol = getImgColIdx();
-    var csv = '\uFEFF' + headers.map(csvEsc).join(',') + '\n';
+    var csv = '\uFEFF' + headers.map(csvEscape).join(',') + '\n';
     data.forEach(function(row) {
         var line = [];
         for (var i = 0; i < headers.length; i++) {
@@ -975,7 +992,7 @@ function saveChanges() {
 
 function flushPendingEdits() {
     var data = getData();
-    document.querySelectorAll('#editorBody input').forEach(function(input) {
+    document.querySelectorAll('#editorBody input, #editorBody textarea').forEach(function(input) {
         var tr = input.closest('tr');
         if (!tr) return;
         var td = input.closest('td');
@@ -1002,6 +1019,11 @@ function flushPendingEdits() {
 // ==================== Utilities ====================
 function csvEscape(s) { if (s == null) s = ''; s = String(s); return (s.indexOf(',') >= 0 || s.indexOf('"') >= 0 || s.indexOf('\n') >= 0) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 function escH(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+function escJS(s) {
+    if (s == null) return '';
+    s = String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    return escH(s);
+}
 function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
 function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type||'success'); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},3000); }
 
@@ -1028,37 +1050,6 @@ function parseCSV(text) {
     return rows;
 }
 
-// Column Resize
-var resizeState = null;
-function startResize(e) {
-    e.preventDefault();
-    var th = e.target.parentElement;
-    var colIdx = Array.from(th.parentElement.children).indexOf(th);
-    resizeState = { startX: e.clientX, startWidth: th.offsetWidth, th: th, colIdx: colIdx };
-    e.target.classList.add('active');
-    document.addEventListener('mousemove', doResize);
-    document.addEventListener('mouseup', stopResize);
-}
-function doResize(e) {
-    if (!resizeState) return;
-    var newWidth = Math.max(60, resizeState.startWidth + e.clientX - resizeState.startX);
-    resizeState.th.style.width = newWidth + 'px';
-    resizeState.th.style.minWidth = newWidth + 'px';
-    var colIdx = resizeState.colIdx;
-    document.querySelectorAll('#editorBody tr').forEach(function(tr) {
-        var td = tr.children[colIdx];
-        if (td) { td.style.width = newWidth + 'px'; td.style.minWidth = newWidth + 'px'; }
-    });
-}
-function stopResize() {
-    if (resizeState) {
-        var handle = resizeState.th.querySelector('.resize-handle');
-        if (handle) handle.classList.remove('active');
-    }
-    resizeState = null;
-    document.removeEventListener('mousemove', doResize);
-    document.removeEventListener('mouseup', stopResize);
-}
 
 // Keyboard
 document.addEventListener('keydown', function(e) {
