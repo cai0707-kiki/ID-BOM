@@ -59,7 +59,8 @@
         .accessory-category-left{display:flex;align-items:center;gap:8px}
         .accessory-icon{width:24px;height:24px;background:#f1f5f9;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px}
         .accessory-category-name{font-size:11px;font-weight:500;color:#333}
-        .accessory-category-count{font-size:10px;color:#94a3b8}
+        .accessory-category-count{font-size:9px;color:#94a3b8}
+        .accessory-category-count .acc-count-selected{color:#f97316;font-weight:600}
         .accessory-arrow{color:#94a3b8;font-size:12px}
         .quick-search{margin-top:6px;margin-bottom:10px}
         .quick-search-wrap{position:relative;display:flex;align-items:center}
@@ -2049,8 +2050,12 @@
             if (matchCount === 0) continue;
             if (matchCount === stdCount) continue;
 
+            var items = buildIdAccItems(keys[i]);
+            if (items.length === 0) continue;
+
             var cnt = idSelectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
-            var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
+            var txt = items.length + ' 个配件';
+            if (cnt > 0) txt += ' · <span class="acc-count-selected">' + cnt + ' 个已选</span>';
             h += '<div class="accessory-category" onclick="openIdAccessoryModal(\'' + keys[i] + '\')">'
                +   '<div class="accessory-category-left">'
                +     '<div class="accessory-icon">' + cfg.icon + '</div>'
@@ -2085,11 +2090,10 @@
 
     /* ==================== 打开配件选择弹窗 ==================== */
 
-    function openIdAccessoryModal(key) {
-        modalSource = 'id';
-        idCurrentAccessoryKey = key;
+    /* ==================== 选配弹窗 items 构建（弹窗与卡片统计共用，保证数量口径一致） ==================== */
+
+    function buildIdAccItems(key) {
         var cfg = accessoryColumns[key];
-        var catName = cfg.name;
         var refVal = idCurrentMatch[cfg.col] || '';
 
         var refTags = refVal.split(';').map(function(s) {
@@ -2105,7 +2109,6 @@
             if (refFlags[i] === '1') camStdTags[t] = true;
         });
 
-        idCurrentAccessoryItems = [];
         var _tmpItems = [];
 
         idAllRows.forEach(function(r) {
@@ -2142,40 +2145,20 @@
         });
 
         var hasOptional = _tmpItems.some(function(x) { return !x.isStd; });
+        var items = [];
         _tmpItems.forEach(function(x) {
             if (!hasOptional || !x.isStd) {
-                idCurrentAccessoryItems.push({
+                items.push({
                     series: x.series, name: x.name, desc: x.desc,
                     code: x.code, remark: x.remark, img: x.img
                 });
             }
         });
-
-        document.getElementById('modalTitle').textContent = catName + ' - 选择配件';
-        idTempSelectedItems = idSelectedAccessories.filter(function(a) {
-            return a.key === key;
-        }).map(function(a) { return a.code; });
-
-        if (cableCategories[key]) {
-            idCableFilterState = { length: 'all', material: 'all' };
-            renderCableFilterArea();
-            renderCableFilteredItems();
-        } else {
-            document.getElementById('cableFilterArea').innerHTML = '';
-            renderCableFilteredItems();
-        }
-
-        resizeModalBody();
-        document.getElementById('accessoryModal').classList.add('active');
+        return items;
     }
 
-    /* ==================== SC 弹窗打开 ==================== */
-
-    function openScAccessoryModal(key) {
-        modalSource = 'sc';
-        scCurrentAccessoryKey = key;
+    function buildScAccItems(key) {
         var cfg = scAccessoryColumns[key];
-        var catName = cfg.name;
         var refVal = scCurrentMatch[cfg.col] || '';
 
         var refTags = refVal.split(';').map(function(s) {
@@ -2191,7 +2174,6 @@
             if (refFlags[i] === '1') camStdTags[t] = true;
         });
 
-        scCurrentAccessoryItems = [];
         var _tmpItems = [];
 
         scAllRows.forEach(function(r) {
@@ -2226,14 +2208,53 @@
         });
 
         var hasOptional = _tmpItems.some(function(x) { return !x.isStd; });
+        var items = [];
         _tmpItems.forEach(function(x) {
             if (!hasOptional || !x.isStd) {
-                scCurrentAccessoryItems.push({
+                items.push({
                     series: x.series, name: x.name, desc: x.desc,
                     code: x.code, remark: x.remark, img: x.img
                 });
             }
         });
+        return items;
+    }
+
+    function openIdAccessoryModal(key) {
+        modalSource = 'id';
+        idCurrentAccessoryKey = key;
+        var cfg = accessoryColumns[key];
+        var catName = cfg.name;
+
+        idCurrentAccessoryItems = buildIdAccItems(key);
+
+        document.getElementById('modalTitle').textContent = catName + ' - 选择配件';
+        idTempSelectedItems = idSelectedAccessories.filter(function(a) {
+            return a.key === key;
+        }).map(function(a) { return a.code; });
+
+        if (cableCategories[key]) {
+            idCableFilterState = { length: 'all', material: 'all' };
+            renderCableFilterArea();
+            renderCableFilteredItems();
+        } else {
+            document.getElementById('cableFilterArea').innerHTML = '';
+            renderCableFilteredItems();
+        }
+
+        resizeModalBody();
+        document.getElementById('accessoryModal').classList.add('active');
+    }
+
+    /* ==================== SC 弹窗打开 ==================== */
+
+    function openScAccessoryModal(key) {
+        modalSource = 'sc';
+        scCurrentAccessoryKey = key;
+        var cfg = scAccessoryColumns[key];
+        var catName = cfg.name;
+
+        scCurrentAccessoryItems = buildScAccItems(key);
 
         document.getElementById('modalTitle').textContent = catName + ' - 选择配件';
         scTempSelectedItems = scSelectedAccessories.filter(function(a) {
@@ -3032,8 +3053,12 @@
             if (matchCount === 0) continue;
             if (matchCount === stdCount) continue;
 
+            var items = buildScAccItems(keys[i]);
+            if (items.length === 0) continue;
+
             var cnt = scSelectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
-            var txt = cnt > 0 ? cnt + ' 个已选' : '点击选择';
+            var txt = items.length + ' 个配件';
+            if (cnt > 0) txt += ' · <span class="acc-count-selected">' + cnt + ' 个已选</span>';
             h += '<div class="accessory-category" onclick="openScAccessoryModal(\'' + keys[i] + '\')">'
                +   '<div class="accessory-category-left">'
                +     '<div class="accessory-icon">' + cfg.icon + '</div>'
