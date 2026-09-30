@@ -2318,7 +2318,7 @@
         var lengths = extractCableLengths();
         var materials = extractCableMaterials(_modalGet('accessoryKey'));
         var h = '<div class="cable-filter">';
-        h += '<div class="cable-warn"><em>⚠️ 7m线缆无法配置下单，须订单备注删除标配线缆，再额外下单！</em></div>';
+        h += '<div class="cable-warn"><em>⚠️ ≥7m线缆无法配置下单，须订单备注删除标配线缆，再额外下单！</em></div>';
         h += '<div class="cable-filter-row"><span class="cable-filter-label">长度</span><div class="cable-filter-btns">';
         h += '<button class="cable-filter-btn active" onclick="setCableFilter(\'length\',\'all\',this)">全部</button>';
         lengths.forEach(function(l) {
