@@ -1,7 +1,7 @@
 /**
  * SC-BOM 配件产品数据
  * 数据来源：sc_accessory_data.csv（SC 智能相机配件产品清单）
- * 更新方式：修改 sc_accessory_data.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var SCBOM_ACCESSORY_DATA = [
 {"Count":10,"value":["配件","电源","电源适配器","ADS-26FSG-12 12024EPCN","310100899","电源适配器_12V2A_ADS-26FSG-12 12024EPCN,AC100-240V,国标,24W,两线,VI","静态。open端搭配101301847端子可方便接线。","Power12","0","SC_ACC/ADS-12"]},

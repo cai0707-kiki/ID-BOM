@@ -1,7 +1,7 @@
 /**
  * SC-BOM 智能相机产品数据
  * 数据来源：sc_camera_data.csv（海康机器人智能相机产品清单）
- * 更新方式：修改 sc_camera_data.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var SCBOM_CAMERA_DATA = [
 {"Count":26,"value":["SC系列","SC1000系列","SC1003M","MV-SC1003M-03S-WBN-SR(国内标配)","308600804","新款超小型视觉传感器，0.3MP，3mm镜头，不可调焦，镜头不能更换，黑白，白色LED光源，自带0.6m航空头甩线","工作距离固定240mm","Power12;Power24;LRS-24","0;0;0","Braket8E","0","","","","","ACG","0","","","","","","","BZ3;EPE8E;M36;VT;AX-184-H","1;1;1;0;0","SC_CAM/SC1000"]},

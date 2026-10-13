@@ -284,7 +284,7 @@ var DATASETS = {
         newRowFirst: '',
         keys: ['scene', 'name', 'codeStd', 'codeNeu', 'swName', 'swCode', 'modules', 'remark'],
         csvFile: 'vm_dongle_data.csv', jsFile: 'vm_dongle_data.js', jsVar: 'VM_DONGLE_DATA',
-        jsDescription: 'VM 加密狗产品数据\n * 数据来源：vm_dongle_data.csv（VisionMaster 加密狗/软加密清单）\n * 更新方式：修改 vm_dongle_data.csv 后运行 `node import_csv.js`'
+        jsDescription: 'VM 加密狗产品数据\n * 数据来源：vm_dongle_data.csv（VisionMaster 加密狗/软加密清单）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
     },
     updates: {
         scope: 'global', startCol: 0, headers: UPDATES_HEADERS,
@@ -299,7 +299,7 @@ var DATASETS = {
         newRowFirst: 'autoId',
         keys: ['id', 'date', 'productType', 'type', 'content', 'series', 'docName', 'featured'],
         csvFile: 'product_updates.csv', jsFile: 'product_updates.js', jsVar: 'IDBOM_PRODUCT_UPDATES',
-        jsDescription: 'ID-BOM 产品动态数据\n * 数据来源：product_updates.csv（产品更新动态）\n * 更新方式：修改 product_updates.csv 后运行 `node import_csv.js`'
+        jsDescription: 'ID-BOM 产品动态数据\n * 数据来源：product_updates.csv（产品更新动态）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
     }
 };
 var GLOBAL_TABS = ['vm', 'updates'];
@@ -1225,30 +1225,30 @@ function exportCurrentCSV() {
 }
 
 // ==================== JS Export ====================
-// 与 import_csv.js 的 TABLE_DATASETS + writeDataJs 完全对齐（格式/命名/描述文案一致）
+// 导出格式与 scripts/ 既有数据文件对齐（每行 JSON、末行无逗号、\n 分隔、同名同变量）
 var JS_EXPORT_DATASETS = {
     id: {
         camera: {
             file: 'id_camera_data.js', variable: 'IDBOM_CAMERA_DATA',
             colCount: 26, imgCol: 25, imgDir: null,
-            description: 'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`'
+            description: 'ID-BOM 相机产品数据\n * 数据来源：id_camera_data.csv（海康机器人相机产品清单）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
         },
         accessory: {
             file: 'id_accessory_data.js', variable: 'IDBOM_ACCESSORY_DATA',
             colCount: 10, imgCol: 9, imgDir: null,
-            description: 'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`'
+            description: 'ID-BOM 配件产品数据\n * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
         }
     },
     sc: {
         camera: {
             file: 'sc_camera_data.js', variable: 'SCBOM_CAMERA_DATA',
             colCount: 26, imgCol: 25, imgDir: 'SC_CAM',
-            description: 'SC-BOM 智能相机产品数据\n * 数据来源：sc_camera_data.csv（海康机器人智能相机产品清单）\n * 更新方式：修改 sc_camera_data.csv 后运行 `node import_csv.js`'
+            description: 'SC-BOM 智能相机产品数据\n * 数据来源：sc_camera_data.csv（海康机器人智能相机产品清单）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
         },
         accessory: {
             file: 'sc_accessory_data.js', variable: 'SCBOM_ACCESSORY_DATA',
             colCount: 10, imgCol: 9, imgDir: 'SC_ACC',
-            description: 'SC-BOM 配件产品数据\n * 数据来源：sc_accessory_data.csv（SC 智能相机配件产品清单）\n * 更新方式：修改 sc_accessory_data.csv 后运行 `node import_csv.js`'
+            description: 'SC-BOM 配件产品数据\n * 数据来源：sc_accessory_data.csv（SC 智能相机配件产品清单）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
         }
     }
 };
@@ -1279,7 +1279,7 @@ function exportCurrentJS() {
 
     var ds = JS_EXPORT_DATASETS[currentProduct][currentTab];
 
-    // 行转换：对齐 import_csv.js buildTableDataset（\r 清除、补列、IMG 前缀、slice）
+    // 行转换（沿用原 buildTableDataset 规则）：\r 清除、补列、IMG 前缀、slice）
     var jsonData = data.map(function(row) {
         var r = [];
         for (var i = 0; i < ds.colCount; i++) r.push((row[i] || '').toString().replace(/\r/g, ''));
@@ -1289,7 +1289,7 @@ function exportCurrentJS() {
         return { Count: ds.colCount, value: r.slice(0, ds.colCount) };
     });
 
-    // 对齐 import_csv.js writeDataJs：每行 JSON，末行无逗号，/\n 分隔
+    // 输出规则（沿用原 writeDataJs）：每行 JSON，末行无逗号，/\n 分隔
     var lines = jsonData.map(function(item, i) {
         var line = JSON.stringify(item);
         return i < jsonData.length - 1 ? line + ',' : line;

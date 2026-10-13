@@ -1,7 +1,7 @@
 /**
  * ID-BOM 配件产品数据
  * 数据来源：id_accessory_data.csv（海康机器人配件产品清单）
- * 更新方式：修改 id_accessory_data.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var IDBOM_ACCESSORY_DATA = [
 {"Count":10,"value":["配件","电源","电源适配器(圆头)","ADS-26FSG-12 12024EPCN(圆头)(全球通中性)","310101855","适配器,ADS-26FSG-12 12024EPCN,国标,12V2A,Φ2.1","","PwID","0","ADS-26FSG"]},

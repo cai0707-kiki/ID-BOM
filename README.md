@@ -47,14 +47,13 @@ ID-BOM/
 │   └── PIC/                # 其他图片（QR码等）
 │       └── THUMB/          # 其他缩略图 120x120
 ├── pdf/                    # 产品动态关联PDF文档
-├── import_csv.js           # 构建脚本 — CSV → JS数据文件
 ├── resize.js               # 图片工具 — 缩略图生成 / 图片尺寸调整 / 自动分发
 ├── search-spec-url.py      # 工具脚本 — 从海康官网抓取产品链接
-├── id_camera_data.csv      # ID相机产品数据源（GBK编码，26列）
-├── id_accessory_data.csv   # ID配件产品数据源（GBK编码，10列）
+├── id_camera_data.csv      # ID相机产品数据源（26列，编辑器导出为UTF-8带BOM）
+├── id_accessory_data.csv   # ID配件产品数据源（10列，编辑器导出为UTF-8带BOM）
 ├── mapping.csv             # 基线型号 ↔ 经销型号映射
-├── product_updates.csv     # 产品动态数据源（GBK编码）
-├── vm_dongle_data.csv      # VM加密狗数据源（GBK编码，8列）
+├── product_updates.csv     # 产品动态数据源
+├── vm_dongle_data.csv      # VM加密狗数据源（8列）
 ├── package.json            # 项目依赖声明
 └── README.md               # 本文件
 ```
@@ -67,30 +66,20 @@ ID-BOM/
 
 ### 方式二：更新数据
 
-如果修改了CSV数据文件，需要重新生成JS数据文件：
+数据统一通过浏览器打开 `editor.html` 维护：
 
-```bash
-# 1. 安装依赖
-npm install
-
-# 2. 执行构建（CSV → JS数据文件）
-npm run build
-```
-
-构建脚本 `import_csv.js` 会：
-1. 读取 `id_camera_data.csv`、`id_accessory_data.csv`（GBK编码）
-2. 转换为JSON，生成JS数据文件
-3. 读取 `mapping.csv` 生成 `scripts/mapping_data.js`
-4. 读取 `product_updates.csv` 生成 `scripts/product_updates.js`
+1. 顶部选择产品（🔵ID / 🟢SC / 🔐VM / 📰产品动态），点击「导入」载入对应 CSV（也可直接编辑现有数据）
+2. 编辑、筛选、预览图片后，点击「导出JS」生成 `scripts/` 同名同格式的 JS 文件（如 `id_camera_data.js`）
+3. 将导出的 JS 文件覆盖放入 `scripts/` 目录，刷新 `index.html` 即生效
 
 ### 数据流
 
 ```
-id_camera_data.csv ──┐
-                     ├── import_csv.js ──→ scripts/*.js ←── index.html 加载
-id_accessory_data.csv┤
-mapping.csv ─────────┤
-product_updates.csv ─┘
+*.csv（可选，导入编辑器）
+        ↓
+editor.html（编辑 / 筛选 / 导入导出）
+        ↓ 导出JS
+scripts/*.js ←── index.html 加载
 ```
 
 ## 数据编辑器
@@ -103,8 +92,8 @@ product_updates.csv ─┘
 - VM产品的「支持模块」「备注」两列按主页规则纵向合并单元格（有值行合并下方连续空行，仅渲染层效果，导出CSV/JS仍为逐行数据）
 - 多行文本单元格按内容自动调整行高（合并单元格内的长文本完整显示，不会被截断）；产品动态「文档名称」列自动换行
 - 单元格编辑、下拉选择、批量删除
-- CSV导入 / 导出（相机/配件导出文件名带 `id_`/`sc_` 前缀；VM导出 `vm_dongle_data.csv`、产品动态导出 `product_updates.csv`，均可直接用于 `import_csv.js`）
-- JS导出（按当前产品+Tab 生成 `scripts/` 同格式同命名的 JS 文件，手动放入 `scripts/` 目录即可使用；VM/产品动态导出为对象数组格式）
+- CSV导入 / 导出（相机/配件导出文件名带 `id_`/`sc_` 前缀；VM导出 `vm_dongle_data.csv`、产品动态导出 `product_updates.csv`，均为 UTF-8 带 BOM，可再次导入编辑器）
+- JS导出（按当前产品+Tab 生成 `scripts/` 同格式同命名的 JS 文件，手动放入 `scripts/` 目录即可使用；VM/产品动态导出为对象数组格式）——这是更新 `scripts/` 数据文件的唯一方式
 - 图片缩略图预览（与主页一致）
 - 公告编辑
 - 修改结果保存到localStorage（ID/SC 分开存储，旧版单套数据自动视为 ID）

@@ -1,7 +1,7 @@
 /**
  * ID-BOM 相机产品数据
  * 数据来源：id_camera_data.csv（海康机器人相机产品清单）
- * 更新方式：修改 id_camera_data.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var IDBOM_CAMERA_DATA = [
 {"Count":26,"value":["ID系列","ID800系列","ID803系列U口","MV-ID803M-03S-WBN-SR-U(国内标配)","313201715","0.3MP，3.1m镜头，1颗暖白LED，标准距离120mm，USB型号","支持U口/串口线缆互换","","","Braket8E","0","10P10C-U","1","","","","","","","","","","","BZ3;EPE8E;M36","1;1;1","ID800M"]},

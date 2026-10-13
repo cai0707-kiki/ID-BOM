@@ -1,7 +1,7 @@
 /**
  * ID-BOM 产品动态数据
  * 数据来源：product_updates.csv（产品更新动态）
- * 更新方式：修改 product_updates.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var IDBOM_PRODUCT_UPDATES = [
 {"id":"1","date":"2026/8/10","productType":"ID产品","type":"市场策略","content":"2026年市场政策调整，将对经销型号IDA/IDB/IDC/IDE系列进行停产，仅保留一套命名规则，一个物料仅出一个渠道","series":"固定式","docName":"关于工业读码器部分型号停产及命名规则调整的公告通知.pdf","featured":"是"},
