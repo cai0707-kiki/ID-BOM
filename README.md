@@ -24,7 +24,7 @@
 ```
 ID-BOM/
 ├── index.html              # 主页面 — ID/SC BOM配单工具
-├── editor.html             # 数据编辑器 — 管理相机/配件数据
+├── editor.html             # 数据编辑器 — 管理相机/配件/VM/产品动态数据
 ├── scripts/                # JS数据与逻辑文件
 │   ├── id_camera_data.js       # ID相机产品数据
 │   ├── id_accessory_data.js    # ID配件产品数据
@@ -33,6 +33,7 @@ ID-BOM/
 │   ├── mapping_data.js         # 经销基线对照表
 │   ├── pda_data.js             # PDA智能移动终端选型数据
 │   ├── product_updates.js      # 产品动态数据
+│   ├── vm_dongle_data.js       # VM加密狗产品数据
 │   └── spec-mapping.js         # 产品型号 → 官网详情页 URL 映射
 ├── IMG/                    # 产品图片
 │   ├── ID_CAM/             # ID相机原图
@@ -53,6 +54,7 @@ ID-BOM/
 ├── id_accessory_data.csv   # ID配件产品数据源（GBK编码，10列）
 ├── mapping.csv             # 基线型号 ↔ 经销型号映射
 ├── product_updates.csv     # 产品动态数据源（GBK编码）
+├── vm_dongle_data.csv      # VM加密狗数据源（GBK编码，8列）
 ├── package.json            # 项目依赖声明
 └── README.md               # 本文件
 ```
@@ -95,12 +97,14 @@ product_updates.csv ─┘
 
 浏览器打开 `editor.html` 即可使用数据编辑器，支持：
 
-- ID / SC 产品顶部切换（按导入文件名前缀 `id_`/`sc_` 自动切换；无前缀文件导入时弹窗询问归属）
-- 相机数据 / 配件数据双Tab切换
-- 搜索过滤（型号、物料代码、描述）
+- 顶部四选一切换：🔵ID产品 / 🟢SC产品 / 🔐VM产品 / 📰产品动态（ID/SC 按钮显示相机数据行数，VM/产品动态显示各自行数；点击 VM/产品动态提示「已切换至…」；VM、产品动态为全局数据不分 ID/SC，选中时下方相机/配件子Tab条隐藏，点 ID/SC 自动回到相机子Tab）
+- 相机数据 / 配件数据 子Tab切换（按导入文件名前缀 `id_`/`sc_` 自动切换产品；无前缀文件导入时弹窗询问归属）
+- 搜索过滤（型号、物料代码、描述）+ 两级筛选：相机/配件按行对动态级联，VM 只保留「应用场景」单筛选，产品动态为固定选项（与主页一致）；有筛选时导出仍为全量数据并提示
+- VM产品的「支持模块」「备注」两列按主页规则纵向合并单元格（有值行合并下方连续空行，仅渲染层效果，导出CSV/JS仍为逐行数据）
+- 多行文本单元格按内容自动调整行高（合并单元格内的长文本完整显示，不会被截断）；产品动态「文档名称」列自动换行
 - 单元格编辑、下拉选择、批量删除
-- CSV导入 / 导出（导出文件名带 `id_`/`sc_` 前缀，可直接用于 `import_csv.js`）
-- JS导出（按当前产品+Tab 生成 `scripts/` 同格式同命名的 JS 文件，手动放入 `scripts/` 目录即可使用）
+- CSV导入 / 导出（相机/配件导出文件名带 `id_`/`sc_` 前缀；VM导出 `vm_dongle_data.csv`、产品动态导出 `product_updates.csv`，均可直接用于 `import_csv.js`）
+- JS导出（按当前产品+Tab 生成 `scripts/` 同格式同命名的 JS 文件，手动放入 `scripts/` 目录即可使用；VM/产品动态导出为对象数组格式）
 - 图片缩略图预览（与主页一致）
 - 公告编辑
 - 修改结果保存到localStorage（ID/SC 分开存储，旧版单套数据自动视为 ID）

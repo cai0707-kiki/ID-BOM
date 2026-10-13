@@ -9,8 +9,8 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f0f2f5;color:#333;height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
         .editor-header{background:#1e293b;color:white;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative}
-        .editor-header-left{display:flex;align-items:center;gap:12px}
-        .editor-title{font-size:18px;font-weight:700}.editor-title span{color:#f97316}
+        .editor-header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .editor-title{font-size:18px;font-weight:700}
         .editor-badge{background:#f97316;color:white;padding:2px 8px;border-radius:10px;font-size:12px}
         .product-switch{display:flex;background:#0f172a;border-radius:6px;padding:2px;gap:2px;margin-left:4px}
         .ps-btn{padding:4px 12px;border:none;border-radius:4px;background:transparent;color:#94a3b8;font-size:12px;cursor:pointer;transition:all .15s;font-family:inherit}
@@ -30,11 +30,15 @@
         .tab:hover{color:#f97316}.tab.active{color:#f97316;border-bottom-color:#f97316;font-weight:600}
         .tab-count{background:#f1f5f9;color:#64748b;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px}
         .tab.active .tab-count{background:#fff7ed;color:#f97316}
+        .ps-btn .tab-count{background:#1e293b;color:#cbd5e1;padding:1px 6px;border-radius:8px;font-size:11px;margin-left:4px}
+        .ps-btn.active .tab-count{background:rgba(255,255,255,.28);color:#fff}
         .toolbar{background:white;padding:8px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap}
         .toolbar-left{display:flex;align-items:center;gap:8px}
         .toolbar-right{display:flex;align-items:center;gap:8px}
         .search-box{padding:5px 10px;border:1px solid #e2e8f0;border-radius:4px;font-size:13px;width:220px}
         .search-box:focus{outline:none;border-color:#f97316}
+        .filter-select{padding:5px 6px;border:1px solid #e2e8f0;border-radius:4px;font-size:13px;background:#fff;max-width:150px;cursor:pointer}
+        .filter-select:focus{outline:none;border-color:#f97316}
         .stats-bar{font-size:12px;color:#64748b}.stats-bar strong{color:#1e293b}
         .table-container{flex:1 1 0%;min-height:0;min-width:0;overflow:auto;background:white}
         .data-editor-table{border-collapse:collapse;font-size:12px;table-layout:fixed;white-space:nowrap}
@@ -69,10 +73,11 @@
         font-size:12px;
         box-sizing:border-box;
         resize:vertical;
+        field-sizing:content;
         border: 1px solid transparent;
         border-radius: 3px;
         background: transparent;
-        transition: all 0.15s;}
+        transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;}
         .cell-textarea:hover {
             border-color: #e2e8f0;
         }
@@ -94,7 +99,6 @@
         .cell-combo:hover,.cell-input:hover{border-color:#e2e8f0}
         .cell-combo:focus,.cell-input:focus{outline:none;border-color:#f97316;background:white;box-shadow:0 0 0 2px rgba(249,115,22,.1)}
         .cell-combo.modified,.cell-input.modified{background:#fef3c7;border-color:#fbbf24}
-        .status-bar{background:#1e293b;color:#94a3b8;padding:4px 20px;font-size:12px;display:flex;justify-content:space-between;flex-shrink:0}
         .stats-bar .unsaved{color:#fbbf24}.stats-bar .saved{color:#10b981}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
         .modal-overlay.active{display:flex}
@@ -137,11 +141,12 @@
 <body>
     <div class="editor-header">
         <div class="editor-header-left">
-            <div class="editor-title"><span id="titleProduct">ID</span> · 数据编辑器</div>
-            <div class="editor-badge">BETA</div>
+            <div class="editor-title">数据编辑器</div>
             <div class="product-switch">
-                <button type="button" class="ps-btn active" data-p="id" onclick="switchProduct('id')">ID 产品</button>
-                <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">SC 产品</button>
+                <button type="button" class="ps-btn active" data-p="id" onclick="switchProduct('id')">🔵 ID 产品 <span class="tab-count" id="idCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">🟢 SC 产品 <span class="tab-count" id="scCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="vm" onclick="switchTab('vm')">🔐 VM产品 <span class="tab-count" id="vmCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="updates" onclick="switchTab('updates')">📰 产品动态 <span class="tab-count" id="updatesCount">0</span></button>
             </div>
         </div>
         <div class="editor-header-right">
@@ -159,6 +164,8 @@
         <div class="toolbar-left">
             <input type="text" class="search-box" id="searchBox" placeholder="搜索型号、物料代码、描述..." oninput="onSearch()">
             <button class="btn btn-outline btn-sm" onclick="clearSearch()">清除</button>
+            <select class="filter-select" id="filterCol1" onchange="renderTable()"></select>
+            <select class="filter-select" id="filterCol2" onchange="renderTable()"></select>
         </div>
         <div class="toolbar-right">
             <button class="btn btn-outline btn-sm" onclick="addRow()">➕ 添加行</button>
@@ -172,7 +179,6 @@
             <tbody id="editorBody"></tbody>
         </table>
     </div>
-    <div class="status-bar"><span id="statusLeft">就绪</span><span id="statusRight"></span></div>
     <input type="file" id="imgFileInput" accept="image/*" onchange="onImgFileSelected(event)">
 
     <!-- Import Modal -->
@@ -181,7 +187,7 @@
             <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
             <div class="modal-body" style="text-align:center">
                 <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
-                <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)" style="display:none">
+                <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)">
                 <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
             </div>
             <div class="modal-footer">
@@ -245,10 +251,65 @@ var COL_WIDTHS = {
 var CAMERA_COMBO_COLS = [1, 2];
 var ACCESSORY_COMBO_COLS = [1, 2];
 
+// ===== 全局数据集（不分 ID/SC）：VM产品、产品动态 =====
+var VM_HEADERS = ['应用场景', '加密狗名称', '代码(标配)', '代码(中间)', '软加密名称', '软加密代码', '支持模块', '备注'];
+var UPDATES_HEADERS = ['序号', '更新日期', '产品类型', '产品动态', '动态描述', '产品系列', '文档名称', '是否精选'];
+
+// ===== 数据集注册表 =====
+// scope:      'product' = 按 ID/SC 切换；'global' = 全局单份数据（dataStore[target]）
+// startCol:   渲染起始列（相机/配件 col0=数据分类 不渲染；新数据集从 col0 开始）
+// imgCol:     图片列索引，null 表示无图片列
+// filterCols/labels: 工具栏两个级联筛选下拉对应的列与文案
+// wrapCols:   多行文本列（渲染为 textarea）
+// newRowFirst: 新增行首列默认值（'autoId' = 产品动态序号自动 +1）
+var DATASETS = {
+    camera: {
+        scope: 'product', startCol: 1, headers: CAMERA_HEADERS, widths: COL_WIDTHS.camera,
+        comboCols: CAMERA_COMBO_COLS, filterCols: [1, 2], filterLabels: ['产品大类', '产品系列'],
+        fixedCols: [1, 2, 3], wrapCols: [3, 5, 6], imgCol: IMG_COL_CAMERA,
+        newRowFirst: '相机'
+    },
+    accessory: {
+        scope: 'product', startCol: 1, headers: ACCESSORY_HEADERS, widths: COL_WIDTHS.accessory,
+        comboCols: ACCESSORY_COMBO_COLS, filterCols: [1, 2], filterLabels: ['配件类别', '产品系列'],
+        fixedCols: [1, 2, 3], wrapCols: [3, 5, 6], imgCol: IMG_COL_ACCESSORY,
+        newRowFirst: '配件'
+    },
+    vm: {
+        scope: 'global', startCol: 0, headers: VM_HEADERS,
+        widths: { 0: 130, 1: 168, 2: 100, 3: 100, 4: 150, 5: 110, 6: 320, 7: 320 },
+        comboCols: [0], filterCols: [0], filterLabels: ['应用场景'],
+        fixedCols: [], wrapCols: [6, 7], imgCol: null,
+        mergeCols: [6, 7], // 支持模块/备注：有值行向下合并连续空行（与主页一致，仅影响渲染，不影响导出）
+        newRowFirst: '',
+        keys: ['scene', 'name', 'codeStd', 'codeNeu', 'swName', 'swCode', 'modules', 'remark'],
+        csvFile: 'vm_dongle_data.csv', jsFile: 'vm_dongle_data.js', jsVar: 'VM_DONGLE_DATA',
+        jsDescription: 'VM 加密狗产品数据\n * 数据来源：vm_dongle_data.csv（VisionMaster 加密狗/软加密清单）\n * 更新方式：修改 vm_dongle_data.csv 后运行 `node import_csv.js`'
+    },
+    updates: {
+        scope: 'global', startCol: 0, headers: UPDATES_HEADERS,
+        widths: { 0: 52, 1: 92, 2: 92, 3: 92, 4: 340, 5: 116, 6: 220, 7: 66 },
+        comboCols: [2, 3], filterCols: [2, 3], filterLabels: ['产品类型', '产品动态'],
+        // 两个筛选下拉为固定内容（与主页一致），不随数据动态生成、不级联
+        filterOptions: [
+            ['ID产品', 'SC产品', 'VM产品'],
+            ['市场策略', '产品发布', '产品迭代', '产品退市', '客户端更新', '固件更新']
+        ],
+        fixedCols: [0], wrapCols: [4, 6], imgCol: null,
+        newRowFirst: 'autoId',
+        keys: ['id', 'date', 'productType', 'type', 'content', 'series', 'docName', 'featured'],
+        csvFile: 'product_updates.csv', jsFile: 'product_updates.js', jsVar: 'IDBOM_PRODUCT_UPDATES',
+        jsDescription: 'ID-BOM 产品动态数据\n * 数据来源：product_updates.csv（产品更新动态）\n * 更新方式：修改 product_updates.csv 后运行 `node import_csv.js`'
+    }
+};
+var GLOBAL_TABS = ['vm', 'updates'];
+function isGlobalTab(t) { return GLOBAL_TABS.indexOf(t) >= 0; }
+
 // ==================== State ====================
 var currentTab = 'camera';
 var currentProduct = 'id'; // 'id' | 'sc'
-var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] } };
+// id/sc 为产品维度数据；vm/updates 为全局数据集（对象行以二维数组存储，列序 = DATASETS[tab].keys/headers）
+var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] }, vm: [], updates: [] };
 var cameraData = dataStore.id.camera;
 var accessoryData = dataStore.id.accessory;
 var filteredIndices = [];
@@ -256,6 +317,9 @@ var selectedRows = {};
 var modifiedCells = {};
 var imgUploadTarget = null; // { type, idx }
 var deleteSnapshot = null; // 单行删除弹窗打开前的选区快照（取消时恢复）
+
+function getDS() { return DATASETS[currentTab]; }
+function getDataForTab(t) { return isGlobalTab(t) ? dataStore[t] : dataStore[currentProduct][t]; }
 
 // ==================== Init ====================
 function init() {
@@ -276,6 +340,8 @@ function loadInitialData() {
                     var b = d.store[p] || {};
                     dataStore[p] = { camera: b.camera || [], accessory: b.accessory || [] };
                 });
+                dataStore.vm = d.store.vm || [];
+                dataStore.updates = d.store.updates || [];
                 currentProduct = d.currentProduct === 'sc' ? 'sc' : 'id';
             } else {
                 // 旧格式单套数据 → 视为 ID 产品
@@ -302,40 +368,42 @@ function loadInitialData() {
         });
     });
 
+    // 全局数据集：按表头补齐列
+    GLOBAL_TABS.forEach(function(t) {
+        var len = DATASETS[t].headers.length;
+        (dataStore[t] || []).forEach(function(r) { while (r.length < len) r.push(''); });
+    });
+
     cameraData = dataStore[currentProduct].camera;
     accessoryData = dataStore[currentProduct].accessory;
 }
 
 // ==================== Dropdown Cache ====================
-var cameraDropdownCache = {};
-var accessoryDropdownCache = {};
+// 每个 tab 独立缓存；列序 = DATASETS[tab].headers
+var dropdownCaches = { camera: {}, accessory: {}, vm: {}, updates: {} };
 
 function rebuildDropdownCache() {
-    cameraDropdownCache = buildDropdownCache(cameraData, CAMERA_HEADERS.length);
-    accessoryDropdownCache = buildDropdownCache(accessoryData, ACCESSORY_HEADERS.length);
+    Object.keys(DATASETS).forEach(function(t) {
+        dropdownCaches[t] = buildDropdownCache(getDataForTab(t), DATASETS[t].headers.length, DATASETS[t].startCol);
+    });
 }
 
-function buildDropdownCache(data, colCount) {
+function buildDropdownCache(data, colCount, startCol) {
     var cache = {};
-    for (var c = 1; c < colCount; c++) { // 列0不渲染，无需下拉缓存
+    for (var c = startCol; c < colCount; c++) {
         var seen = {};
         var list = [];
         data.forEach(function(row) {
             var v = (row[c] || '').toString().trim();
             if (v && !seen[v]) { seen[v] = true; list.push(v); }
         });
-        list.sort();
         cache[c] = list;
     }
     return cache;
 }
 
 function getDropdownCache() {
-    return currentTab === 'camera' ? cameraDropdownCache : accessoryDropdownCache;
-}
-
-function getComboCols() {
-    return currentTab === 'camera' ? CAMERA_COMBO_COLS : ACCESSORY_COMBO_COLS;
+    return dropdownCaches[currentTab];
 }
 
 function updateDropdownValue(colIdx, newVal) {
@@ -343,8 +411,69 @@ function updateDropdownValue(colIdx, newVal) {
     if (!cache[colIdx]) cache[colIdx] = [];
     if (newVal && cache[colIdx].indexOf(newVal) < 0) {
         cache[colIdx].push(newVal);
-        cache[colIdx].sort();
+        // 选项变了，作废 datalist HTML 记忆，否则新值要等切 Tab 才会出现在下拉里
+        datalistMemo.cache = null;
     }
+}
+
+// ==================== Filter (col1/col2 cascade) ====================
+function refreshFilterOptions() {
+    var sel1 = document.getElementById('filterCol1');
+    var sel2 = document.getElementById('filterCol2');
+    if (!sel1 || !sel2) return;
+    var ds = getDS();
+    var labels = ds.filterLabels;
+    var data = getData();
+    var cache = getDropdownCache();
+    var fc1 = ds.filterCols[0], fc2 = ds.filterCols[1];
+
+    var cur1 = sel1.value;
+    // 固定内容筛选（产品动态）：选项写死，不随数据/级联变化
+    var fixed1 = ds.filterOptions ? ds.filterOptions[0] : null;
+    var list1 = fixed1 || cache[fc1] || [];
+    if (cur1 && list1.indexOf(cur1) < 0) cur1 = '';
+    var opts1 = '<option value="">全部（' + escH(labels[0]) + '）</option>';
+    list1.forEach(function(v) { opts1 += '<option value="' + escH(v) + '">' + escH(v) + '</option>'; });
+    if (sel1.__optHtml !== opts1) { sel1.innerHTML = opts1; sel1.__optHtml = opts1; }
+    sel1.value = cur1;
+
+    // 只配一个筛选列时（VM 只按应用场景），隐藏并清空第二个筛选
+    if (fc2 === undefined || fc2 === null) {
+        sel2.style.display = 'none';
+        sel2.value = '';
+        sel2.innerHTML = '';
+        sel2.__optHtml = '';
+        return;
+    }
+    if (sel2.style.display === 'none') sel2.style.display = '';
+
+    var list2 = [];
+    if (ds.filterOptions) {
+        list2 = ds.filterOptions[1];
+    } else if (cur1) {
+        // col2 级联：选了 col1 时从匹配行对动态推导（col2 可跨多个 col1，不能用静态树）
+        var seen = {};
+        data.forEach(function(row) {
+            var a = (row[fc1] || '').toString().trim();
+            var b = (row[fc2] || '').toString().trim();
+            if (a === cur1 && b && !seen[b]) { seen[b] = true; list2.push(b); }
+        });
+    } else {
+        list2 = (cache[fc2] || []).slice();
+    }
+    var cur2 = sel2.value;
+    if (cur2 && list2.indexOf(cur2) < 0) cur2 = '';
+    var opts2 = '<option value="">全部（' + escH(labels[1]) + '）</option>';
+    list2.forEach(function(v) { opts2 += '<option value="' + escH(v) + '">' + escH(v) + '</option>'; });
+    if (sel2.__optHtml !== opts2) { sel2.innerHTML = opts2; sel2.__optHtml = opts2; }
+    sel2.value = cur2;
+}
+
+function isFilterActive() {
+    var s = document.getElementById('searchBox');
+    var f1 = document.getElementById('filterCol1');
+    var f2 = document.getElementById('filterCol2');
+    return !!((s && s.value.trim()) || (f1 && f1.value) || (f2 && f2.value));
 }
 
 // ==================== Tab ====================
@@ -352,32 +481,54 @@ function resetViewState() {
     selectedRows = {};
     modifiedCells = {};
     document.getElementById('searchBox').value = '';
+    var f1 = document.getElementById('filterCol1');
+    var f2 = document.getElementById('filterCol2');
+    if (f1) f1.value = '';
+    if (f2) f2.value = '';
 }
 
-function switchTab(tab) {
+function switchTab(tab, opts) {
     currentTab = tab;
-    document.querySelectorAll('.tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === tab);
-    });
+    syncTabUI();
+    updateProductUI();
     resetViewState();
     renderTable();
     updateStats();
-}
-
-// ==================== Product Switch ====================
-function updateProductUI() {
-    document.getElementById('titleProduct').textContent = currentProduct.toUpperCase();
-    var btns = document.querySelectorAll('.ps-btn');
-    for (var i = 0; i < btns.length; i++) {
-        btns[i].classList.toggle('active', btns[i].dataset.p === currentProduct);
+    // opts.silent：程序化切换（如导入完成后）不再弹「已切换至」，避免和结果提示叠播
+    if (!opts || !opts.silent) {
+        if (tab === 'vm') showToast('已切换至 VM产品', 'success');
+        else if (tab === 'updates') showToast('已切换至 产品动态', 'success');
     }
 }
 
+function syncTabUI() {
+    document.querySelectorAll('.tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === currentTab);
+    });
+}
+
+// ==================== Product Switch ====================
+// 顶部切换含 4 项：ID产品 / SC产品 / VM产品 / 产品动态
+// 全局数据集（VM/产品动态）激活时隐藏相机/配件子Tab条
+function updateProductUI() {
+    var global = isGlobalTab(currentTab);
+    var activeKey = global ? currentTab : currentProduct;
+    var btns = document.querySelectorAll('.ps-btn');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle('active', btns[i].dataset.p === activeKey);
+    }
+    var tabBar = document.querySelector('.tab-bar');
+    if (tabBar) tabBar.style.display = global ? 'none' : '';
+}
+
 function switchProduct(p) {
-    if (p === currentProduct) return;
+    // 从全局数据集切回时，同产品也要切回相机/配件子Tab
+    if (p === currentProduct && !isGlobalTab(currentTab)) return;
     currentProduct = p;
     cameraData = dataStore[p].camera;
     accessoryData = dataStore[p].accessory;
+    if (isGlobalTab(currentTab)) currentTab = 'camera';
+    syncTabUI();
     resetViewState();
     updateProductUI();
     rebuildDropdownCache();
@@ -388,25 +539,54 @@ function switchProduct(p) {
 }
 
 // ==================== Render Table ====================
-function getHeaders() { return currentTab === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS; }
-function getData() { return currentTab === 'camera' ? cameraData : accessoryData; }
-function getImgColIdx() { return currentTab === 'camera' ? IMG_COL_CAMERA : IMG_COL_ACCESSORY; }
+function getHeaders() { return getDS().headers; }
+function getData() { return getDataForTab(currentTab); }
+function getImgColIdx() { return getDS().imgCol; }
+
+// 与主页 computeRowspan 相同：有值行 rowspan = 1 + 后续连续空行数；空行 rowspan = 0（不渲染）；
+// 开头连续空行各自 rowspan = 1，单独渲染空单元格避免列错位
+function computeRowspan(vals) {
+    var spans = new Array(vals.length);
+    for (var k = 0; k < spans.length; k++) spans[k] = 0;
+    var i = 0;
+    while (i < vals.length && vals[i] === '') { spans[i] = 1; i++; }
+    for (; i < vals.length; i++) {
+        if (vals[i] === '') continue;
+        var span = 1;
+        for (var j = i + 1; j < vals.length && vals[j] === ''; j++) span++;
+        spans[i] = span;
+    }
+    return spans;
+}
+
+// datalist HTML 记忆（renderTable 每次渲染都要注入，数据没变就复用）
+var datalistMemo = { cache: null, html: '' };
 
 function renderTable() {
-    var headers = getHeaders();
+    var ds = getDS();
+    var headers = ds.headers;
     var data = getData();
-    var comboCols = getComboCols();
+    var comboCols = ds.comboCols;
     var cache = getDropdownCache();
-    var imgCol = getImgColIdx();
-    var fixedCols = [1, 2, 3];
+    var imgCol = ds.imgCol; // null = 无图片列（VM/产品动态）
+    var startCol = ds.startCol;
+    var fixedCols = ds.fixedCols;
+    var wrapCols = ds.wrapCols;
     var fixedClasses = ['col-f1','col-f2','col-f3'];
 
+    refreshFilterOptions();
     var search = document.getElementById('searchBox').value.toLowerCase().trim();
+    var f1 = document.getElementById('filterCol1').value;
+    var f2 = document.getElementById('filterCol2').value;
+    var fc1 = ds.filterCols[0], fc2 = ds.filterCols[1];
     filteredIndices = [];
     for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        if (f1 && (row[fc1] || '').toString().trim() !== f1) continue;
+        if (f2 && fc2 != null && (row[fc2] || '').toString().trim() !== f2) continue;
         if (!search) { filteredIndices.push(i); continue; }
-        for (var j = 0; j < data[i].length; j++) {
-            if (data[i][j] && String(data[i][j]).toLowerCase().indexOf(search) >= 0) {
+        for (var j = 0; j < row.length; j++) {
+            if (row[j] && String(row[j]).toLowerCase().indexOf(search) >= 0) {
                 filteredIndices.push(i); break;
             }
         }
@@ -416,24 +596,25 @@ function renderTable() {
     var th = '<tr>';
     th += '<th class="col-fixed col-num">#</th>';
     th += '<th class="col-fixed col-act"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>';
-    var cw = COL_WIDTHS[currentTab] || {};
+    var cw = ds.widths || {};
     // 粘性列偏移：序号列36 + 操作列72，随后各固定列按当前 tab 列宽累加
     var stickyBase = 36 + 72;
     var sticky = { f1: stickyBase };
-    sticky.f2 = sticky.f1 + (cw[1] || 0);
-    sticky.f3 = sticky.f2 + (cw[2] || 0);
+    sticky.f2 = sticky.f1 + (cw[fixedCols[0]] || 0);
+    sticky.f3 = sticky.f2 + (cw[fixedCols[1]] || 0);
     var tableEl = document.getElementById('editorTable');
     tableEl.style.setProperty('--sticky-f1', sticky.f1 + 'px');
     tableEl.style.setProperty('--sticky-f2', sticky.f2 + 'px');
     tableEl.style.setProperty('--sticky-f3', sticky.f3 + 'px');
-    for (var c = 1; c < headers.length; c++) {
-        var isFixed = fixedCols.indexOf(c) >= 0;
+    for (var c = startCol; c < headers.length; c++) {
+        var fixIdx = fixedCols.indexOf(c);
+        var isFixed = fixIdx >= 0;
         var w = cw[c];
-        var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-auto';
+        var cls = isFixed ? 'col-fixed ' + fixedClasses[fixIdx] : 'col-auto';
         var style = w ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
         th += '<th class="' + cls + '"' + style + '>' + headers[c] + '</th>';
-        // 在 col3（具体型号/物料名称）之后插入图片列头
-        if (c === IMG_INSERT_AFTER) {
+        // 图片列头：仅产品数据集，在第3列（具体型号/物料名称）之后插入
+        if (imgCol != null && c === IMG_INSERT_AFTER) {
             th += '<th class="col-img" style="width:72px;min-width:72px">图片</th>';
         }
     }
@@ -442,25 +623,44 @@ function renderTable() {
 
     // 计算表格最小宽度
     var totalW = 36 + 72;
-    for (var c = 1; c < headers.length; c++) {
+    for (var c = startCol; c < headers.length; c++) {
         var w = cw[c];
         totalW += w ? w : 80;
-        if (c === IMG_INSERT_AFTER) totalW += 72;
+        if (imgCol != null && c === IMG_INSERT_AFTER) totalW += 72;
     }
     tableEl.style.width = totalW + 'px';
 
     // ===== Datalists =====
-    var datalists = '';
-    comboCols.forEach(function(ci) {
-        var items = cache[ci] || [];
-        datalists += '<datalist id="dl_' + ci + '">';
-        items.forEach(function(v) { datalists += '<option value="' + escH(v) + '">'; });
-        datalists += '</datalist>';
-    });
+    // 按 dropdownCache 对象缓存 HTML：缓存对象只在 rebuildDropdownCache 时被整体替换，
+    // 数据没变就不用每次重绘都重新拼接/解析几千个 <option>（688 行 × 2 列）
+    var datalists;
+    if (datalistMemo.cache === cache) {
+        datalists = datalistMemo.html;
+    } else {
+        datalists = '';
+        comboCols.forEach(function(ci) {
+            var items = cache[ci] || [];
+            datalists += '<datalist id="dl_' + ci + '">';
+            items.forEach(function(v) { datalists += '<option value="' + escH(v) + '">'; });
+            datalists += '</datalist>';
+        });
+        datalistMemo.cache = cache;
+        datalistMemo.html = datalists;
+    }
 
     // ===== Body =====
+    // 单元格合并（与主页 computeRowspan 一致）：有值行向下合并连续空行；
+    // 开头连续空行各自 rowspan=1 单独渲染，避免列错位。仅影响渲染，数据/导出不变。
+    var mergeCols = ds.mergeCols || [];
+    var mergeSpans = {};
+    mergeCols.forEach(function(mc) {
+        mergeSpans[mc] = computeRowspan(filteredIndices.map(function(fi) {
+            return (data[fi][mc] || '').toString().trim();
+        }));
+    });
+
     var bhtml = '';
-    filteredIndices.forEach(function(idx) {
+    filteredIndices.forEach(function(idx, pos) {
         var row = data[idx];
         var chk = selectedRows[idx] ? 'checked' : '';
         bhtml += '<tr data-idx="' + idx + '">';
@@ -471,30 +671,34 @@ function renderTable() {
         bhtml += '<button class="btn-row del" onclick="deleteSingleRow(' + idx + ')" title="删除">✕</button>';
         bhtml += '</td>';
 
-        for (var c = 1; c < headers.length; c++) {
+        for (var c = startCol; c < headers.length; c++) {
+            var span = mergeSpans[c] ? mergeSpans[c][pos] : 1;
+            if (span === 0) continue; // 该单元格已并入上方行，不渲染
+            var rowspanAttr = span > 1 ? ' rowspan="' + span + '"' : '';
             var val = (row[c] || '').toString().trim();
             var ck = idx + '_' + c;
             var mc = modifiedCells[ck] ? ' modified' : '';
-            var isFixed = fixedCols.indexOf(c) >= 0;
+            var fixIdx = fixedCols.indexOf(c);
+            var isFixed = fixIdx >= 0;
             var w = cw[c];
-            var cls = isFixed ? 'col-fixed ' + fixedClasses[fixedCols.indexOf(c)] : 'col-auto';
-            // 多行列：第3、5、6列
-            if (c === 3 || c === 5 || c === 6) cls += ' col-wrap';
+            var cls = isFixed ? 'col-fixed ' + fixedClasses[fixIdx] : 'col-auto';
+            if (wrapCols.indexOf(c) >= 0) cls += ' col-wrap';
             var style = w ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
+            var colAttr = ' data-col="' + c + '"';
 
             if (comboCols.indexOf(c) >= 0) {
                 // 组合框（单行输入框 + datalist）
-                bhtml += '<td class="' + cls + '"' + style + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
-            } else if (c === 3 || c === 5 || c === 6) {
+                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+            } else if (wrapCols.indexOf(c) >= 0) {
                 // 多行文本列 → textarea
-                bhtml += '<td class="' + cls + '"' + style + '><textarea class="cell-textarea' + mc + '" rows="2" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
+                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><textarea class="cell-textarea' + mc + '" rows="2" oninput="autoGrow(this)" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
             } else {
                 // 普通单行输入框
-                bhtml += '<td class="' + cls + '"' + style + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             }
 
-            // ===== 图片缩略图列（在第3列之后插入） =====
-            if (c === IMG_INSERT_AFTER) {
+            // ===== 图片缩略图列（在第3列之后插入，仅产品数据集） =====
+            if (imgCol != null && c === IMG_INSERT_AFTER) {
                 var imgVal = (row[imgCol] || '').toString().trim().replace(/\r/g, '');
                 var imgPrefix = (currentProduct === 'sc' ? 'SC_' : 'ID_') + (currentTab === 'camera' ? 'CAM/' : 'ACC/');
                 var imgKey = imgVal ? (imgVal.indexOf('/') >= 0 ? imgVal : imgPrefix + imgVal) : '';
@@ -527,6 +731,39 @@ function renderTable() {
     document.getElementById('totalCount').textContent = data.length;
     document.getElementById('cameraCount').textContent = cameraData.length;
     document.getElementById('accessoryCount').textContent = accessoryData.length;
+    document.getElementById('vmCount').textContent = dataStore.vm.length;
+    document.getElementById('updatesCount').textContent = dataStore.updates.length;
+    document.getElementById('idCount').textContent = dataStore.id.camera.length;
+    document.getElementById('scCount').textContent = dataStore.sc.camera.length;
+    autoGrowAll();
+}
+
+// 浏览器原生支持 field-sizing（Chrome/Edge 123+）时，文本域高度由浏览器自适应，无需 JS 测量
+function fieldSizingNative() {
+    try {
+        return typeof CSS !== 'undefined' && !!CSS.supports && CSS.supports('field-sizing', 'content');
+    } catch (e) { return false; }
+}
+
+// 文本域按内容自适应行高，保证合并单元格/长文本完整显示
+function autoGrow(ta) {
+    if (!ta || !ta.tagName || String(ta.tagName).toUpperCase() !== 'TEXTAREA') return;
+    if (fieldSizingNative()) return;
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
+}
+
+// 批量自适应：先统一置 auto，再一次性读 scrollHeight，最后统一写高度 —— 只触发一次布局。
+// 逐元素「写→读→写」每次读都会强制同步重排（相机数据 688 行 × 3 列 ≈ 2064 个文本域，
+// 约 4000 次全表重排，实测单次渲染从 73ms 恶化到 ~2000ms），界面会卡死。
+function autoGrowAll() {
+    var list = document.querySelectorAll('#editorBody textarea');
+    if (!list.length || fieldSizingNative()) return;
+    var i;
+    for (i = 0; i < list.length; i++) list[i].style.height = 'auto';
+    var hs = new Array(list.length);
+    for (i = 0; i < list.length; i++) hs[i] = list[i].scrollHeight;
+    for (i = 0; i < list.length; i++) list[i].style.height = hs[i] + 'px';
 }
 
 function updateStats() {
@@ -553,6 +790,8 @@ function onCellChange(rowIdx, colIdx, input) {
         modifiedCells[ck] = true;
         input.classList.add('modified');
         updateDropdownValue(colIdx, newV);
+        var fc = getDS().filterCols;
+        if (colIdx === fc[0] || colIdx === fc[1]) refreshFilterOptions();
         autoSave();
     } else {
         delete modifiedCells[ck];
@@ -562,7 +801,12 @@ function onCellChange(rowIdx, colIdx, input) {
 }
 
 // ==================== Selection ====================
-function toggleRow(idx) { selectedRows[idx] ? delete selectedRows[idx] : (selectedRows[idx] = true); }
+function toggleRow(idx) {
+    selectedRows[idx] ? delete selectedRows[idx] : (selectedRows[idx] = true);
+    // 行勾选变化时同步表头全选框，否则状态会陈旧（toggleSelectAll/closeDeleteModal 之外的第三条路径）
+    var sa = document.getElementById('selectAll');
+    if (sa) sa.checked = filteredIndices.length > 0 && filteredIndices.every(function(i) { return !!selectedRows[i]; });
+}
 function toggleSelectAll() {
     var chk = document.getElementById('selectAll').checked;
     filteredIndices.forEach(function(i) { chk ? (selectedRows[i] = true) : delete selectedRows[i]; });
@@ -575,14 +819,32 @@ function toggleSelectAll() {
 function addRow() {
     var data = getData();
     var headers = getHeaders();
-    var newRow = headers.map(function(_, i) { return i === 0 ? (currentTab === 'camera' ? '相机' : '配件') : ''; });
+    var ds = getDS();
+    var newRow;
+    if (ds.newRowFirst === 'autoId') {
+        // 产品动态：序号 = 现有最大数字 + 1
+        var max = 0;
+        data.forEach(function(r) { var n = parseInt(r[0], 10); if (n > max) max = n; });
+        newRow = headers.map(function() { return ''; });
+        newRow[0] = String(max + 1);
+    } else {
+        newRow = headers.map(function(_, i) { return i === 0 ? (ds.newRowFirst || '') : ''; });
+    }
     data.push(newRow);
+    var f1 = document.getElementById('filterCol1');
+    var f2 = document.getElementById('filterCol2');
+    var sb = document.getElementById('searchBox');
+    var hadFilter = !!((sb && sb.value) || (f1 && f1.value) || (f2 && f2.value));
+    // 搜索关键字也要清掉：否则新行可能被过滤掉、滚到底也看不见
+    if (sb) sb.value = '';
+    if (f1) f1.value = '';
+    if (f2) f2.value = '';
     rebuildDropdownCache();
     renderTable();
     autoSave();
     var ct = document.getElementById('tableContainer');
     ct.scrollTop = ct.scrollHeight;
-    showToast('已添加新行', 'success');
+    showToast(hadFilter ? '已添加新行（筛选已重置）' : '已添加新行', 'success');
 }
 
 function copyRow(idx) {
@@ -655,8 +917,23 @@ function closeDeleteModal() {
 }
 
 // ==================== Search ====================
-function onSearch() { renderTable(); }
-function clearSearch() { document.getElementById('searchBox').value = ''; renderTable(); }
+var searchTimer = null;
+function onSearch() {
+    // 防抖：搜索是 oninput 触发，逐键全量重绘 688 行表格会有明显卡顿
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(function() {
+        searchTimer = null;
+        renderTable();
+    }, 120);
+}
+function clearSearch() {
+    document.getElementById('searchBox').value = '';
+    var f1 = document.getElementById('filterCol1');
+    var f2 = document.getElementById('filterCol2');
+    if (f1) f1.value = '';
+    if (f2) f2.value = '';
+    renderTable();
+}
 
 // ==================== 图片上传 / 预览 ====================
 function triggerImgUpload(type, idx) {
@@ -751,9 +1028,10 @@ function onFileSelected(e) {
                 if (en.ambIdx >= 0) {
                     return '❓ ' + escH(en.fname) + ' · ' + en.count + ' 行 · 归属 <select onchange="assignAmbiguous(' + en.ambIdx + ',this.value)"><option value="">请选择</option><option value="id">ID 产品</option><option value="sc">SC 产品</option></select>';
                 }
-                var prodLabel = en.slot ? en.slot.split('_')[0].toUpperCase() + ' · ' : '';
+                var prodLabel = en.slot && en.slot.indexOf('_') > 0 ? en.slot.split('_')[0].toUpperCase() + ' · ' : '';
                 var dupNote = en.slot && slotCount[en.slot] > 1 ? ' <span style="color:#b91c1c">⚠ 同目标多文件，仅保留最后完成解析的一份</span>' : '';
-                return prodLabel + (en.target === 'camera' ? '📷 相机' : '🔧 配件') + ' · ' + escH(en.fname) + ' · ' + en.count + ' 行' + dupNote;
+                var targetLabel = en.target === 'camera' ? '📷 相机' : (en.target === 'accessory' ? '🔧 配件' : (en.target === 'vm' ? '🔐 VM产品' : '📰 产品动态'));
+                return prodLabel + targetLabel + ' · ' + escH(en.fname) + ' · ' + en.count + ' 行' + dupNote;
             });
             var infoEl = document.getElementById('importInfo');
             infoEl.innerHTML = infoLines.join('<br>') || '未识别到可导入的数据';
@@ -801,6 +1079,8 @@ function readFile(file, callback) {
             parseAndStore(text, fname, callback);
         }
     };
+    // 首次读取失败也要回调，否则 onFileSelected 的 remaining 永远不归零，导入框会一直卡住
+    reader.onerror = function() { callback(null, 0, fname); };
     reader.readAsText(file, 'utf-8');
 }
 
@@ -808,18 +1088,26 @@ function parseAndStore(text, fname, callback) {
     var rows = parseCSV(text);
     if (!rows.length) { callback(null, 0, fname); return; }
     var target = '';
-    if (fname.indexOf('camera') >= 0) target = 'camera';
+    // 全局数据集：按文件名识别（无产品归属）
+    if (fname.indexOf('vm_dongle') >= 0 || fname.indexOf('vm_') >= 0) target = 'vm';
+    else if (fname.indexOf('product_updates') >= 0) target = 'updates';
+    else if (fname.indexOf('camera') >= 0) target = 'camera';
     else if (fname.indexOf('accessory') >= 0) target = 'accessory';
     var first = rows[0];
     if (first.length > 0) {
         var fc = first[0].toLowerCase().replace(/^\ufeff/, '');
-        if (fc.indexOf('\u6570\u636e\u5206\u7c7b') >= 0 || fc.indexOf('\u4ea7\u54c1\u5927\u7c7b') >= 0 || fc.indexOf('\u914d\u4ef6\u7c7b\u522b') >= 0) rows = rows.slice(1);
+        if (fc.indexOf('数据分类') >= 0 || fc.indexOf('产品大类') >= 0 || fc.indexOf('配件类别') >= 0) rows = rows.slice(1);
     }
     if (!target) {
         for (var i = 0; i < Math.min(10, rows.length); i++) {
-            if (rows[i][0] && rows[i][0].trim() === '\u76f8\u673a') { target = 'camera'; break; }
-            if (rows[i][0] && rows[i][0].trim() === '\u914d\u4ef6') { target = 'accessory'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '相机') { target = 'camera'; break; }
+            if (rows[i][0] && rows[i][0].trim() === '配件') { target = 'accessory'; break; }
         }
+    }
+    // 表头行识别（全局数据集首行 = 表头）
+    if (target && isGlobalTab(target) && rows.length && rows[0][0] &&
+        rows[0][0].replace(/^\ufeff/, '').trim() === DATASETS[target].headers[0]) {
+        rows = rows.slice(1);
     }
     if (!target) target = (first.length >= 20) ? 'camera' : 'accessory';
 
@@ -828,7 +1116,7 @@ function parseAndStore(text, fname, callback) {
     if (fname.indexOf('id_') === 0) prod = 'id';
     else if (fname.indexOf('sc_') === 0) prod = 'sc';
 
-    var headers = target === 'camera' ? CAMERA_HEADERS : ACCESSORY_HEADERS;
+    var headers = DATASETS[target].headers;
     var expectedCols = headers.length;
     var normalized = rows.map(function(r) {
         var nr = [];
@@ -837,6 +1125,13 @@ function parseAndStore(text, fname, callback) {
     }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
     // IMG 列保持原样，不添加前缀
     if (normalized.length === 0) { callback(null, 0, fname); return; }
+
+    // 全局数据集无产品归属歧义：slot 即 tab 名
+    if (isGlobalTab(target)) {
+        pendingImports[target] = normalized;
+        callback(target, normalized.length, fname, target, -1);
+        return;
+    }
 
     if (!prod) {
         var ambIdx = ambiguousFiles.length;
@@ -862,8 +1157,16 @@ function confirmImport() {
     if (!keys.length) return;
 
     var productsTouched = {};
+    var globalTouched = {};
     var imported = [];
     keys.forEach(function(k) {
+        if (isGlobalTab(k)) {
+            // 全局数据集：slot 即 tab 名（vm / updates）
+            dataStore[k] = batch[k];
+            globalTouched[k] = true;
+            imported.push((k === 'vm' ? 'VM产品' : '产品动态') + ' ' + batch[k].length + ' 行');
+            return;
+        }
         var parts = k.split('_');
         var p = parts[0], t = parts[1];
         dataStore[p][t] = batch[k];
@@ -883,8 +1186,11 @@ function confirmImport() {
     modifiedCells = {}; selectedRows = {};
     rebuildDropdownCache();
     closeImportModal();
-    var showTab = (batch[currentProduct + '_camera'] || !batch[currentProduct + '_accessory']) ? 'camera' : 'accessory';
-    switchTab(showTab);
+    var gl = Object.keys(globalTouched);
+    var showTab;
+    if (gl.length && !prods.length) showTab = gl[0];
+    else showTab = (batch[currentProduct + '_camera'] || !batch[currentProduct + '_accessory']) ? 'camera' : 'accessory';
+    switchTab(showTab, { silent: true });
     autoSave();
     showToast('成功导入 ' + imported.join('，'), 'success');
     pendingImports = {};
@@ -893,6 +1199,7 @@ function confirmImport() {
 
 // ==================== CSV Export ====================
 function exportCurrentCSV() {
+    flushPendingEdits(); // 与 JS 导出一致：未失焦的编辑也要进 CSV
     var headers = getHeaders();
     var data = getData();
     var imgCol = getImgColIdx();
@@ -910,9 +1217,11 @@ function exportCurrentCSV() {
         }
         csv += line.join(',') + '\n';
     });
-    var fname = currentProduct + '_' + (currentTab === 'camera' ? 'camera' : 'accessory') + '_data.csv';
+    var ds = getDS();
+    var fname = isGlobalTab(currentTab) ? ds.csvFile : currentProduct + '_' + currentTab + '_data.csv';
     dl(csv, fname, 'text/csv;charset=utf-8;');
-    showToast('已导出 ' + data.length + ' 行', 'success');
+    if (isFilterActive()) showToast('已导出 ' + data.length + ' 行（当前有筛选，导出为全量数据）', 'warning');
+    else showToast('已导出 ' + data.length + ' 行', 'success');
 }
 
 // ==================== JS Export ====================
@@ -946,9 +1255,29 @@ var JS_EXPORT_DATASETS = {
 
 function exportCurrentJS() {
     flushPendingEdits();
-    var ds = JS_EXPORT_DATASETS[currentProduct][currentTab];
     var data = getData();
     if (!data.length) { showToast('当前视图无数据可导出', 'warning'); return; }
+
+    if (isGlobalTab(currentTab)) {
+        // 全局数据集：导出为对象数组（与 scripts/*.js 现有格式字节风格一致）
+        var gds = getDS();
+        var objs = data.map(function(row) {
+            var o = {};
+            for (var i = 0; i < gds.keys.length; i++) o[gds.keys[i]] = (row[i] || '').toString().replace(/\r/g, '');
+            return o;
+        });
+        var glines = objs.map(function(o, i) {
+            var line = JSON.stringify(o);
+            return i < objs.length - 1 ? line + ',' : line;
+        });
+        var gcontent = '/**\n * ' + gds.jsDescription + '\n */\nvar ' + gds.jsVar + ' = [\n' + glines.join('\n') + '\n];\n';
+        dl(gcontent, gds.jsFile, 'text/javascript;charset=utf-8;');
+        if (isFilterActive()) showToast('已导出 ' + gds.jsFile + '（' + data.length + ' 行，当前有筛选，导出为全量数据），请放入 scripts/ 目录', 'warning');
+        else showToast('已导出 ' + gds.jsFile + '（' + data.length + ' 行），请放入 scripts/ 目录', 'success');
+        return;
+    }
+
+    var ds = JS_EXPORT_DATASETS[currentProduct][currentTab];
 
     // 行转换：对齐 import_csv.js buildTableDataset（\r 清除、补列、IMG 前缀、slice）
     var jsonData = data.map(function(row) {
@@ -968,7 +1297,8 @@ function exportCurrentJS() {
     var content = '/**\n * ' + ds.description + '\n */\nvar ' + ds.variable + ' = [\n' + lines.join('\n') + '\n];\n';
 
     dl(content, ds.file, 'text/javascript;charset=utf-8;');
-    showToast('已导出 ' + ds.file + '（' + data.length + ' 行），请放入 scripts/ 目录', 'success');
+    if (isFilterActive()) showToast('已导出 ' + ds.file + '（' + data.length + ' 行，当前有筛选，导出为全量数据），请放入 scripts/ 目录', 'warning');
+    else showToast('已导出 ' + ds.file + '（' + data.length + ' 行），请放入 scripts/ 目录', 'success');
 }
 
 // ==================== Save ====================
@@ -992,6 +1322,7 @@ function saveChanges() {
 
 function flushPendingEdits() {
     var data = getData();
+    var ds = getDS();
     document.querySelectorAll('#editorBody input, #editorBody textarea').forEach(function(input) {
         var tr = input.closest('tr');
         if (!tr) return;
@@ -1002,9 +1333,11 @@ function flushPendingEdits() {
         // 跳过 #, actions, 以及图片列（图片列不是 input td）
         var colOffset = cells.indexOf(td) - 2; // subtract num and actions
         // 如果图片列在 col3 之后插入，需要减去它
-        if (colOffset > IMG_INSERT_AFTER) colOffset--;
-        var dataColIdx = colOffset + 1;
-        if (isNaN(rowIdx) || dataColIdx < 1 || dataColIdx >= data[rowIdx].length) return;
+        if (ds.imgCol != null && colOffset > IMG_INSERT_AFTER) colOffset--;
+        // 单元格合并会跳过部分 td，优先用 data-col 直接定位数据列
+        var colAttr = td.getAttribute ? td.getAttribute('data-col') : null;
+        var dataColIdx = (colAttr !== null && colAttr !== '') ? parseInt(colAttr, 10) : colOffset + ds.startCol;
+        if (isNaN(rowIdx) || dataColIdx < ds.startCol || dataColIdx >= data[rowIdx].length) return;
         var currentVal = (data[rowIdx][dataColIdx] || '').toString().trim();
         var inputVal = input.value.trim();
         if (currentVal !== inputVal) {
@@ -1025,7 +1358,17 @@ function escJS(s) {
     return escH(s);
 }
 function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
-function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast ' + (type||'success'); setTimeout(function(){t.classList.add('show');},10); setTimeout(function(){t.classList.remove('show');},3000); }
+var toastTimer1 = null, toastTimer2 = null;
+function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || 'success');
+    // 清掉上一条提示的定时器：否则旧定时器会提前隐藏新 toast（或新 toast 永不消失）
+    if (toastTimer1) { clearTimeout(toastTimer1); toastTimer1 = null; }
+    if (toastTimer2) { clearTimeout(toastTimer2); toastTimer2 = null; }
+    toastTimer1 = setTimeout(function() { t.classList.add('show'); }, 10);
+    toastTimer2 = setTimeout(function() { t.classList.remove('show'); toastTimer1 = toastTimer2 = null; }, 3000);
+}
 
 function parseCSV(text) {
     var rows = [], cur = [], field = '', inQ = false;

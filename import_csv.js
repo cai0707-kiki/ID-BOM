@@ -266,6 +266,36 @@ function main() {
         console.log('\n跳过: 未找到 product_updates.csv');
     }
 
+    // ===== 7. VM加密狗（vm_dongle_data.csv）=====
+    const vmCsvPath = path.join(__dirname, 'vm_dongle_data.csv');
+    const VM_KEYS = ['scene', 'name', 'codeStd', 'codeNeu', 'swName', 'swCode', 'modules', 'remark'];
+    if (fs.existsSync(vmCsvPath)) {
+        console.log('\n读取 vm_dongle_data.csv...');
+        const vmBuffer = fs.readFileSync(vmCsvPath);
+        const vmCsv = iconv.decode(vmBuffer, encoding);
+        const vmRows = parseCSV(vmCsv);
+
+        const vmJsonData = [];
+        vmRows.forEach(row => {
+            if (row.length >= 2 && (row[1] || '').trim()) {
+                vmJsonData.push(VM_KEYS.reduce((o, k, i) => {
+                    o[k] = (row[i] || '').trim();
+                    return o;
+                }, {}));
+            }
+        });
+
+        console.log(`  vm_dongle_data.csv: ${vmJsonData.length} 条记录`);
+        writeDataJs(
+            path.join(__dirname, 'scripts', 'vm_dongle_data.js'),
+            'VM_DONGLE_DATA',
+            vmJsonData,
+            'VM 加密狗产品数据\n * 数据来源：vm_dongle_data.csv（VisionMaster 加密狗/软加密清单）\n * 更新方式：修改 vm_dongle_data.csv 后运行 `node import_csv.js`'
+        );
+    } else {
+        console.log('\n跳过: 未找到 vm_dongle_data.csv');
+    }
+
     // ===== 完成 =====
     console.log('\n导入完成！');
     console.log('已生成以下 JS 数据文件:');
@@ -281,6 +311,9 @@ function main() {
     }
     if (fs.existsSync(productUpdatesCsvPath)) {
         console.log('  - product_updates.js    (IDBOM_PRODUCT_UPDATES)');
+    }
+    if (fs.existsSync(vmCsvPath)) {
+        console.log('  - vm_dongle_data.js     (VM_DONGLE_DATA)');
     }
 
     console.log('\n刷新 index.html 即可加载最新数据。');
