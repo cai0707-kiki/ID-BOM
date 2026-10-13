@@ -147,6 +147,7 @@
                 <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">🟢 SC 产品 <span class="tab-count" id="scCount">0</span></button>
                 <button type="button" class="ps-btn" data-p="vm" onclick="switchTab('vm')">🔐 VM产品 <span class="tab-count" id="vmCount">0</span></button>
                 <button type="button" class="ps-btn" data-p="updates" onclick="switchTab('updates')">📰 产品动态 <span class="tab-count" id="updatesCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="mapping" onclick="switchTab('mapping')">🔗 经销对照 <span class="tab-count" id="mappingCount">0</span></button>
             </div>
         </div>
         <div class="editor-header-right">
@@ -254,6 +255,7 @@ var ACCESSORY_COMBO_COLS = [1, 2];
 // ===== 全局数据集（不分 ID/SC）：VM产品、产品动态 =====
 var VM_HEADERS = ['应用场景', '加密狗名称', '代码(标配)', '代码(中间)', '软加密名称', '软加密代码', '支持模块', '备注'];
 var UPDATES_HEADERS = ['序号', '更新日期', '产品类型', '产品动态', '动态描述', '产品系列', '文档名称', '是否精选'];
+var MAPPING_HEADERS = ['产品系列', '基线型号', '基线代码', '经销型号', '经销代码'];
 
 // ===== 数据集注册表 =====
 // scope:      'product' = 按 ID/SC 切换；'global' = 全局单份数据（dataStore[target]）
@@ -300,16 +302,27 @@ var DATASETS = {
         keys: ['id', 'date', 'productType', 'type', 'content', 'series', 'docName', 'featured'],
         csvFile: 'product_updates.csv', jsFile: 'product_updates.js', jsVar: 'IDBOM_PRODUCT_UPDATES',
         jsDescription: 'ID-BOM 产品动态数据\n * 数据来源：product_updates.csv（产品更新动态）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
+    },
+    mapping: {
+        scope: 'global', startCol: 0, headers: MAPPING_HEADERS,
+        widths: { 0: 120, 1: 260, 2: 96, 3: 260, 4: 96 },
+        comboCols: [0], filterCols: [0], filterLabels: ['产品系列'],
+        fixedCols: [], wrapCols: [], imgCol: null,
+        newRowFirst: '',
+        keys: ['series', 'baseModel', 'baseCode', 'distModel', 'distCode'],
+        csvFile: 'mapping.csv', jsFile: 'mapping_data.js', jsVar: 'IDBOM_MAPPING_DATA',
+        jsDescription: 'ID-BOM 经销基线对照表\n * 数据来源：mapping.csv（基线型号 ↔ 经销型号映射）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
     }
 };
-var GLOBAL_TABS = ['vm', 'updates'];
+var GLOBAL_TABS = ['vm', 'updates', 'mapping'];
+var GLOBAL_TAB_LABELS = { vm: 'VM产品', updates: '产品动态', mapping: '经销对照' };
 function isGlobalTab(t) { return GLOBAL_TABS.indexOf(t) >= 0; }
 
 // ==================== State ====================
 var currentTab = 'camera';
 var currentProduct = 'id'; // 'id' | 'sc'
 // id/sc 为产品维度数据；vm/updates 为全局数据集（对象行以二维数组存储，列序 = DATASETS[tab].keys/headers）
-var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] }, vm: [], updates: [] };
+var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] }, vm: [], updates: [], mapping: [] };
 var cameraData = dataStore.id.camera;
 var accessoryData = dataStore.id.accessory;
 var filteredIndices = [];
@@ -342,6 +355,7 @@ function loadInitialData() {
                 });
                 dataStore.vm = d.store.vm || [];
                 dataStore.updates = d.store.updates || [];
+                dataStore.mapping = d.store.mapping || [];
                 currentProduct = d.currentProduct === 'sc' ? 'sc' : 'id';
             } else {
                 // 旧格式单套数据 → 视为 ID 产品
@@ -380,7 +394,7 @@ function loadInitialData() {
 
 // ==================== Dropdown Cache ====================
 // 每个 tab 独立缓存；列序 = DATASETS[tab].headers
-var dropdownCaches = { camera: {}, accessory: {}, vm: {}, updates: {} };
+var dropdownCaches = { camera: {}, accessory: {}, vm: {}, updates: {}, mapping: {} };
 
 function rebuildDropdownCache() {
     Object.keys(DATASETS).forEach(function(t) {
@@ -498,6 +512,7 @@ function switchTab(tab, opts) {
     if (!opts || !opts.silent) {
         if (tab === 'vm') showToast('已切换至 VM产品', 'success');
         else if (tab === 'updates') showToast('已切换至 产品动态', 'success');
+        else if (tab === 'mapping') showToast('已切换至 经销对照', 'success');
     }
 }
 
@@ -508,8 +523,8 @@ function syncTabUI() {
 }
 
 // ==================== Product Switch ====================
-// 顶部切换含 4 项：ID产品 / SC产品 / VM产品 / 产品动态
-// 全局数据集（VM/产品动态）激活时隐藏相机/配件子Tab条
+// 顶部切换含 5 项：ID产品 / SC产品 / VM产品 / 产品动态 / 经销对照
+// 全局数据集（VM/产品动态/经销对照）激活时隐藏相机/配件子Tab条
 function updateProductUI() {
     var global = isGlobalTab(currentTab);
     var activeKey = global ? currentTab : currentProduct;
@@ -733,6 +748,7 @@ function renderTable() {
     document.getElementById('accessoryCount').textContent = accessoryData.length;
     document.getElementById('vmCount').textContent = dataStore.vm.length;
     document.getElementById('updatesCount').textContent = dataStore.updates.length;
+    document.getElementById('mappingCount').textContent = dataStore.mapping.length;
     document.getElementById('idCount').textContent = dataStore.id.camera.length;
     document.getElementById('scCount').textContent = dataStore.sc.camera.length;
     autoGrowAll();
@@ -1091,6 +1107,7 @@ function parseAndStore(text, fname, callback) {
     // 全局数据集：按文件名识别（无产品归属）
     if (fname.indexOf('vm_dongle') >= 0 || fname.indexOf('vm_') >= 0) target = 'vm';
     else if (fname.indexOf('product_updates') >= 0) target = 'updates';
+    else if (fname.indexOf('mapping') >= 0) target = 'mapping';
     else if (fname.indexOf('camera') >= 0) target = 'camera';
     else if (fname.indexOf('accessory') >= 0) target = 'accessory';
     var first = rows[0];
@@ -1164,7 +1181,7 @@ function confirmImport() {
             // 全局数据集：slot 即 tab 名（vm / updates）
             dataStore[k] = batch[k];
             globalTouched[k] = true;
-            imported.push((k === 'vm' ? 'VM产品' : '产品动态') + ' ' + batch[k].length + ' 行');
+            imported.push((GLOBAL_TAB_LABELS[k] || k) + ' ' + batch[k].length + ' 行');
             return;
         }
         var parts = k.split('_');
