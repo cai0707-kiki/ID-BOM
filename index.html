@@ -33,7 +33,7 @@
         .header-logo .logo-text{user-select:none;-webkit-user-select:none}
         .container{display:flex;gap:12px;padding:12px;max-width:1400px;margin:0 auto}
         .nav-sidebar{width:64px;flex-shrink:0;display:flex;flex-direction:column;background:#1e3a5f;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);height:fit-content;position:sticky;top:52px;align-self:flex-start;}
-        .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 4px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:10px;font-weight:500;text-align:center;color:rgba(255,255,255,0.6)}
+        .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;cursor:pointer;transition:all .2s;border-left:3px solid transparent;font-size:9px;font-weight:500;text-align:center;color:rgba(255,255,255,0.6)}
         .nav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.9)}
         .nav-item.active{background:#fff7ed;border-left-color:#f97316;color:#f97316;font-weight:600}
         .nav-icon{font-size:18px;line-height:1}
@@ -1214,26 +1214,26 @@
         <div class="header-left">
             <div class="header-logo"><span class="logo-text">智能产品线配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V2.2</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V2.3</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
         </div>
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、ID2000XM/RM扩展光源配件，亮度提升2.5倍以上；\n2、ID3000XM/RM扩展光源配件，亮度提升2.5倍以上","date":"2026-10-13"}
+    {"content":"本次更新：\n1、ID2000XM/RM扩展光源配件，亮度提升2.5倍以上；\n2、ID3000XM/RM扩展光源配件，亮度提升2.5倍以上","date":"2026-10-19"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
         <div class="nav-sidebar">
             <div class="nav-item active" onclick="switchPage('home')"><span class="nav-icon">🏠</span>首页</div>
-            <div class="nav-item" onclick="switchPage('bom')"><span class="nav-icon">📋</span>ID配单表</div>
-            <div class="nav-item" onclick="switchPage('scbom')"><span class="nav-icon">📋</span>SC配单表</div>
-            <div class="nav-item" onclick="switchPage('vm')"><span class="nav-icon">🔐</span>VM选型</div>
-            <div class="nav-item" onclick="switchPage('cmp')"><span class="nav-icon">📊</span>对照表</div>
-            <div class="nav-item" onclick="switchPage('overview')"><span class="nav-icon">📦</span>ID系列表</div>
-            <div class="nav-item" onclick="switchPage('scoverview')"><span class="nav-icon">📦</span>SC系列表</div>
-            <div class="nav-item" onclick="switchPage('pda')"><span class="nav-icon">📱</span>PDA</div>
+            <div class="nav-item" onclick="switchPage('bom')"><span class="nav-icon">📋</span>ID智能配单</div>
+            <div class="nav-item" onclick="switchPage('scbom')"><span class="nav-icon">📋</span>SC智能配单</div>
+            <div class="nav-item" onclick="switchPage('vm')"><span class="nav-icon">🔐</span>VM智能选型</div>
+            <div class="nav-item" onclick="switchPage('cmp')"><span class="nav-icon">📊</span>经销对照表</div>
+            <div class="nav-item" onclick="switchPage('overview')"><span class="nav-icon">📦</span>ID系列全览</div>
+            <div class="nav-item" onclick="switchPage('scoverview')"><span class="nav-icon">📦</span>SC系列全览</div>
+            <div class="nav-item" onclick="switchPage('pda')"><span class="nav-icon">📱</span>PDA选型</div>
             <div class="nav-item" onclick="switchPage('updates')"><span class="nav-icon">📰</span>产品动态</div>
         </div>
         <div id="pageHome">
@@ -1247,10 +1247,10 @@
                     <button class="home-card" onclick="switchPage('bom')">
                         <div class="home-card-top">
                             <div class="home-card-icon">📋</div>
-                            <div class="home-card-title">ID配单表</div>
+                            <div class="home-card-title">ID智能配单</div>
                             <div class="home-card-num">01</div>
                         </div>
-                        <div class="home-card-desc">ID产品三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
+                        <div class="home-card-desc">ID产品三级联动智能选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">生成配单 →</span>
                         </div>
@@ -1258,10 +1258,10 @@
                     <button class="home-card" onclick="switchPage('scbom')">
                         <div class="home-card-top">
                             <div class="home-card-icon">📋</div>
-                            <div class="home-card-title">SC配单表</div>
+                            <div class="home-card-title">SC智能配单</div>
                             <div class="home-card-num">02</div>
                         </div>
-                        <div class="home-card-desc">SC产品三级联动选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
+                        <div class="home-card-desc">SC产品三级联动智能选型，自动匹配电源、线缆、灯板、镜头罩以及扩展配件等选装配件，支持CSV导出。</div>
                         <div class="home-card-footer">
                             <span class="home-card-link">生成配单 →</span>
                         </div>
@@ -1269,7 +1269,7 @@
                     <button class="home-card" onclick="switchPage('vm')">
                         <div class="home-card-top">
                             <div class="home-card-icon">🔐</div>
-                            <div class="home-card-title">VM选型</div>
+                            <div class="home-card-title">VM智能选型</div>
                             <div class="home-card-num">03</div>
                         </div>
                         <div class="home-card-desc">VisionMaster加密狗及软加密选型，覆盖读码、缺陷检测、定位测量、深度学习等8大应用场景。</div>
@@ -1280,7 +1280,7 @@
                     <button class="home-card" onclick="switchPage('cmp')">
                         <div class="home-card-top">
                             <div class="home-card-icon">📊</div>
-                            <div class="home-card-title">对照表</div>
+                            <div class="home-card-title">经销对照表</div>
                             <div class="home-card-num">04</div>
                         </div>
                         <div class="home-card-desc">基线 ↔ 经销型号物料代码对照，支持快速搜索筛选，涵盖ID/SC产品。</div>
@@ -1291,7 +1291,7 @@
                     <button class="home-card" onclick="switchPage('overview')">
                         <div class="home-card-top">
                             <div class="home-card-icon">📦</div>
-                            <div class="home-card-title">ID系列表</div>
+                            <div class="home-card-title">ID系列全览</div>
                             <div class="home-card-num">05</div>
                         </div>
                         <div class="home-card-desc">ID产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
@@ -1302,7 +1302,7 @@
                     <button class="home-card" onclick="switchPage('scoverview')">
                         <div class="home-card-top">
                             <div class="home-card-icon">📦</div>
-                            <div class="home-card-title">SC系列表</div>
+                            <div class="home-card-title">SC系列全览</div>
                             <div class="home-card-num">06</div>
                         </div>
                         <div class="home-card-desc">SC产品按系列分组浏览全部相机及关联配件，快速了解各系列完整产品线。</div>
