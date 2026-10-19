@@ -4605,6 +4605,24 @@ document.addEventListener('DOMContentLoaded', function() {
     loadIdData();
     loadScData();
     initOverviewBomJump();
+
+    // ===== 三击标题在新标签打开数据编辑器 =====
+    (function() {
+        var logo = document.querySelector('.logo-text');
+        if (!logo) return;
+        var clicks = 0, timer = null;
+        logo.addEventListener('click', function() {
+            clicks++;
+            if (timer) clearTimeout(timer);
+            if (clicks >= 3) {
+                clicks = 0;
+                window.open('editor.html', '_blank');
+                return;
+            }
+            timer = setTimeout(function() { clicks = 0; }, 600);
+        });
+    })();
+
     setTimeout(showAnnounce, 500);
 
         // ===== 从公告配置读取数据更新日期 =====

@@ -330,6 +330,10 @@ var selectedRows = {};
 var modifiedCells = {};
 var imgUploadTarget = null; // { type, idx }
 var deleteSnapshot = null; // 单行删除弹窗打开前的选区快照（取消时恢复）
+// 页签切换的搜索/筛选状态记忆（会话内存，刷新页面即丢）
+var viewStates = {};
+var pendingRestore = null; // 待回填的筛选值，refreshFilterOptions 校验选项后消费一次
+function activeViewStateKey() { return isGlobalTab(currentTab) ? currentTab : currentProduct + '.' + currentTab; }
 
 function getDS() { return DATASETS[currentTab]; }
 function getDataForTab(t) { return isGlobalTab(t) ? dataStore[t] : dataStore[currentProduct][t]; }
@@ -440,8 +444,9 @@ function refreshFilterOptions() {
     var data = getData();
     var cache = getDropdownCache();
     var fc1 = ds.filterCols[0], fc2 = ds.filterCols[1];
+    var pr = pendingRestore; pendingRestore = null; // 只消费一次，之后用户手改不被覆盖
 
-    var cur1 = sel1.value;
+    var cur1 = pr ? (pr.f1 || '') : sel1.value;
     // 固定内容筛选（产品动态）：选项写死，不随数据/级联变化
     var fixed1 = ds.filterOptions ? ds.filterOptions[0] : null;
     var list1 = fixed1 || cache[fc1] || [];
@@ -475,7 +480,7 @@ function refreshFilterOptions() {
     } else {
         list2 = (cache[fc2] || []).slice();
     }
-    var cur2 = sel2.value;
+    var cur2 = pr ? (pr.f2 || '') : sel2.value;
     if (cur2 && list2.indexOf(cur2) < 0) cur2 = '';
     var opts2 = '<option value="">全部（' + escH(labels[1]) + '）</option>';
     list2.forEach(function(v) { opts2 += '<option value="' + escH(v) + '">' + escH(v) + '</option>'; });
@@ -491,6 +496,12 @@ function isFilterActive() {
 }
 
 // ==================== Tab ====================
+function saveViewState() {
+    var s = document.getElementById('searchBox');
+    var f1 = document.getElementById('filterCol1');
+    var f2 = document.getElementById('filterCol2');
+    viewStates[activeViewStateKey()] = { q: s ? s.value : '', f1: f1 ? f1.value : '', f2: f2 ? f2.value : '' };
+}
 function resetViewState() {
     selectedRows = {};
     modifiedCells = {};
@@ -500,12 +511,21 @@ function resetViewState() {
     if (f1) f1.value = '';
     if (f2) f2.value = '';
 }
+// 切回页签时恢复记忆：searchBox 直接回填；下拉值交给 refreshFilterOptions 校验选项后应用
+function restoreViewState() {
+    var st = viewStates[activeViewStateKey()];
+    document.getElementById('searchBox').value = st ? (st.q || '') : '';
+    pendingRestore = st || null;
+}
 
 function switchTab(tab, opts) {
+    var fresh = opts && opts.freshState;
+    if (!fresh) saveViewState();
     currentTab = tab;
     syncTabUI();
     updateProductUI();
     resetViewState();
+    if (!fresh) restoreViewState(); else pendingRestore = null;
     renderTable();
     updateStats();
     // opts.silent：程序化切换（如导入完成后）不再弹「已切换至」，避免和结果提示叠播
@@ -539,12 +559,14 @@ function updateProductUI() {
 function switchProduct(p) {
     // 从全局数据集切回时，同产品也要切回相机/配件子Tab
     if (p === currentProduct && !isGlobalTab(currentTab)) return;
+    saveViewState();
     currentProduct = p;
     cameraData = dataStore[p].camera;
     accessoryData = dataStore[p].accessory;
     if (isGlobalTab(currentTab)) currentTab = 'camera';
     syncTabUI();
     resetViewState();
+    restoreViewState();
     updateProductUI();
     rebuildDropdownCache();
     renderTable();
@@ -1201,13 +1223,14 @@ function confirmImport() {
     accessoryData = dataStore[currentProduct].accessory;
 
     modifiedCells = {}; selectedRows = {};
+    viewStates = {}; pendingRestore = null; // 数据被替换，旧搜索/筛选记忆全部作废
     rebuildDropdownCache();
     closeImportModal();
     var gl = Object.keys(globalTouched);
     var showTab;
     if (gl.length && !prods.length) showTab = gl[0];
     else showTab = (batch[currentProduct + '_camera'] || !batch[currentProduct + '_accessory']) ? 'camera' : 'accessory';
-    switchTab(showTab, { silent: true });
+    switchTab(showTab, { silent: true, freshState: true }); // 导入后不恢复旧搜索/筛选，避免新数据被滤掉
     autoSave();
     showToast('成功导入 ' + imported.join('，'), 'success');
     pendingImports = {};
