@@ -1,7 +1,7 @@
 /**
  * ID-BOM 经销基线对照表
  * 数据来源：mapping.csv（基线型号 ↔ 经销型号映射）
- * 更新方式：修改 mapping.csv 后运行 `node import_csv.js`
+ * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var IDBOM_MAPPING_DATA = [
 {"series":"ID800系列","baseModel":"MV-ID803M-03S-WBN-SR-U(国内标配)","baseCode":"313201715","distModel":"MV-IDA02X-03WSU(国内标配)","distCode":"328500153"},
@@ -357,6 +357,30 @@ var IDBOM_MAPPING_DATA = [
 {"series":"SC2000E系列","baseModel":"MV-SC2016EM-12S-WBN(国内中性)V3.0","baseCode":"308601029","distModel":"MV-SCB007EM-12S-WBN(国内中性) V3.0","distCode":"328500233"},
 {"series":"SC2000E系列","baseModel":"MV-SC2016EM-15S-WBN(国内标配)V3.0","baseCode":"308601018","distModel":"MV-SCB007EM-15S-WBN(国内标配) V3.0","distCode":"328500234"},
 {"series":"SC2000E系列","baseModel":"MV-SC2016EM-15S-WBN(国内中性)V3.0","baseCode":"308601030","distModel":"MV-SCB007EM-15S-WBN(国内中性) V3.0","distCode":"328500235"},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-16M-WBN(国内中性)","baseCode":"308601371","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-16M-WBN(国内标配)","baseCode":"308601373","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-12M-WBN(国内中性)","baseCode":"308601377","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-12M-WBN(国内标配)","baseCode":"308601367","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-05M-WBN(国内中性)","baseCode":"308601370","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XM-05M-WBN(国内标配)","baseCode":"308601374","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-16M-WBN(国内中性)","baseCode":"308601375","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-16M-WBN(国内标配)","baseCode":"308601369","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-12M-WBN(国内中性)","baseCode":"308601376","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-12M-WBN(国内标配)","baseCode":"308601372","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-05M-WBN(国内中性)","baseCode":"308601368","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"MV-SC2013XC-05M-WBN(国内标配)","baseCode":"308601378","distModel":"无经销型号","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500556","distModel":"MV-SCB006XC-12M-WBN(国内中性)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500558","distModel":"MV-SCB006XC-12M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500559","distModel":"MV-SCB006XC-05M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500565","distModel":"MV-SCB006XC-05M-WBN(国内中性)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500557","distModel":"MV-SCB006XC-16M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500566","distModel":"MV-SCB006XC-16M-WBN(国内中性)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500560","distModel":"MV-SCB006XM-16M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500561","distModel":"MV-SCB006XM-16M-WBN(国内中性)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500564","distModel":"MV-SCB006XM-12M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500567","distModel":"MV-SCB006XM-12M-WBN(国内中性)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500562","distModel":"MV-SCB006XM-05M-WBN(国内标配)","distCode":""},
+{"series":"SC2000X系列","baseModel":"无基线型号","baseCode":"328500563","distModel":"MV-SCB006XM-05M-WBN(国内中性)","distCode":""},
 {"series":"SC2000X系列","baseModel":"MV-SC2023XM-16M-WBN(国内中性)","baseCode":"308601228","distModel":"MV-SCB008XM-16M-WBN(国内中性)","distCode":"328500457"},
 {"series":"SC2000X系列","baseModel":"MV-SC2023XM-16M-WBN(国内标配)","baseCode":"308601200","distModel":"MV-SCB008XM-16M-WBN(国内标配)","distCode":"328500456"},
 {"series":"SC2000X系列","baseModel":"MV-SC2023XM-12M-WBN(国内中性)","baseCode":"308601226","distModel":"MV-SCB008XM-12M-WBN(国内中性)","distCode":"328500459"},
