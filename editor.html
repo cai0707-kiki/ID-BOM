@@ -116,8 +116,18 @@
         #imgFileInput{display:none}
 
         /* ====== 表格内图片缩略图列 ====== */
-        .col-wrap{white-space:normal!important;word-break:break-word;line-height:1.5}
+        .col-wrap{white-space:normal!important;word-break:break-word;line-height:1.5;position:relative}
         .col-wrap input{white-space:normal;word-break:break-word}
+
+        /* ====== 继承列（VM 支持模块/备注，方案D）：空值行显示继承占位，每行可独立编辑 ====== */
+        .cell-textarea.cell-inherit{background:#f8fafc}
+        .cell-textarea.cell-inherit::placeholder{color:#94a3b8;font-style:italic}
+        /* 修改标记（琥珀色）优先于继承底色，避免「已改未同步」状态被灰底盖住 */
+        .cell-textarea.cell-inherit.modified{background:#fef3c7;border-color:#fbbf24}
+        /* 悬停继承列单元格时显示「恢复继承」按钮（仅渲染在有值的单元格上） */
+        .btn-inherit{position:absolute;top:2px;right:2px;width:18px;height:18px;border:none;background:#e2e8f0;color:#64748b;border-radius:3px;cursor:pointer;font-size:11px;line-height:18px;padding:0;display:none;z-index:3}
+        .col-wrap:hover .btn-inherit{display:block}
+        .btn-inherit:hover{background:#f97316;color:#fff}
         .col-img{width:72px;min-width:72px;text-align:center;vertical-align:middle;padding:3px 2px!important}
         .thumb-wrap{display:inline-block;position:relative;vertical-align:middle}
         .thumb{width:48px;height:48px;object-fit:contain;border-radius:3px;border:1px solid #e2e8f0;cursor:pointer;transition:all .15s;background:#fff;display:block}
@@ -151,7 +161,7 @@
            </div>
         </div>
         <div class="editor-header-right">
-            <button class="btn btn-secondary" onclick="showImportModal()">📥 导入CSV</button>
+            <button class="btn btn-secondary" onclick="showImportModal()">📥 导入数据</button>
             <button class="btn btn-primary" onclick="exportCurrentCSV()">📤 导出CSV</button>
             <button class="btn btn-success" onclick="exportCurrentJS()">📤 导出JS</button>
         </div>
@@ -185,10 +195,10 @@
     <!-- Import Modal -->
     <div class="modal-overlay" id="importModal">
         <div class="modal" style="width:380px">
-            <div class="modal-header"><span class="modal-title">📥 导入CSV</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
+            <div class="modal-header"><span class="modal-title">📥 导入数据（CSV / JS）</span><button class="modal-close" onclick="closeImportModal()">✕</button></div>
             <div class="modal-body" style="text-align:center">
-                <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择CSV文件（可多选）</button>
-                <input type="file" id="csvFileInput" accept=".csv,.txt" multiple onchange="onFileSelected(event)">
+                <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()" style="padding:10px 28px;font-size:13px">📄 选择 CSV / JS 文件（可多选）</button>
+                <input type="file" id="csvFileInput" accept=".csv,.txt,.js" multiple onchange="onFileSelected(event)">
                 <div id="importInfo" style="margin-top:14px;font-size:12px;color:#64748b;display:none"></div>
             </div>
             <div class="modal-footer">
@@ -282,7 +292,11 @@ var DATASETS = {
         widths: { 0: 130, 1: 168, 2: 100, 3: 100, 4: 150, 5: 110, 6: 320, 7: 320 },
         comboCols: [0], filterCols: [0], filterLabels: ['应用场景'],
         fixedCols: [], wrapCols: [6, 7], imgCol: null,
-        mergeCols: [6, 7], // 支持模块/备注：有值行向下合并连续空行（与主页一致，仅影响渲染，不影响导出）
+        // 支持模块/备注：空值 = 继承上方最近有值行（数据语义与主页一致，仅影响渲染，不影响导出）。
+        // 渲染采用方案D：不再用 rowspan 合并，每行都渲染独立可编辑单元格，
+        // 空值行显示「继承自第N行」占位、有值行悬停可「恢复继承」。
+        // 方案A 的两个保护点因此天然满足：新增/末行一定可编辑；继承锚点按全量数据顺序计算，不受筛选影响。
+        inheritCols: [6, 7],
         newRowFirst: '',
         keys: ['scene', 'name', 'codeStd', 'codeNeu', 'swName', 'swCode', 'modules', 'remark'],
         csvFile: 'vm_dongle_data.csv', jsFile: 'vm_dongle_data.js', jsVar: 'VM_DONGLE_DATA',
@@ -580,20 +594,26 @@ function getHeaders() { return getDS().headers; }
 function getData() { return getDataForTab(currentTab); }
 function getImgColIdx() { return getDS().imgCol; }
 
-// 与主页 computeRowspan 相同：有值行 rowspan = 1 + 后续连续空行数；空行 rowspan = 0（不渲染）；
-// 开头连续空行各自 rowspan = 1，单独渲染空单元格避免列错位
-function computeRowspan(vals) {
-    var spans = new Array(vals.length);
-    for (var k = 0; k < spans.length; k++) spans[k] = 0;
-    var i = 0;
-    while (i < vals.length && vals[i] === '') { spans[i] = 1; i++; }
-    for (; i < vals.length; i++) {
-        if (vals[i] === '') continue;
-        var span = 1;
-        for (var j = i + 1; j < vals.length && vals[j] === ''; j++) span++;
-        spans[i] = span;
-    }
-    return spans;
+// ===== 继承列锚点（VM 支持模块/备注） =====
+// 数据语义与主页 computeRowspan 一致：空值 = 继承上方最近的有值行；
+// 但编辑器不再做 rowspan 合并（方案D）——每行都渲染独立可编辑单元格，
+// 空值行以「继承自第N行」占位显示。锚点按【全量数据】顺序计算，
+// 因此筛选/搜索不改变继承关系，新增/复制的行也永远有自己的单元格、不会被上一行吞掉（方案A 的保护点）。
+function computeInheritAnchors(data, inheritCols) {
+    var res = {}; // rowIdx -> { colIdx: anchorRowIdx }
+    inheritCols.forEach(function(c) {
+        var last = -1; // 最近一个有值行的索引
+        for (var i = 0; i < data.length; i++) {
+            if ((data[i][c] || '').toString().trim() !== '') { last = i; continue; }
+            if (last >= 0) (res[i] || (res[i] = {}))[c] = last;
+        }
+    });
+    return res;
+}
+
+// 继承占位里的行标识：优先加密狗名称(col1)，其次应用场景(col0)，最后用行号
+function rowLabel(row, idx) {
+    return (row[1] || row[0] || '').toString().trim() || ('第' + (idx + 1) + '行');
 }
 
 // datalist HTML 记忆（renderTable 每次渲染都要注入，数据没变就复用）
@@ -686,15 +706,11 @@ function renderTable() {
     }
 
     // ===== Body =====
-    // 单元格合并（与主页 computeRowspan 一致）：有值行向下合并连续空行；
-    // 开头连续空行各自 rowspan=1 单独渲染，避免列错位。仅影响渲染，数据/导出不变。
-    var mergeCols = ds.mergeCols || [];
-    var mergeSpans = {};
-    mergeCols.forEach(function(mc) {
-        mergeSpans[mc] = computeRowspan(filteredIndices.map(function(fi) {
-            return (data[fi][mc] || '').toString().trim();
-        }));
-    });
+    // 继承列（VM 支持模块/备注，方案D）：空值 = 继承上方最近有值行。
+    // 不再用 rowspan 合并跳行渲染——每行都渲染独立可编辑单元格，
+    // 空值行显示「继承自第N行」占位；锚点按全量数据顺序计算，与筛选/搜索无关。
+    var inheritCols = ds.inheritCols || [];
+    var inheritMap = computeInheritAnchors(data, inheritCols);
 
     var bhtml = '';
     filteredIndices.forEach(function(idx, pos) {
@@ -709,9 +725,6 @@ function renderTable() {
         bhtml += '</td>';
 
         for (var c = startCol; c < headers.length; c++) {
-            var span = mergeSpans[c] ? mergeSpans[c][pos] : 1;
-            if (span === 0) continue; // 该单元格已并入上方行，不渲染
-            var rowspanAttr = span > 1 ? ' rowspan="' + span + '"' : '';
             var val = (row[c] || '').toString().trim();
             var ck = idx + '_' + c;
             var mc = modifiedCells[ck] ? ' modified' : '';
@@ -723,15 +736,26 @@ function renderTable() {
             var style = w ? ' style="min-width:'+w+'px;width:'+w+'px"' : '';
             var colAttr = ' data-col="' + c + '"';
 
-            if (comboCols.indexOf(c) >= 0) {
+            if (inheritCols.indexOf(c) >= 0) {
+                // 继承列：每行渲染独立 textarea；空值行灰底占位显示继承来源，有值行悬停可「恢复继承」
+                var anc = inheritMap[idx] ? inheritMap[idx][c] : null;
+                var isInherited = (val === '' && anc != null);
+                var ph = isInherited ? ' placeholder="\u21b3 继承自第' + (anc + 1) + '行 ' + escH(rowLabel(data[anc], anc)) + '（点击输入即独立编辑）"' : '';
+                var tAttr = isInherited ? ' title="' + escH((data[anc][c] || '').toString().trim()) + '"' : '';
+                var inhCls = isInherited ? ' cell-inherit' : '';
+                bhtml += '<td class="' + cls + inhCls + '"' + style + colAttr + '>';
+                bhtml += '<textarea class="cell-textarea' + mc + inhCls + '" rows="2"' + ph + tAttr + ' oninput="autoGrow(this)" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea>';
+                if (val !== '') bhtml += '<button class="btn-inherit" title="清空并恢复继承上方" onclick="resetToInherit(' + idx + ',' + c + ')">\u21ba</button>';
+                bhtml += '</td>';
+            } else if (comboCols.indexOf(c) >= 0) {
                 // 组合框（单行输入框 + datalist）
-                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + colAttr + '><input class="cell-combo' + mc + '" list="dl_' + c + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             } else if (wrapCols.indexOf(c) >= 0) {
                 // 多行文本列 → textarea
-                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><textarea class="cell-textarea' + mc + '" rows="2" oninput="autoGrow(this)" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
+                bhtml += '<td class="' + cls + '"' + style + colAttr + '><textarea class="cell-textarea' + mc + '" rows="2" oninput="autoGrow(this)" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')">' + escH(val) + '</textarea></td>';
             } else {
                 // 普通单行输入框
-                bhtml += '<td class="' + cls + '"' + style + rowspanAttr + colAttr + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
+                bhtml += '<td class="' + cls + '"' + style + colAttr + '><input class="cell-input' + mc + '" value="' + escH(val) + '" onchange="onCellChange(' + idx + ',' + c + ',this)" onfocus="this.parentElement.parentElement.classList.add(\'editing\')" onblur="this.parentElement.parentElement.classList.remove(\'editing\')"></td>';
             }
 
             // ===== 图片缩略图列（在第3列之后插入，仅产品数据集） =====
@@ -836,6 +860,15 @@ function onCellChange(rowIdx, colIdx, input) {
         input.classList.remove('modified');
     }
     updateStats();
+}
+
+// 继承列「恢复继承」：清空该单元格，使其重新并入上方继承链（等价于手动删空内容，一步到位）
+function resetToInherit(rowIdx, colIdx) {
+    var ta = document.querySelector('#editorBody tr[data-idx="' + rowIdx + '"] td[data-col="' + colIdx + '"] textarea');
+    if (!ta) return;
+    ta.value = '';
+    onCellChange(rowIdx, colIdx, ta);
+    renderTable(); // 重绘以显示继承占位；修改标记保留，导出前仍计入「未确认同步」
 }
 
 // ==================== Selection ====================
@@ -1056,32 +1089,39 @@ function onFileSelected(e) {
     pendingImports = {};
     ambiguousFiles = [];
     var remaining = files.length;
-    var entries = []; // { target, count, fname, slot, ambIdx }
+    var entries = []; // { target, count, fname, slot, ambIdx, error }
     var done = function() {
         remaining--;
         if (remaining === 0) {
             var slotCount = {};
             entries.forEach(function(en) { if (en.slot) slotCount[en.slot] = (slotCount[en.slot] || 0) + 1; });
             var infoLines = entries.map(function(en) {
+                if (en.error) {
+                    return '❌ ' + escH(en.fname) + ' · <span style="color:#b91c1c">' + escH(en.error) + '</span>';
+                }
                 if (en.ambIdx >= 0) {
                     return '❓ ' + escH(en.fname) + ' · ' + en.count + ' 行 · 归属 <select onchange="assignAmbiguous(' + en.ambIdx + ',this.value)"><option value="">请选择</option><option value="id">ID 产品</option><option value="sc">SC 产品</option></select>';
                 }
                 var prodLabel = en.slot && en.slot.indexOf('_') > 0 ? en.slot.split('_')[0].toUpperCase() + ' · ' : '';
                 var dupNote = en.slot && slotCount[en.slot] > 1 ? ' <span style="color:#b91c1c">⚠ 同目标多文件，仅保留最后完成解析的一份</span>' : '';
-                var targetLabel = en.target === 'camera' ? '📷 相机' : (en.target === 'accessory' ? '🔧 配件' : (en.target === 'vm' ? '🔐 VM产品' : '📰 产品动态'));
+                var targetLabel = en.target === 'camera' ? '📷 相机' : (en.target === 'accessory' ? '🔧 配件' : (en.target === 'vm' ? '🔐 VM产品' : (en.target === 'mapping' ? '🔗 经销对照' : '📰 产品动态')));
                 return prodLabel + targetLabel + ' · ' + escH(en.fname) + ' · ' + en.count + ' 行' + dupNote;
             });
             var infoEl = document.getElementById('importInfo');
             infoEl.innerHTML = infoLines.join('<br>') || '未识别到可导入的数据';
             infoEl.style.display = 'block';
-            infoEl.style.color = infoLines.length ? '#166534' : '#b91c1c';
+            var hasErr = entries.some(function(en) { return !!en.error; });
+            infoEl.style.color = (infoLines.length && !hasErr) ? '#166534' : '#b91c1c';
             updateImportBtn();
         }
     };
     for (var i = 0; i < files.length; i++) {
         (function(f) {
-            readFile(f, function(target, count, fname, slot, ambIdx) {
-                if (target === null) { done(); return; }
+            readFile(f, function(target, count, fname, slot, ambIdx, err) {
+                if (target === null) {
+                    if (err) entries.push({ fname: fname, error: err }); // 解析失败要在清单里显式报错，不能静默吞掉
+                    done(); return;
+                }
                 entries.push({ target: target, count: count, fname: fname, slot: slot, ambIdx: ambIdx });
                 done();
             });
@@ -1104,17 +1144,23 @@ function updateImportBtn() {
 
 function readFile(file, callback) {
     var fname = (file.name || '').toLowerCase();
+    var isJs = /\.js$/.test(fname);
+    // JS / CSV 共用编码探测（UTF-8 失败回退 GBK），只在解析环节分道
+    var handle = function(t) {
+        if (isJs) parseJSAndStore(t, fname, callback);
+        else parseAndStore(t, fname, callback);
+    };
     var reader = new FileReader();
     reader.onload = function(e) {
         var text = e.target.result;
         var hasGarbage = /\ufffd/.test(text.substring(0, 500));
         if (hasGarbage) {
             var reader2 = new FileReader();
-            reader2.onload = function(e2) { parseAndStore(e2.target.result, fname, callback); };
-            reader2.onerror = function() { parseAndStore(text, fname, callback); };
+            reader2.onload = function(e2) { handle(e2.target.result); };
+            reader2.onerror = function() { handle(text); };
             reader2.readAsText(file, 'gbk');
         } else {
-            parseAndStore(text, fname, callback);
+            handle(text);
         }
     };
     // 首次读取失败也要回调，否则 onFileSelected 的 remaining 永远不归零，导入框会一直卡住
@@ -1182,6 +1228,121 @@ function parseAndStore(text, fname, callback) {
     var slot = prod + '_' + target;
     pendingImports[slot] = normalized;
     callback(target, normalized.length, fname, slot, -1);
+}
+
+// ==================== JS Import ====================
+// 解析 scripts/*.js 数据文件（exportCurrentJS 的逆操作）。
+// 安全策略：不 eval、不注入 <script> —— 只把 `var XXX = [ ... ];` 中的数组字面量
+// 逐字符扫描定位后按 JSON 解析；手改过的文件（单引号/尾逗号/注释/无引号键）走一次
+// 宽松化预处理再解析，仍失败则明确报错，不触碰现有数据（失败发生在 pendingImports 赋值前）。
+function parseJSAndStore(text, fname, callback) {
+    var fail = function(msg) { callback(null, 0, fname, '', -1, msg); };
+    var src = text.replace(/^\uFEFF/, '');
+    var m = src.match(/\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*\[/);
+    if (!m) { fail('未找到 var XXX = [ ... ] 数据定义'); return; }
+    var varName = m[1];
+    var start = m.index + m[0].length - 1; // '[' 的位置
+    var end = findArrayEnd(src, start);
+    if (end < 0) { fail('数组未闭合（缺少 ]）'); return; }
+    var body = src.substring(start, end + 1);
+    var arr = null;
+    try { arr = JSON.parse(body); } catch (e) { arr = null; }
+    if (!Array.isArray(arr)) arr = tryLenientParse(body);
+    if (!Array.isArray(arr)) { fail('JS 格式无法解析，请使用编辑器导出的原始格式'); return; }
+
+    // 数据集识别：优先变量名（IDBOM_/SCBOM_ 前缀直接判定产品，无歧义；
+    // 比 CSV 的文件名前缀猜测更可靠），变量名不认识再用文件名 + 内容嗅探兜底
+    var target = '', slot = '';
+    var vn = varName.toUpperCase();
+    if (vn === 'VM_DONGLE_DATA') target = 'vm';
+    else if (vn === 'IDBOM_PRODUCT_UPDATES') target = 'updates';
+    else if (vn === 'IDBOM_MAPPING_DATA') target = 'mapping';
+    else if (vn === 'IDBOM_CAMERA_DATA' || vn === 'SCBOM_CAMERA_DATA') target = 'camera';
+    else if (vn === 'IDBOM_ACCESSORY_DATA' || vn === 'SCBOM_ACCESSORY_DATA') target = 'accessory';
+    if (target === 'camera' || target === 'accessory') slot = (vn.indexOf('SCBOM') === 0 ? 'sc' : 'id') + '_' + target;
+    else if (target) slot = target;
+
+    if (!target) {
+        if (fname.indexOf('vm') >= 0) target = 'vm';
+        else if (fname.indexOf('update') >= 0) target = 'updates';
+        else if (fname.indexOf('mapping') >= 0) target = 'mapping';
+        else if (fname.indexOf('camera') >= 0) target = 'camera';
+        else if (fname.indexOf('accessory') >= 0) target = 'accessory';
+        var first = (arr[0] && typeof arr[0] === 'object') ? arr[0] : {};
+        if (!target) {
+            if ('scene' in first || 'modules' in first) target = 'vm';
+            else if ('productType' in first || 'featured' in first) target = 'updates';
+            else if ('baseModel' in first || 'distCode' in first) target = 'mapping';
+            else if (Array.isArray(first.value)) target = first.value.length >= 20 ? 'camera' : 'accessory';
+        }
+        if (!target) { fail('无法识别该 JS 属于哪个数据集（变量名/文件名/内容均不匹配）'); return; }
+    }
+
+    var rows = normalizeJsRows(arr, target);
+    if (!rows.length) { fail('未解析到有效数据行'); return; }
+
+    if (target === 'camera' || target === 'accessory') {
+        if (!slot) {
+            // 产品归属未知（手写变量名）→ 复用 CSV 的「待询问」流程
+            var ambIdx = ambiguousFiles.length;
+            ambiguousFiles.push({ rows: rows, target: target, assigned: '' });
+            callback(target, rows.length, fname, '', ambIdx);
+            return;
+        }
+    } else {
+        slot = target; // 全局数据集：slot 即 tab 名
+    }
+    pendingImports[slot] = rows;
+    callback(target, rows.length, fname, slot, -1);
+}
+
+// 从 '[' 开始扫描到匹配的 ']'（跳过字符串与转义），返回 ']' 下标；未闭合返回 -1。
+// 不能用非贪婪正则：备注文本里一旦出现 ] 或 ]; 会截断到错误位置
+function findArrayEnd(s, start) {
+    var depth = 0, inStr = false, quote = '';
+    for (var i = start; i < s.length; i++) {
+        var ch = s.charAt(i);
+        if (inStr) {
+            if (ch === '\\') { i++; continue; }
+            if (ch === quote) inStr = false;
+            continue;
+        }
+        if (ch === '"' || ch === "'") { inStr = true; quote = ch; continue; }
+        if (ch === '[') depth++;
+        else if (ch === ']') { depth--; if (depth === 0) return i; }
+    }
+    return -1;
+}
+
+// 宽松化预处理（仅在严格 JSON.parse 失败后执行一次）：
+// 整行 // 注释、/* */ 块注释、尾逗号、单引号字符串、无引号键 → 再试 JSON.parse
+function tryLenientParse(body) {
+    var s = body;
+    s = s.replace(/^\s*\/\/.*$/gm, '');
+    s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+    s = s.replace(/,\s*([\]}])/g, '$1');
+    s = s.replace(/'([^"']*)'/g, '"$1"');
+    s = s.replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g, '$1"$2":');
+    try { var v = JSON.parse(s); return Array.isArray(v) ? v : null; } catch (e) { return null; }
+}
+
+// JS 行 → 编辑器行数组：对象数组按 DATASETS[target].keys 映射；{Count,value} 取 value；
+// 纯二维数组直接用。统一补列/截断、trim、去全空行（口径与 CSV 导入一致）
+function normalizeJsRows(arr, target) {
+    var ds = DATASETS[target];
+    var len = ds.headers.length;
+    return arr.map(function(item) {
+        var nr = null;
+        if (Array.isArray(item)) nr = item;
+        else if (item && typeof item === 'object') {
+            if (Array.isArray(item.value)) nr = item.value;               // 相机/配件：{"Count":26,"value":[...]}
+            else if (ds.keys) nr = ds.keys.map(function(k) { return item[k] != null ? item[k] : ''; });
+        }
+        if (!nr) return [];
+        var out = [];
+        for (var i = 0; i < len; i++) out.push((nr[i] != null ? nr[i] : '').toString().trim());
+        return out;
+    }).filter(function(r) { return r.some(function(v) { return v !== ''; }); });
 }
 
 function confirmImport() {
