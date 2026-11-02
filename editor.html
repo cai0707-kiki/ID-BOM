@@ -117,6 +117,9 @@
 
         /* ====== 表格内图片缩略图列 ====== */
         .col-wrap{white-space:normal!important;word-break:break-word;line-height:1.5;position:relative}
+        /* 固定列+换行列（相机具体型号/配件物料名称）：sticky 优先级必须高于 col-wrap 的 relative，
+           否则 left:var(--sticky-fN) 会从粘性锚点变成相对位移，单元格被推到物料描述列上 */
+        .col-fixed.col-wrap{position:sticky}
         .col-wrap input{white-space:normal;word-break:break-word}
 
         /* ====== 继承列（VM 支持模块/备注，方案D）：空值行显示继承占位，每行可独立编辑 ====== */
