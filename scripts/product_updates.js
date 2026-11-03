@@ -4,10 +4,11 @@
  * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）
  */
 var IDBOM_PRODUCT_UPDATES = [
-{"id":"1","date":"2026/8/10","productType":"ID产品","type":"市场策略","content":"2026年市场政策调整，将对经销型号IDA/IDB/IDC/IDE系列进行停产，仅保留一套命名规则，一个物料仅出一个渠道","series":"固定式","docName":"关于工业读码器部分型号停产及命名规则调整的公告通知.pdf","featured":"是"},
+{"id":"1","date":"2026/8/10","productType":"ID产品","type":"市场策略","content":"2026年市场政策调整，将对经销型号IDA/IDB/IDC/IDE系列进行停产，仅保留一套命名规则，一个物料仅出一个渠道","series":"固定式","docName":"关于工业读码器部分型号停产及命名规则调整的公告通知.pdf","featured":"否"},
 {"id":"2","date":"2026/8/14","productType":"ID产品","type":"客户端更新","content":"固定式Web页面发布，免安装，浏览器输入读码器IP即可查看设备信息、设备调试等，暂时支持ID5000M和ID5000XM系列，后续扩展至其他系列","series":"ID5000系列","docName":"","featured":"否"},
 {"id":"3","date":"2026/8/24","productType":"ID产品","type":"产品迭代","content":"ID800系列新出货固件2.0.0版本，无法降级，原定制功能需要定制移植，支持老设备升级","series":"ID800系列","docName":"","featured":"否"},
 {"id":"4","date":"2026/9/1","productType":"ID产品","type":"产品迭代","content":"ID5050M系列新出货固件4.0.9版本，无法降级，原定制功能需要定制移植，支持老设备升级","series":"ID5050系列","docName":"","featured":"否"},
 {"id":"5","date":"2026/9/3","productType":"ID产品","type":"固件更新","content":"ID5000系列发布4.0.8固件版本，后续扩展至其他系列：1、算法版本更新至4.7.16，新增Maxicode码制；2、新增对比度增强、腐蚀、膨胀等预处理算法；3、支持三种光源模式：频闪、取流常亮、触发常亮；4、新增条码感应触发、整包输出等功能；5、部分功能优化","series":"ID5000系列","docName":"ID5000系列固件客户端功能更新一指禅.pdf","featured":"是"},
-{"id":"6","date":"2026/9/8","productType":"ID产品","type":"产品迭代","content":"E10 V2.0医药一体机新出货固件3.4.0版本，优化HID传输速率，无法降级，也不支持老设备升级","series":"医药一体机","docName":"","featured":"否"}
+{"id":"6","date":"2026/9/8","productType":"ID产品","type":"产品迭代","content":"E10 V2.0医药一体机新出货固件3.4.0版本，优化HID传输速率，无法降级，也不支持老设备升级","series":"医药一体机","docName":"","featured":"否"},
+{"id":"6","date":"2026/11/4","productType":"全产品","type":"产品迭代","content":"📢智能产品线十月月报已更新\n包含智能相机、PDA、读码、AI 训推等新品发布、升级迭代和产品未来动态，方便大家了解最新产品动态～","series":"全产品","docName":"智能产品线十月月报.png","featured":"是"}
 ];
