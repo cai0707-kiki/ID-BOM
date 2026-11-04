@@ -47,7 +47,7 @@ ID-BOM/
 │   │   └── THUMB/          # SC配件缩略图 80x80
 │   └── PIC/                # 其他图片（QR码等）
 │       └── THUMB/          # 其他缩略图 120x120
-├── pdf/                    # 产品动态关联PDF文档
+├── docs/                   # 产品动态关联附件（PDF/PNG 等）
 ├── resize.js               # 图片工具 — 缩略图生成 / 图片尺寸调整 / 自动分发
 ├── search-spec-url.py      # 工具脚本 — 从海康官网抓取产品链接
 ├── id_camera_data.csv      # ID相机产品数据源（26列，编辑器导出为UTF-8带BOM）

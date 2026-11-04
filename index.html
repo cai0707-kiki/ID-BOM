@@ -4745,7 +4745,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].indexOf(docExt) !== -1) {
                     docIcon = '🖼️';
                 }
-                html += '<a class="update-item-doc" href="pdf/' + encodeURIComponent(item.docName) + '" target="_blank" title="打开文件">';
+                html += '<a class="update-item-doc" href="docs/' + encodeURIComponent(item.docName) + '" target="_blank" title="打开文件">';
                 html += docIcon + ' ' + item.docName;
                 html += '</a>';
             }
