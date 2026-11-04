@@ -3554,15 +3554,15 @@
         var maxY = document.documentElement.scrollHeight - window.innerHeight;
         if (targetY > maxY) targetY = maxY;
         if (targetY < 0) targetY = 0;
-        window.scrollTo({ top: targetY, behavior: 'smooth' });
-        setTimeout(function() {
-            if (!tr.isConnected) return;
-            tr.classList.add('row-flash');
-            tr.addEventListener('animationend', function handler() {
-                tr.classList.remove('row-flash');
-                tr.removeEventListener('animationend', handler);
-            });
-        }, 100);
+        // 方案C：瞬时定位（不平滑滚动），高亮从到位那一刻立即开始，
+        // 避免平滑滚动耗时吞掉 1s 闪底动画导致远处物料看不到底色
+        window.scrollTo({ top: targetY });
+        if (!tr.isConnected) return;
+        tr.classList.add('row-flash');
+        tr.addEventListener('animationend', function handler() {
+            tr.classList.remove('row-flash');
+            tr.removeEventListener('animationend', handler);
+        });
     }
 
     function jumpOverviewToProduct(side, idx) {
