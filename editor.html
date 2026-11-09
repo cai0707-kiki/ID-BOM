@@ -835,8 +835,8 @@ function updateStats() {
     var n = Object.keys(modifiedCells).length;
     var el = document.getElementById('modifiedIndicator');
     el.innerHTML = n > 0
-        ? ' · <span class="unsaved">' + n + ' 处修改未确认同步</span>'
-        : ' · <span class="saved">全部修改已确认</span>';
+        ? ' · <span class="unsaved">' + n + ' 处修改未导出</span>'
+        : ' · <span class="saved">无待导出修改</span>';
 }
 
 // ==================== Auto Save ====================
@@ -1512,16 +1512,14 @@ function saveChanges() {
     modifiedCells = {};
     renderTable();
     updateStats();
-    fetch('http://127.0.0.1:18088', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product: currentProduct, camera: cameraData, accessory: accessoryData })
-    }).then(function(r) { return r.json(); }).then(function(d) {
-        if (d.ok) showToast('数据已同步到CSV和index.html！', 'success');
-        else showToast('同步失败', 'error');
-    }).catch(function() {
-        showToast('数据已保存到浏览器（同步服务未启动）', 'warning');
-    });
+    // 编辑器是纯静态页面，没有后端可写文件：
+    // 「保存」= 收口未失焦的编辑 + 写入 localStorage 草稿，然后引导用户导出 JS/CSV。
+    // 原先此处会 POST 到一个本地端口的「同步服务」，但项目从未提供该服务，
+    // 请求必然失败并提示「同步服务未启动」，属于无效路径，已移除。
+    var label = isGlobalTab(currentTab)
+        ? GLOBAL_TAB_LABELS[currentTab]
+        : currentProduct.toUpperCase() + ' / ' + (currentTab === 'camera' ? '相机' : '配件');
+    showToast('已存入浏览器草稿（' + label + '）。要写入文件，请用「导出JS」覆盖 scripts/ 下对应文件', 'success', 6000);
 }
 
 function flushPendingEdits() {
@@ -1563,7 +1561,7 @@ function escJS(s) {
 }
 function dl(c, f, t) { var b = new Blob([c],{type:t}), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = f; a.click(); URL.revokeObjectURL(a.href); }
 var toastTimer1 = null, toastTimer2 = null;
-function showToast(msg, type) {
+function showToast(msg, type, duration) {
     var t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast ' + (type || 'success');
@@ -1571,7 +1569,8 @@ function showToast(msg, type) {
     if (toastTimer1) { clearTimeout(toastTimer1); toastTimer1 = null; }
     if (toastTimer2) { clearTimeout(toastTimer2); toastTimer2 = null; }
     toastTimer1 = setTimeout(function() { t.classList.add('show'); }, 10);
-    toastTimer2 = setTimeout(function() { t.classList.remove('show'); toastTimer1 = toastTimer2 = null; }, 3000);
+    var dur = duration || 3000;
+    toastTimer2 = setTimeout(function() { t.classList.remove('show'); toastTimer1 = toastTimer2 = null; }, dur);
 }
 
 function parseCSV(text) {

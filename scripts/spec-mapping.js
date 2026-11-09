@@ -327,20 +327,25 @@
     "MV-IDH9000B/13HHD/16RP/US/套包": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13273",
     "MV-IDM-B08": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13338",
     "MV-IDM-C08": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12542",
+    "MV-IDM-E10": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12934",
     "MV-IDM-E10(V2.0)": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12934",
     "MV-IDP3204/32G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10227",
     "MV-IDP3204/64G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12881",
     "MV-IDP3204/A/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12880",
+    "MV-IDP3304/A/3&32": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12885",
     "MV-IDP4104/4&64/DP/05NR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12550",
     "MV-IDP5006/5G/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12027",
     "MV-IDP5006/5G/4&64/05FR/H": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12096",
     "MV-IDP5006/5G/A/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12028",
+    "MV-IDP5006/5G/A/4&64/05FR/经济款": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12028",
     "MV-IDP5102/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12886",
+    "MV-IDP5104/AI 4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12006",
     "MV-IDP5104/AI4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12006",
     "MV-IDP5114/4&64/05FR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12577",
     "MV-IDP5204/3&32": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10230",
     "MV-IDP5204/4&64": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10229",
     "MV-IDP5204/4&64/07ER": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12896",
+    "MV-IDP5204/4&64/DP": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=11524",
     "MV-IDS006M-12C-C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10452",
     "MV-IDS012M-16C-C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10451",
     "MV-IDS012M-16C-OCR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=11964",
@@ -349,6 +354,7 @@
     "MV-PD010003-06M-12C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9134",
     "MV-PD010003-06M-16C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9888",
     "MV-PD010003-12C-8C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9801",
+    "MV-PD010003-12M-16C": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=9138",
     "MV-SC1003C-03S-WBN-NR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13009",
     "MV-SC1003C-03S-WBN-SR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13010",
     "MV-SC1003M-03S-WBN-NR": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=11701",
@@ -402,6 +408,9 @@
     "MV-SC3016M-06M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=7404",
     "MV-SC3016M-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=7405",
     "MV-SC3016M-15M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=7406",
+    "MV-SC3020XC-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14597",
+    "MV-SC3020XM-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14599",
+    "MV-SC3020XM-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14598",
     "MV-SC3030XC-05M-MED": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12729",
     "MV-SC3030XC-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10649",
     "MV-SC3030XC-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=10651",
@@ -432,19 +441,31 @@
     "MV-SC3060XM-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13836",
     "MV-SC5020XC-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13163",
     "MV-SC5020XC-06M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12735",
+    "MV-SC5020XC-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14661",
+    "MV-SC5020XC-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14662",
     "MV-SC5020XC-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12734",
+    "MV-SC5020XC-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14663",
     "MV-SC5020XC-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12733",
     "MV-SC5020XM-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13164",
     "MV-SC5020XM-06M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12736",
+    "MV-SC5020XM-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14667",
+    "MV-SC5020XM-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14668",
     "MV-SC5020XM-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12738",
+    "MV-SC5020XM-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14669",
     "MV-SC5020XM-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12737",
     "MV-SC5050XC-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13165",
+    "MV-SC5050XC-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14664",
     "MV-SC5050XC-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12739",
+    "MV-SC5050XC-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14665",
     "MV-SC5050XC-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12740",
+    "MV-SC5050XC-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14666",
     "MV-SC5050XC-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12741",
     "MV-SC5050XM-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13166",
+    "MV-SC5050XM-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14670",
     "MV-SC5050XM-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12743",
+    "MV-SC5050XM-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14671",
     "MV-SC5050XM-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12742",
+    "MV-SC5050XM-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14672",
     "MV-SC5050XM-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=12744",
     "MV-SC5060XC-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14176",
     "MV-SC5060XC-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14173",
@@ -455,12 +476,18 @@
     "MV-SC5060XM-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14166",
     "MV-SC5060XM-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14165",
     "MV-SC5100XC-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14159",
+    "MV-SC5100XC-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14605",
     "MV-SC5100XC-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14156",
+    "MV-SC5100XC-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14606",
     "MV-SC5100XC-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14157",
+    "MV-SC5100XC-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14607",
     "MV-SC5100XC-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14158",
     "MV-SC5100XM-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14163",
+    "MV-SC5100XM-08L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14602",
     "MV-SC5100XM-08M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14160",
+    "MV-SC5100XM-12L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14603",
     "MV-SC5100XM-12M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14162",
+    "MV-SC5100XM-16L-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14604",
     "MV-SC5100XM-16M-WBN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14161",
     "MV-SC5120XC-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13161",
     "MV-SC5120XM-00C-NNN": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=13160",
@@ -496,24 +523,40 @@
     "MV-SVC2506-16G60-128G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=11558",
     "MV-SVC2509-16G60-512G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=11557",
     "MV-VAC3504H-128G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14578",
+    "MV-VAC3504H-128G01": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14578",
     "MV-VAC3504X-128G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14576",
+    "MV-VAC3504X-128G01": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14576",
     "MV-VAC3704H-128G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14577",
+    "MV-VAC3704H-128G01": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14577",
     "MV-VAC3704X-128G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14579",
+    "MV-VAC3704X-128G01": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14579",
     "MV-VAC5524-256G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14580",
-    "MV-VAC5724-256G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14581"
+    "MV-VAC5524-256G02": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14580",
+    "MV-VAC5724-256G": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14581",
+    "MV-VAC5724-256G02": "https://www.hikrobotics.com/cn/machinevision/productdetail/?id=14581"
   };
 
   // ==================== 对外接口 ====================
+  // 严格版本后缀：这类型号在官网是独立条目，若清洗后未精确命中，
+  // 说明官网未收录该版本，必须明确返回空，不能用基型页顶替
+  // （否则 MV-SC3020XM-12M-WBN-SE 会指向非 -SE 的 MV-SC3020XM-12M-WBN 页面）
+  var SPEC_STRICT_SUFFIX = /-SE$/i;
+
   function getSpecUrl(modelName) {
     if (!modelName) return '';
     // 清洗型号：去掉 (国内标配)(国内中性) 等括号后缀和版本号
+    // 版本号必须带 V（如 V2.0 / V3.0）才剥离。旧写法 V? 使 V 可选，
+    // 会把型号本身的数字尾段一起吃掉：MV-IDM-E10 截成 MV-IDM-E、
+    // MV-IDP3204/A/4&64 截成 MV-IDP3204/A/4&，再靠模糊包含匹配可能命中别的型号。
     var cleaned = modelName
       .replace(/\([^)]*\)/g, '')
-      .replace(/\s*V?\d+(\.\d+)?\s*$/, '')
+      .replace(/\s*V\d+(\.\d+)?\s*$/, '')
       .trim();
     // 1. 直接匹配
     if (DOWNLOAD_URLS[cleaned]) return DOWNLOAD_URLS[cleaned];
-    // 2. 模糊匹配：遍历 keys，找到包含关系
+    // 2. 带严格版本后缀（如 -SE）的型号不做模糊兜底，明确返回空
+    if (SPEC_STRICT_SUFFIX.test(cleaned)) return '';
+    // 3. 模糊匹配：遍历 keys，找到包含关系
     var keys = Object.keys(DOWNLOAD_URLS);
     for (var i = 0; i < keys.length; i++) {
       if (cleaned.indexOf(keys[i]) >= 0 || keys[i].indexOf(cleaned) >= 0) {
@@ -523,5 +566,5 @@
     return '';
   }
 
-  window.getSpecUrl = getSpecUrl;
+  /** @type {any} */ (window).getSpecUrl = getSpecUrl;
 })();

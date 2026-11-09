@@ -42,27 +42,31 @@ HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 
 def clean_model(raw):
     """
-    清洗型号：去掉 (国内标配)(国内中性)(全球通中性) 等括号后缀，去掉版本号
+    清洗型号：去掉 (国内标配)(国内中性)(全球通中性) 等括号后缀，去掉版本号。
+
     示例：
-      MV-ID803M-03S-WBN-SR-U(国内标配) → MV-ID803M-03S-WBN-SR-U
-      MV-ID2013EMI-05-RBN(国内标配)V2.0 → MV-ID2013EMI-05-RBN
-      MV-SC5020XC-12M-WBN(国内中性     → MV-SC5020XC-12M-WBN（缺右括号）
-      MV-SVC2506-08G60-128G(国内标配）  → MV-SVC2506-08G60-128G（中文右括号）
+      MV-ID803M-03S-WBN-SR-U(国内标配)   → MV-ID803M-03S-WBN-SR-U
+      MV-ID2013EMI-05-RBN(国内标配)V2.0  → MV-ID2013EMI-05-RBN
+      MV-SC5020XC-12M-WBN(国内中性       → MV-SC5020XC-12M-WBN（缺右括号）
+      MV-SVC2506-08G60-128G(国内标配）    → MV-SVC2506-08G60-128G（中文右括号）
+      MV-IDP3204/A/4&64(国内标配)        → MV-IDP3204/A/4&64（&64 是型号的一部分，不能删）
     """
-    cleaned = raw
+    cleaned = raw.strip()
+    # 先摘掉版本号：只认 V2 / V2.0 / V3.0.1 这种带 V 的，且必须在结尾。
+    # 旧实现用的是 \s*V?\d+(\.\d+)?$ —— V 可选，会把 MV-IDP3204/A/4&64 砍成
+    # MV-IDP3204/A/4&、把 MV-IDM-E10 砍成 MV-IDM-E，造成后面匹配到别的产品页。
+    cleaned = re.sub(r'\s*[Vv]\d+(\.\d+)*\s*$', '', cleaned)
     # 去掉英文括号及其内容：(xxx)
     cleaned = re.sub(r'\([^)]*\)', '', cleaned)
-    # 去掉中文括号及其内容：（xxx） 或 (xxx）（右括号为中文）
+    # 去掉中文括号及其内容：（xxx）
     cleaned = re.sub(r'（[^）]*）', '', cleaned)
-    # 处理缺右括号的异常情况：(xxx 后面没有右括号就截断
-    cleaned = re.sub(r'\([^(\)]*$', '', cleaned)
-    # 处理中文右括号残留：xxx） 开头无左括号
-    cleaned = re.sub(r'^[^(（]*[）\)]', '', cleaned)
-    # 去掉版本号后缀
-    cleaned = re.sub(r'\s*V?\d+(\.\d+)?$', '', cleaned).strip()
-    # 去掉末尾残留的括号
-    cleaned = cleaned.rstrip(')').rstrip('）')
-    return cleaned
+    # 缺右括号的异常情况：(xxx 一直到结尾
+    cleaned = re.sub(r'\([^(（]*$', '', cleaned)
+    # 残留的中文右括号：xxx）
+    cleaned = re.sub(r'^[^(（]*[）]', '', cleaned)
+    # 括号剥离后可能又露出版本号，例如 ...(国内标配)V2.0
+    cleaned = re.sub(r'\s*[Vv]\d+(\.\d+)*\s*$', '', cleaned)
+    return cleaned.strip().rstrip(')').rstrip('）')
 
 
 # ==================== index.html 解析 ====================
@@ -83,7 +87,10 @@ def extract_models_from_data():
                 for item in data:
                     row = item.get("value", item)
                     if isinstance(row, list) and len(row) > 3:
-                        if row[0] and row[0].strip() == "相机" and row[3]:
+                        # 注意：ID 相机数据的「数据分类」列取值是「ID系列」，
+                        # 不是「相机」（那是配件表首列的写法）。曾误写为「相机」，
+                        # 导致 ID 侧 688 行型号从未被提取、spec-mapping.js 长期缺 ID 链接。
+                        if row[0] and row[0].strip() in ("ID系列", "相机") and row[3]:
                             raw = row[3].strip()
                             cleaned = clean_model(raw)
                             if cleaned and cleaned.startswith("MV-") and cleaned not in models:

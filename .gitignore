@@ -25,3 +25,6 @@ npm-debug.log*
 
 # PowerPoint files
 *.pptx
+
+# Local maintenance scripts (not part of the distributed site)
+tools/
