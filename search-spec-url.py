@@ -33,6 +33,11 @@ except ImportError:
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_JS  = os.path.join(SCRIPT_DIR, "scripts", "spec-mapping.js")
 
+# 引入 spec-mapping.js 读写模块（tools/spec_mapping_io.py）
+# 统一表头/字典序/分隔符/行尾，保证与 tools/_gen_spec.js 逐字节一致
+sys.path.insert(0, os.path.join(SCRIPT_DIR, "tools"))
+import spec_mapping_io as spec_io  # noqa: E402
+
 # 海康官网 API（可用，不会被 WAF 拦截）
 API_URL = "https://www.hikrobotics.com/cn/Api/Foreground/Vision/VisionProductIntroduction"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
@@ -205,61 +210,26 @@ def match_models(html_models, scanned_products):
 
 
 # ==================== spec-mapping.js 读写 ====================
+#
+# 文件格式统一由 tools/spec_mapping_io.py 负责，与 tools/_gen_spec.js 逐字节一致。
+# 注意：旧实现用正则 '"([^"]+)"\s*:\s*"([^"]+)"' 读对象格式；改成纯数据数组后，
+# 该正则会匹配出 {"型号":...} 与 {"URL":...} 并互相覆盖，最终只剩 1 条。
+# 因此必须走 json 解析，不能再用正则。
 
 def load_existing_urls():
-    """从 spec-mapping.js 中读取已有的 DOWNLOAD_URLS"""
-    if not os.path.exists(OUTPUT_JS):
-        return {}
-    with open(OUTPUT_JS, "r", encoding="utf-8") as f:
-        content = f.read()
-    match = re.search(r'var\s+DOWNLOAD_URLS\s*=\s*\{([^}]*)\}', content, re.DOTALL)
-    if not match:
-        return {}
-    urls = {}
-    for line in match.group(1).split("\n"):
-        m = re.match(r'\s*"([^"]+)"\s*:\s*"([^"]+)"', line)
-        if m:
-            urls[m.group(1)] = m.group(2)
-    return urls
+    """从 spec-mapping.js 中读取已有映射（兼容新旧两种格式）"""
+    return spec_io.load(OUTPUT_JS)
 
 
 def save_to_spec_js(new_urls):
-    """将新匹配的 URL 合并写入 spec-mapping.js 的 DOWNLOAD_URLS 中"""
+    """将新匹配的 URL 合并写入 spec-mapping.js（纯数据数组格式，字典序）"""
     if not os.path.exists(OUTPUT_JS):
         print(f"❌ {OUTPUT_JS} 不存在，请先创建基础文件")
-        return
+        return 0
 
-    with open(OUTPUT_JS, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # 读取已有的
-    existing = load_existing_urls()
-    # 合并（新的覆盖旧的）
-    merged = dict(existing)
-    merged.update(new_urls)
-
-    # 构建新的 DOWNLOAD_URLS 块
-    lines = ["  var DOWNLOAD_URLS = {"]
-    sorted_keys = sorted(merged.keys())
-    for i, key in enumerate(sorted_keys):
-        comma = "," if i < len(sorted_keys) - 1 else ""
-        # 转义 URL 中的特殊字符
-        lines.append(f'    "{key}": "{merged[key]}"{comma}')
-    lines.append("  };")
-    new_block = "\n".join(lines)
-
-    # 替换
-    content = re.sub(
-        r'var\s+DOWNLOAD_URLS\s*=\s*\{[^}]*\};',
-        new_block,
-        content,
-        flags=re.DOTALL
-    )
-
-    with open(OUTPUT_JS, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    return len(merged)
+    total, added, updated = spec_io.merge(OUTPUT_JS, new_urls)
+    print(f"   新增 {added} 条，覆盖更新 {updated} 条")
+    return total
 
 
 # ==================== 主流程 ====================

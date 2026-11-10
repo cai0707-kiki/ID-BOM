@@ -952,17 +952,42 @@
             background:#ffedd5;
             color:#f97316;
         }
-        .dblclick-hint{
-            display:block;
+        /* 型号单元格第二行：「双击打开配单表」 + Spec 链接 */
+        .host-name-extra{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:6px;
             margin-top:2px;
+        }
+        .dblclick-hint{
+            display:inline-block;
             color:#f97316;
             font-size:10px;
             font-weight:600;
+            line-height:1.5;
+            white-space:nowrap;
             opacity:0;
             transition:opacity .15s;
+            cursor:pointer;
+            user-select:none;
         }
         tr[data-kind="host"]:hover .dblclick-hint{
             opacity:1;
+        }
+        .ov-spec-link{
+            font-size:10px;
+            color:#3b82f6;
+            text-decoration:none;
+            white-space:nowrap;
+            flex:0 0 auto;
+        }
+        a.ov-spec-link:hover{
+            text-decoration:underline;
+        }
+        .ov-spec-link.is-empty{
+            color:#94a3b8;
+            cursor:default;
         }
         .row-accessory td {
             background: #eff6ff;
@@ -1238,14 +1263,14 @@
         <div class="header-left">
             <div class="header-logo"><span class="logo-text">智能产品线配单工具</span></div>
             <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                <div class="header-logo" style="font-size:10px;color:#94a3b8">V2.3.3</div>
+                <div class="header-logo" style="font-size:10px;color:#94a3b8">V2.4.0</div>
                 <div class="header-logo" style="font-size:10px;color:#94a3b8" id="dataUpdateDate"></div>
             </div>
         </div>
     </div>
     <!-- ====== 公告配置（编辑这里修改公告内容和日期） ====== -->
     <script id="announceConfig" type="application/json">
-    {"content":"本次更新：\n1、新增SC3020XC/XM系列;\n2、新增SC5020/5050/5100 液态镜头;\n3、新增SC2000X/SC3000X扩展光源配件；\n4、新增VT1008C 智能相机独立模块；\n6、调整部分VM加密狗表描述；\n6、更正部分描述或者配图错误","date":"2026-11-09"}
+    {"content":"本次更新：\n1、新增SC3020XC/XM系列;\n2、新增SC5020/5050/5100 液态镜头;\n3、新增SC2000X/SC3000X扩展光源配件；\n4、新增VT1008C 智能相机独立模块；\n6、调整部分VM加密狗表描述；\n6、更正部分描述或者配图错误","date":"2026-11-10"}
     </script>
     <!-- ====== /公告配置 ====== -->
         <div class="container">
@@ -1768,10 +1793,37 @@
 
     <script src="scripts/spec-mapping.js"></script>
     <script>
-    // fallback: spec-mapping.js 加载失败时提供空实现
-    if (typeof window.getSpecUrl !== 'function') {
-      window.getSpecUrl = function() { return ''; };
+    /* ==================== 产品资料链接 ====================
+     * spec-mapping.js 是纯数据文件（SPEC_MAPPING_DATA: [{型号,URL},...]），
+     * 匹配逻辑集中在这里，数据文件不再含任何代码。
+     *
+     * 清洗规则：数据里的型号带 (国内标配)/(国内中性)、V2.0 等后缀，
+     * 映射表的 key 是裸型号，必须先剥掉后缀才能精确命中。
+     * 版本号必须带 V 才剥离 —— 写成 V? 会把型号本身的数字尾段一起吃掉
+     * （MV-IDM-E10 → MV-IDM-E、MV-IDP3204/A/4&64 → MV-IDP3204/A/4&）。
+     *
+     * 只做精确匹配，不做模糊子串兜底：
+     * 官网未收录的型号（如 -SE 独立版本）宁可显示「暂无产品页」，
+     * 也不能用基型页面顶替 —— 指错页比失链更危险。
+     */
+    var SPEC_MAP = {};
+    (function() {
+      var arr = (typeof SPEC_MAPPING_DATA !== 'undefined' && SPEC_MAPPING_DATA) || [];
+      for (var i = 0; i < arr.length; i++) {
+        var it = arr[i];
+        if (it && it['型号'] && it['URL']) SPEC_MAP[it['型号']] = it['URL'];
+      }
+    })();
+
+    function getSpecUrl(modelName) {
+      if (!modelName) return '';
+      var cleaned = modelName
+        .replace(/\([^)]*\)/g, '')
+        .replace(/\s*V\d+(\.\d+)?\s*$/, '')
+        .trim();
+      return SPEC_MAP[cleaned] || '';
     }
+    window.getSpecUrl = getSpecUrl;
     </script>
     <script src="scripts/id_camera_data.js"></script>
     <script src="scripts/id_accessory_data.js"></script>
@@ -3760,6 +3812,25 @@
     var first = container.querySelector('.series-item');
     if (first) renderIdOverviewTable(first.getAttribute('data-series'), first);
     }
+    /* 型号单元格第二行：「双击打开配单表」 + Spec 链接
+     * - 只有主机行才显示；配件的 row[3] 不是官网型号，挂了也没意义
+     * - Spec 命中 SPEC_MAP → 蓝色可点链接，新窗口打开官网产品页
+     * - 未命中 → 置灰「📋 Spec」+ title 提示，与配单表内部表现一致
+     * - 双击跳转只绑在 .dblclick-hint 上，Spec 链接不会误触
+     */
+    function buildHostNameExtra(modelName, isCamera) {
+        if (!isCamera) return '';
+        var specUrl = getSpecUrl(modelName);
+        var specHtml = specUrl
+            ? '<a class="ov-spec-link" href="' + esc(specUrl) + '" target="_blank" rel="noopener noreferrer"' +
+              ' title="在新窗口打开官网产品页" onclick="event.stopPropagation()">📋 Spec</a>'
+            : '<span class="ov-spec-link is-empty" title="暂无产品页">📋 Spec</span>';
+        return '<span class="host-name-extra">'
+            + '<small class="dblclick-hint" title="双击打开配单表">双击打开配单表</small>'
+            + specHtml
+            + '</span>';
+    }
+
     // 渲染右侧表格
     function renderIdOverviewTable(seriesName, el, opts) {
         // 高亮切换
@@ -3838,7 +3909,7 @@
             html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
-                +  '<td>' + nl2br(name) + (isCamera ? '<small class="dblclick-hint">双击打开配单表</small>' : '') + '</td>'
+                +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
                 +  '<td class="material-code">' + code + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
@@ -3996,7 +4067,7 @@
             html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
-                +  '<td>' + nl2br(name) + (isCamera ? '<small class="dblclick-hint">双击打开配单表</small>' : '') + '</td>'
+                +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
                 +  '<td class="material-code">' + code + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
@@ -4046,7 +4117,9 @@
             var wrap = document.getElementById(cfg[0]);
             if (!wrap) return;
             wrap.addEventListener('dblclick', function(e) {
-                if (e.target.closest('img')) return;
+                // 只有双击「双击打开配单表」这行提示才跳转。
+                // 双击型号文字（想框选/复制）、图片、Spec 链接一律不跳。
+                if (!e.target.closest('.dblclick-hint')) return;
                 var tr = e.target.closest('tr[data-kind]');
                 if (!tr || tr.getAttribute('data-kind') !== 'host') return;
                 jumpOverviewToBom(cfg[1], tr);

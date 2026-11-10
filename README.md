@@ -12,7 +12,7 @@
 - **规格书速查** — 输入型号即可跳转海康机器人官网产品详情页
 - **数据编辑器** — 独立的相机/配件数据管理界面，支持增删改查、搜索、CSV导入导出
 - **快速搜索** — 全局搜索型号名称或物料代码，一键加入配单
-- **ID/SC系列全览** — 按产品系列浏览全部相机和关联配件，支持快速搜索跳转并滚动定位到目标产品
+- **ID/SC系列全览** — 按产品系列浏览全部相机和关联配件，支持快速搜索跳转并滚动定位到目标产品；主机行附「📋 Spec」直达官网产品页（无对应页时置灰），双击「双击打开配单表」提示进入配单
 - **ID/SC经销对照表** — 基线型号与经销型号映射查询，数据可在编辑器「🔗经销对照」Tab 维护
 - **VM智能选型** — VisionMaster加密狗及软加密选型，覆盖读码、缺陷检测、定位测量、深度学习等8大应用场景
 - **PDA选型** — 多维度筛选参数对比
@@ -58,6 +58,9 @@ ID-BOM/
 │   └── vm_dongle_data.csv      # VM加密狗（8列）
 ├── tools/                  # 维护脚本（仅本地使用，不纳入版本库）
 │   ├── sync_csv_from_scripts.py  # 以 scripts/*.js 为准重生成 csv/
+│   ├── audit_images.py           # 图片资源完整性巡检（引用 vs 磁盘）
+│   ├── audit_spec_coverage.py    # Spec 链接覆盖率巡检 + 未命中归类
+│   ├── _verify_all.py            # 全量校验入口（一条命令跑完 8 组 17 项）
 │   ├── scan_hik_catalog.py       # 扫描海康官网产品库，缓存型号→产品ID
 │   └── ...                       # 规格书链接补全 / 校验等一次性或辅助脚本
 ├── resize.js               # 图片工具 — 缩略图生成 / 图片尺寸调整 / 自动分发
@@ -104,6 +107,37 @@ python tools/sync_csv_from_scripts.py --check  # 只比对差异，不写文件
 > 需要这些脚本，需另行获取；`csv/` 也是本地副本（`*.csv` 已被忽略）。
 > 项目运行本身只依赖 `index.html` + `scripts/*.js` + `IMG/`。
 
+### 质量巡检
+
+改动后建议跑一遍全量校验，任一失败即 exit 1：
+
+```bash
+python tools/_verify_all.py        # 8 组 17 项，约 3 秒
+python tools/_verify_all.py -v     # 显示每项完整输出
+```
+
+其中两个专门盯「数据与资源脱节」的巡检，也可单独运行：
+
+| 命令 | 检查内容 | 失败含义 |
+|---|---|---|
+| `python tools/audit_images.py` | 按 `getImageHtml` 的真实拼接规则，核对 `scripts/*.js` 引用的缩略图/原图是否都存在 | 页面会显示占位符（真故障） |
+| `python tools/audit_spec_coverage.py` | Spec 链接命中率 + 未命中型号归类 | **仅代码层异常才失败**；覆盖率不足属数据问题，只报告 |
+
+两个脚本都带**规则自检**：`audit_images.py` 会核对 `index.html` 里 `ID_CAM/` `ID_ACC/`
+前缀规则仍在；`audit_spec_coverage.py` 会用 Node 实跑 `index.html` 中真实的 `getSpecUrl`，
+与 Python 侧清洗结果做 21 例行为比对。这样「改了渲染逻辑导致巡检仍全绿、线上已坏」会被拦下。
+
+`audit_spec_coverage.py` 支持导出未命中清单便于批量补录：
+
+```bash
+python tools/audit_spec_coverage.py --csv spec_missing.csv   # 导出待补录型号
+python tools/audit_spec_coverage.py -v                       # 打印全部未命中
+```
+
+> **未命中为何不自动补**：缺失分两类 —— 真空缺（映射表里根本没这个型号）与近似条目
+> （如 `MV-IDM-C09` 附近只有 `MV-IDM-C08`）。后者是**不同产品**，模糊匹配会把用户导到
+> 错误的产品页，指错页比失链更危险，因此只报告、由人工确认后录入。
+
 #### CSV 编码约定（重要）
 
 **全部 `csv/*.csv` 统一为 UTF-8 with BOM + CRLF 换行。** 写入方有两条路径，约定必须一致，
@@ -147,8 +181,9 @@ python tools/sync_csv_from_scripts.py --check  # 只比对差异，不写文件
 > 清除浏览器数据会丢失草稿，请定期导出。
 
 > 公告不通过编辑器维护（编辑器没有公告编辑功能）：公告内容与日期直接写在 `index.html`
-> 的 `#announceConfig` JSON 块中（约第 1247 行）；主页版本号在同文件的 `V2.3.3` 文本处
-> （约第 1241 行），数据更新日期由公告配置里的日期自动渲染到 `#dataUpdateDate`。
+> 的 `#announceConfig` JSON 块中（搜索 `id="announceConfig"` 定位，位于 `</head>` 之前）；
+> 主页版本号是同一文件里的 `V2.4.0` 文本（搜索 `header-logo` 定位，紧邻 `#dataUpdateDate`），
+> 数据更新日期由公告配置里的 `date` 字段自动渲染到 `#dataUpdateDate`。
 
 ## 图片管理
 
@@ -215,6 +250,15 @@ var url = getSpecUrl('MV-ID2013EM-05-RBN');
 > `package.json` 中声明的 `xlsx`、`iconv-lite` 目前没有任何脚本引用，属于历史遗留依赖。
 
 ## 版本更新记录
+
+### V2.4.0 (2026-11-10)
+**全览页 Spec 直达 / 双击行为收窄 / 一体线标识修正 / 巡检工具转正**
+
+- **系列全览页新增「📋 Spec」按钮**：ID/SC 全览的型号栏第二行在「双击打开配单表」右侧新增官网直达链接，有映射时蓝色可点（新窗口打开、带 `rel="noopener noreferrer"`），无映射时置灰显示「暂无产品页」，与配单表内部的 `📋 Spec` 样式保持一致；新增 `buildHostNameExtra()` 统一 ID/SC 两侧渲染，行高与列宽均未改变（13 个系列 688 行逐行 A/B 比对，行高、单元格高度完全一致，溢出 0）
+- **双击行为收窄**：`initOverviewBomJump` 的触发条件由「双击行内任意位置」改为仅在 `.dblclick-hint` （「双击打开配单表」文字）上生效。此前双击图片、双击型号文字想选中复制都会误跳配单页，同时该改动从根本上消除了「双击 Spec 误触发配单表跳转」的冲突（无需依赖 `stopPropagation` 补救）
+- **ID2020RM系列U口 一体线标识修正**：`M12A17-L` → `M12A17-U`（10 个型号）。原标识使该系列 U 口型号在配单时列出 18 条 `openRJ45DB9` 网口线，正确的 U 口线一条都看不到；修正后仅列出 3 条正确的 U 口线，与 ID2004M/ID2016M/ID2013XM/ID2016XM/ID2023XM 等其他 U 口系列一致。网口 10 行未受影响，`spec-mapping` 与 CSV 副本同步
+- **巡检工具转正**：原一次性分析脚本整理为 `tools/audit_images.py`（图片引用 vs 磁盘完整性）与 `tools/audit_spec_coverage.py`（Spec 覆盖率 + 未命中归类，支持 `--csv` 导出），接入 `_verify_all.py` 新增第 8 组「资源与覆盖」，全量校验由 7 组 15 项扩展为 **8 组 17 项**；两个工具均带规则漂移自检，`getSpecUrl` 的清洗规则被改动时会以行为比对（21 例）拦下，避免「代码已坏、巡检仍全绿」
+- 主页版本号 V2.4.0，公告日期 2026-11-10（公告正文沿用上一篇，未改动）
 
 ### V2.3.3 (2026-11-09)
 **规格书链接补全 / 匹配规则修正 / 编辑器保存修复 / 文档校正**

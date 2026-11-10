@@ -28,3 +28,7 @@ npm-debug.log*
 
 # Local maintenance scripts (not part of the distributed site)
 tools/
+
+# Python bytecode cache
+__pycache__/
+*.pyc

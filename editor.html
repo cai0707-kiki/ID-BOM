@@ -156,11 +156,12 @@
         <div class="editor-header-left">
             <div class="editor-title">数据编辑器</div>
             <div class="product-switch">
-                <button type="button" class="ps-btn active" data-p="id" onclick="switchProduct('id')">🔵 ID 产品 <span class="tab-count" id="idCount">0</span></button>
-                <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">🟢 SC 产品 <span class="tab-count" id="scCount">0</span></button>
-                <button type="button" class="ps-btn" data-p="vm" onclick="switchTab('vm')">🔐 VM产品 <span class="tab-count" id="vmCount">0</span></button>
-                <button type="button" class="ps-btn" data-p="mapping" onclick="switchTab('mapping')">🔗 经销对照 <span class="tab-count" id="mappingCount">0</span></button>
-                <button type="button" class="ps-btn" data-p="updates" onclick="switchTab('updates')">📰 产品动态 <span class="tab-count" id="updatesCount">0</span></button>
+                <button type="button" class="ps-btn active" data-p="id" onclick="switchProduct('id')">ID 产品 <span class="tab-count" id="idCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="sc" onclick="switchProduct('sc')">SC 产品 <span class="tab-count" id="scCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="vm" onclick="switchTab('vm')">VM 产品 <span class="tab-count" id="vmCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="mapping" onclick="switchTab('mapping')">经销对照 <span class="tab-count" id="mappingCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="spec" onclick="switchTab('spec')">Spec 资料 <span class="tab-count" id="specCount">0</span></button>
+                <button type="button" class="ps-btn" data-p="updates" onclick="switchTab('updates')">产品动态 <span class="tab-count" id="updatesCount">0</span></button>
            </div>
         </div>
         <div class="editor-header-right">
@@ -269,6 +270,8 @@ var ACCESSORY_COMBO_COLS = [1, 2];
 var VM_HEADERS = ['应用场景', '加密狗名称', '代码(标配)', '代码(中间)', '软加密名称', '软加密代码', '支持模块', '备注'];
 var UPDATES_HEADERS = ['序号', '更新日期', '产品类型', '产品动态', '动态描述', '产品系列', '文档名称', '是否精选'];
 var MAPPING_HEADERS = ['产品系列', '基线型号', '基线代码', '经销型号', '经销代码'];
+var SPEC_HEADERS = ['型号', 'URL'];
+var SPEC_KEYS = ['型号', 'URL'];
 
 // ===== 数据集注册表 =====
 // scope:      'product' = 按 ID/SC 切换；'global' = 全局单份数据（dataStore[target]）
@@ -329,17 +332,27 @@ var DATASETS = {
         keys: ['series', 'baseModel', 'baseCode', 'distModel', 'distCode'],
         csvFile: 'mapping.csv', jsFile: 'mapping_data.js', jsVar: 'IDBOM_MAPPING_DATA',
         jsDescription: 'ID-BOM 经销基线对照表\n * 数据来源：mapping.csv（基线型号 ↔ 经销型号映射）\n * 更新方式：在 editor.html 中编辑数据后导出 JS（可先导入 CSV）'
+    },
+    spec: {
+        scope: 'global', startCol: 0, headers: SPEC_HEADERS,
+        widths: { 0: 320, 1: 620 },
+        comboCols: [], filterCols: [], filterLabels: ['筛选', '筛选'],
+        fixedCols: [], wrapCols: [], imgCol: null,
+        newRowFirst: '',
+        keys: SPEC_KEYS,
+        csvFile: 'spec_mapping.csv', jsFile: 'spec-mapping.js', jsVar: 'SPEC_MAPPING_DATA',
+        jsDescription: '海康机器人产品型号 → 产品资料下载页\n *\n * 纯数据文件：只含系列→产品页 URL 映射，不含任何逻辑代码。\n * 匹配逻辑（清洗型号后缀 + 精确查表）在 index.html 的 getSpecUrl() 中实现。\n *\n * 编辑方式：editor.html → 顶部「Spec 资料」页签，改完导出 JS 覆盖本文件\n * 新增系列：按字典序插入一行'
     }
 };
-var GLOBAL_TABS = ['vm', 'updates', 'mapping'];
-var GLOBAL_TAB_LABELS = { vm: 'VM产品', updates: '产品动态', mapping: '经销对照' };
+var GLOBAL_TABS = ['vm', 'updates', 'mapping', 'spec'];
+var GLOBAL_TAB_LABELS = { vm: 'VM产品', updates: '产品动态', mapping: '经销对照', spec: 'Spec资料' };
 function isGlobalTab(t) { return GLOBAL_TABS.indexOf(t) >= 0; }
 
 // ==================== State ====================
 var currentTab = 'camera';
 var currentProduct = 'id'; // 'id' | 'sc'
 // id/sc 为产品维度数据；vm/updates 为全局数据集（对象行以二维数组存储，列序 = DATASETS[tab].keys/headers）
-var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] }, vm: [], updates: [], mapping: [] };
+var dataStore = { id: { camera: [], accessory: [] }, sc: { camera: [], accessory: [] }, vm: [], updates: [], mapping: [], spec: [] };
 var cameraData = dataStore.id.camera;
 var accessoryData = dataStore.id.accessory;
 var filteredIndices = [];
@@ -377,6 +390,7 @@ function loadInitialData() {
                 dataStore.vm = d.store.vm || [];
                 dataStore.updates = d.store.updates || [];
                 dataStore.mapping = d.store.mapping || [];
+                dataStore.spec = d.store.spec || [];
                 currentProduct = d.currentProduct === 'sc' ? 'sc' : 'id';
             } else {
                 // 旧格式单套数据 → 视为 ID 产品
@@ -415,7 +429,7 @@ function loadInitialData() {
 
 // ==================== Dropdown Cache ====================
 // 每个 tab 独立缓存；列序 = DATASETS[tab].headers
-var dropdownCaches = { camera: {}, accessory: {}, vm: {}, updates: {}, mapping: {} };
+var dropdownCaches = { camera: {}, accessory: {}, vm: {}, updates: {}, mapping: {}, spec: {} };
 
 function rebuildDropdownCache() {
     Object.keys(DATASETS).forEach(function(t) {
@@ -460,6 +474,18 @@ function refreshFilterOptions() {
     var labels = ds.filterLabels;
     var data = getData();
     var cache = getDropdownCache();
+
+    // 无筛选列的数据集（Spec 资料只有型号/URL）：两个下拉全部隐藏，避免出现空的「全部（筛选）」
+    if (!ds.filterCols || !ds.filterCols.length) {
+        sel1.style.display = 'none';
+        sel1.value = ''; sel1.innerHTML = ''; sel1.__optHtml = '';
+        sel2.style.display = 'none';
+        sel2.value = ''; sel2.innerHTML = ''; sel2.__optHtml = '';
+        pendingRestore = null;
+        return;
+    }
+    if (sel1.style.display === 'none') sel1.style.display = '';
+
     var fc1 = ds.filterCols[0], fc2 = ds.filterCols[1];
     var pr = pendingRestore; pendingRestore = null; // 只消费一次，之后用户手改不被覆盖
 
@@ -550,6 +576,7 @@ function switchTab(tab, opts) {
         if (tab === 'vm') showToast('已切换至 VM产品', 'success');
         else if (tab === 'updates') showToast('已切换至 产品动态', 'success');
         else if (tab === 'mapping') showToast('已切换至 经销对照', 'success');
+        else if (tab === 'spec') showToast('已切换至 Spec资料', 'success');
     }
 }
 
@@ -798,6 +825,7 @@ function renderTable() {
     document.getElementById('vmCount').textContent = dataStore.vm.length;
     document.getElementById('updatesCount').textContent = dataStore.updates.length;
     document.getElementById('mappingCount').textContent = dataStore.mapping.length;
+    document.getElementById('specCount').textContent = dataStore.spec.length;
     document.getElementById('idCount').textContent = dataStore.id.camera.length;
     document.getElementById('scCount').textContent = dataStore.sc.camera.length;
     autoGrowAll();
@@ -1260,6 +1288,7 @@ function parseJSAndStore(text, fname, callback) {
     if (vn === 'VM_DONGLE_DATA') target = 'vm';
     else if (vn === 'IDBOM_PRODUCT_UPDATES') target = 'updates';
     else if (vn === 'IDBOM_MAPPING_DATA') target = 'mapping';
+    else if (vn === 'SPEC_MAPPING_DATA') target = 'spec';
     else if (vn === 'IDBOM_CAMERA_DATA' || vn === 'SCBOM_CAMERA_DATA') target = 'camera';
     else if (vn === 'IDBOM_ACCESSORY_DATA' || vn === 'SCBOM_ACCESSORY_DATA') target = 'accessory';
     if (target === 'camera' || target === 'accessory') slot = (vn.indexOf('SCBOM') === 0 ? 'sc' : 'id') + '_' + target;
@@ -1269,6 +1298,7 @@ function parseJSAndStore(text, fname, callback) {
         if (fname.indexOf('vm') >= 0) target = 'vm';
         else if (fname.indexOf('update') >= 0) target = 'updates';
         else if (fname.indexOf('mapping') >= 0) target = 'mapping';
+        else if (fname.indexOf('spec') >= 0) target = 'spec';
         else if (fname.indexOf('camera') >= 0) target = 'camera';
         else if (fname.indexOf('accessory') >= 0) target = 'accessory';
         var first = (arr[0] && typeof arr[0] === 'object') ? arr[0] : {};
@@ -1276,6 +1306,7 @@ function parseJSAndStore(text, fname, callback) {
             if ('scene' in first || 'modules' in first) target = 'vm';
             else if ('productType' in first || 'featured' in first) target = 'updates';
             else if ('baseModel' in first || 'distCode' in first) target = 'mapping';
+            else if ('型号' in first && 'URL' in first) target = 'spec';
             else if (Array.isArray(first.value)) target = first.value.length >= 20 ? 'camera' : 'accessory';
         }
         if (!target) { fail('无法识别该 JS 属于哪个数据集（变量名/文件名/内容均不匹配）'); return; }
