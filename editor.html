@@ -1402,12 +1402,16 @@ function confirmImport() {
 }
 
 // ==================== CSV Export ====================
+// 编码与换行约定（须与 tools/sync_csv_from_scripts.py 保持一致）：
+//   编码 UTF-8 with BOM（'\uFEFF' 前缀）· 换行 CRLF（RFC 4180 / Excel 友好）
+// 两边任一处改动都会造成 csv/ 文件反复重写，改这里时请同步改 sync 脚本。
 function exportCurrentCSV() {
     flushPendingEdits(); // 与 JS 导出一致：未失焦的编辑也要进 CSV
     var headers = getHeaders();
     var data = getData();
     var imgCol = getImgColIdx();
-    var csv = '\uFEFF' + headers.map(csvEscape).join(',') + '\n';
+    var EOL = '\r\n';
+    var csv = '\uFEFF' + headers.map(csvEscape).join(',') + EOL;
     data.forEach(function(row) {
         var line = [];
         for (var i = 0; i < headers.length; i++) {
@@ -1419,7 +1423,7 @@ function exportCurrentCSV() {
             }
             line.push(csvEscape(val));
         }
-        csv += line.join(',') + '\n';
+        csv += line.join(',') + EOL;
     });
     var ds = getDS();
     var fname = isGlobalTab(currentTab) ? ds.csvFile : currentProduct + '_' + currentTab + '_data.csv';

@@ -104,6 +104,27 @@ python tools/sync_csv_from_scripts.py --check  # 只比对差异，不写文件
 > 需要这些脚本，需另行获取；`csv/` 也是本地副本（`*.csv` 已被忽略）。
 > 项目运行本身只依赖 `index.html` + `scripts/*.js` + `IMG/`。
 
+#### CSV 编码约定（重要）
+
+**全部 `csv/*.csv` 统一为 UTF-8 with BOM + CRLF 换行。** 写入方有两条路径，约定必须一致，
+否则文件会被反复重写（早期曾出现 4 个 GB18030 + 3 个 UTF-8 并存、每次导出/同步来回翻转）：
+
+| 写入方 | 编码 | 换行 |
+|---|---|---|
+| `editor.html` →「导出CSV」 | UTF-8 BOM（`'\uFEFF'` 前缀） | CRLF |
+| `tools/sync_csv_from_scripts.py` | UTF-8 BOM（`CSV_ENCODING = "utf-8-sig"`） | CRLF |
+
+- 选择 UTF-8 BOM 而非 GB18030 的理由：① 与编辑器导出一致，手工导出与脚本生成结果同构；
+  ② BOM 让 Excel 在中英文 Windows 上都能正确识别，GB18030 仅在中文系统有效；
+  ③ UTF-8 无字符集死角（GB18030 遇到罕用字符会编码失败）。
+- 编辑器导入侧无需特殊处理：`readFile()` 先按 UTF-8 读取、检测到替换字符才回退 GBK，
+  UTF-8 BOM 文件走 UTF-8 分支，且解析时会自动剥掉 BOM。
+- `sync_csv_from_scripts.py --check` 采用**字节级比对**（编码 + BOM + 换行 + 单元格内多行），
+  任何一项不同都会点名（如「换行: LF -> CRLF」）。早期版本先把 `\r\n` 归一化成 `\n` 再比，
+  导致 LF 行尾文件被误判为「一致」而不重写，这是换行反复翻转的第二个根源。
+- 注意：CSV 允许单元格内换行（如配件「备注」列的分行说明），这类裸 `\n` 位于引号内，
+  属正常内容，不是行尾差异，两侧均已原样保留。
+
 ## 数据编辑器
 
 浏览器打开 `editor.html` 即可使用数据编辑器，支持：
@@ -114,7 +135,7 @@ python tools/sync_csv_from_scripts.py --check  # 只比对差异，不写文件
 - VM产品的「支持模块」「备注」两列按主页规则纵向合并单元格（有值行合并下方连续空行，仅渲染层效果，导出CSV/JS仍为逐行数据）
 - 多行文本单元格按内容自动调整行高（合并单元格内的长文本完整显示，不会被截断）；产品动态「文档名称」列自动换行
 - 单元格编辑、下拉选择、批量删除
-- CSV导入 / 导出（相机/配件导出文件名带 `id_`/`sc_` 前缀；VM导出 `vm_dongle_data.csv`、产品动态导出 `product_updates.csv`、经销对照导出 `mapping.csv`，均为 UTF-8 带 BOM，可再次导入编辑器）
+- CSV导入 / 导出（相机/配件导出文件名带 `id_`/`sc_` 前缀；VM导出 `vm_dongle_data.csv`、产品动态导出 `product_updates.csv`、经销对照导出 `mapping.csv`，均为 UTF-8 带 BOM + CRLF，可再次导入编辑器）
 - JS导出（按当前产品+Tab 生成 `scripts/` 同格式同命名的 JS 文件，手动放入 `scripts/` 目录即可使用；VM/产品动态/经销对照导出为对象数组格式）——这是更新 `scripts/` 数据文件的唯一方式
 - 图片缩略图预览（与主页一致）
 - 修改结果自动保存到 localStorage 草稿（ID/SC 分开存储，旧版单套数据自动视为 ID）
