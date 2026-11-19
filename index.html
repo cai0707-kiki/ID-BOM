@@ -104,9 +104,14 @@
         .data-table td{padding:4px 8px;font-size:10px;border-bottom:1px solid #f1f5f9}
         .data-table tr:hover{background:#f8fafc}
         .type-badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:500}
-        .type-badge.host{background:#1e293b;color:white}
+        .type-badge.host{background:#1e293b;color:white;white-space:nowrap}
+        .type-badge.host.dealer{background:#059669}
         .type-badge.standard{background:#3b82f6;color:white}
         .type-badge.optional{background:#f97316;color:white}
+        /* 桌面端：类型列最小宽度，保证「主机·经销」单行显示（平板/移动端不受限） */
+        @media (min-width:1025px){
+            .data-table th.col-type,.data-table td.col-type{min-width:80px}
+        }
         .material-name{font-weight:500;color:#1e293b}
         .material-desc{color:#64748b;line-height:1.3;word-break:break-word}
         .material-code{font-family:monospace;font-size:9px;color:#64748b}
@@ -1824,6 +1829,33 @@
       return SPEC_MAP[cleaned] || '';
     }
     window.getSpecUrl = getSpecUrl;
+
+    /* ========== 经销渠道型号清单 ==========
+       按产品系列名匹配（同时比对 row[1] 大类与 row[2] 子系列）。
+       增删经销型号时，只需修改下面这个数组。 */
+    var DEALER_SERIES_KEYS = [
+        'ID803系列',        //  12 行  子系列：U口 / 串口 / 网口
+        'ID813系列',        //  24 行  U口 / 串口 / 网口
+        'ID2013EM',         // 112 行  ID2013EM V1.5 + ID2013EMI V2.0
+        'ID2004M',          //  14 行  基础款U口 / 基础款网口 / 调焦款网口
+        'ID2013M',          //  18 行  基础款网口 / 长焦款网口
+        'ID2016XM',         //  28 行  U口 / 网口
+        'ID2020RM',         //  20 行  U口 / 网口
+        'ID3013PM',         //  12 行  ID3013PM + ID3013PM-8
+        'ID3040RM',         //  10 行
+        'ID5060M系列V3.0'   //  10 行
+    ];
+
+    /** 判断某条主机记录是否属于经销渠道 */
+    function isDealerChannel(row) {
+        if (!row) return false;
+        var series = '|' + (row[1] || '') + '|' + (row[2] || '') + '|';
+        for (var i = 0; i < DEALER_SERIES_KEYS.length; i++) {
+            if (series.indexOf(DEALER_SERIES_KEYS[i]) >= 0) return true;
+        }
+        return false;
+    }
+    window.isDealerChannel = isDealerChannel;
     </script>
     <script src="scripts/id_camera_data.js"></script>
     <script src="scripts/id_accessory_data.js"></script>
@@ -2132,11 +2164,11 @@
             var cnt = idSelectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
             var txt = items.length + ' 个配件';
             if (cnt > 0) txt += ' · <span class="acc-count-selected">' + cnt + ' 个已选</span>';
-            h += '<div class="accessory-category" onclick="openIdAccessoryModal(\'' + keys[i] + '\')">'
+            h += '<div class="accessory-category" onclick="openIdAccessoryModal(\'' + jsAttr(keys[i]) + '\')">'
                +   '<div class="accessory-category-left">'
                +     '<div class="accessory-icon">' + cfg.icon + '</div>'
                +     '<div>'
-               +       '<div class="accessory-category-name">' + cfg.name + '</div>'
+               +       '<div class="accessory-category-name">' + escapeHtml(cfg.name) + '</div>'
                +       '<div class="accessory-category-count">' + txt + '</div>'
                +     '</div>'
                +   '</div>'
@@ -2398,14 +2430,14 @@
         h += '<div class="cable-filter-row"><span class="cable-filter-label">长度</span><div class="cable-filter-btns">';
         h += '<button class="cable-filter-btn active" onclick="setCableFilter(\'length\',\'all\',this)">全部</button>';
         lengths.forEach(function(l) {
-            h += '<button class="cable-filter-btn" onclick="setCableFilter(\'length\',\'' + l + '\',this)">' + l + '</button>';
+            h += '<button class="cable-filter-btn" onclick="setCableFilter(\'length\',\'' + jsAttr(l) + '\',this)">' + escapeHtml(l) + '</button>';
         });
         h += '</div></div>';
         if (materials.length > 0) {
             h += '<div class="cable-filter-row"><span class="cable-filter-label">材质</span><div class="cable-filter-btns">';
             h += '<button class="cable-filter-btn active" onclick="setCableFilter(\'material\',\'all\',this)">全部</button>';
             materials.forEach(function(m) {
-                h += '<button class="cable-filter-btn" onclick="setCableFilter(\'material\',\'' + m + '\',this)">' + m + '</button>';
+                h += '<button class="cable-filter-btn" onclick="setCableFilter(\'material\',\'' + jsAttr(m) + '\',this)">' + escapeHtml(m) + '</button>';
             });
             h += '</div></div>';
         }
@@ -2476,11 +2508,11 @@
                    + 'if(!cb.checked){cb.checked=true;toggleTempItem(' + origIdx + ');}' + confirmFn + '()">'
                    + '<td><input type="checkbox" id="acc_' + origIdx + '" ' + chk
                    + ' onclick="event.stopPropagation();toggleTempItem(' + origIdx + ')"></td>'
-                   + '<td class="col-series">' + item.series + '</td>'
+                   + '<td class="col-series">' + escapeHtml(item.series) + '</td>'
                    + imgCell
-                   + '<td class="col-name">' + item.name + '</td>'
-                   + '<td class="col-desc">' + item.desc + '</td>'
-                   + '<td class="col-code">' + item.code + '</td>'
+                   + '<td class="col-name">' + escapeHtml(item.name) + '</td>'
+                   + '<td class="col-desc">' + escapeHtml(item.desc) + '</td>'
+                   + '<td class="col-code">' + escapeHtml(item.code) + '</td>'
                    + '</tr>';
             });
             tb.innerHTML = h;
@@ -2720,7 +2752,7 @@
 
     function renderIdTable() {
     var tblHead = '<thead><tr>'
-        + '<th style="width:70px">类型</th>'
+        + '<th class="col-type" style="width:70px">类型</th>'
         + '<th style="width:180px">物料名称</th>'
         + '<th style="width:60px;text-align:center">图片</th>'
         + '<th style="width:260px">描述</th>'
@@ -2745,13 +2777,13 @@
                 typeLabel = a.key || '选配';
             }
             h += '<tr>'
-               + '<td><span class="type-badge optional">' + typeLabel + '</span></td>'
+               + '<td><span class="type-badge optional">' + escapeHtml(typeLabel) + '</span></td>'
                + '<td class="material-name">' + nl2br(a.name) + '</td>'
                + imgCell2
                + '<td class="material-desc">' + nl2br(a.value || '') + '</td>'
-               + '<td class="material-code">' + (a.code || '-') + '</td>'
+               + '<td class="material-code">' + escapeHtml(a.code || '-') + '</td>'
                + '<td>' + renderRemark(a.remark || '') + '</td>'
-               + '<td><button class="btn-remove" onclick="removeIdItem(\'' + a.name.replace(/'/g, "\\'") + '\')">✕</button></td>'
+               + '<td><button class="btn-remove" onclick="removeIdItem(\'' + jsAttr(a.name) + '\')">✕</button></td>'
                + '</tr>';
         });
         h += '</tbody></table><div class="table-footer"><span>共 ' + idSelectedAccessories.length + ' 行</span></div>';
@@ -2766,6 +2798,7 @@
     // 主机行
     items.push({
         type: 'host', typeName: '主机',
+        dealer: isDealerChannel(idCurrentMatch),
         name: idCurrentMatch[3] || '-', desc: idCurrentMatch[5] || '-',
         code: idCurrentMatch[4] || '-', remark: idCurrentMatch[6] || '',
         img: idCurrentMatch[25] || ''
@@ -2827,23 +2860,30 @@
         if (item.type === 'host') {
             var specUrl = getSpecUrl(item.name);
             actionBtn = specUrl
-                ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
+                ? '<a href="' + escapeHtml(specUrl) + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
                 : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
         } else if (item.type === 'optional') {
-            actionBtn = '<button class="btn-remove" onclick="removeIdItem(\'' + item.name.replace(/'/g, "\\'") + '\')">✕</button>';
+            actionBtn = '<button class="btn-remove" onclick="removeIdItem(\'' + jsAttr(item.name) + '\')">✕</button>';
         }
 
         var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42, item.type === 'host' ? 'camera' : 'accessory') + '</td>';
 
-        // ★★★ 核心修改：主机显示"主机"，配件显示 displayType（子类别名称）★★★
-        var typeLabel = (item.type === 'host') ? '主机' : (item.displayType || item.typeName);
+        // 主机按渠道显示「主机·直销 / 主机·经销」，配件显示 displayType（子类别名称）
+        var typeLabel, typeCls;
+        if (item.type === 'host') {
+            typeLabel = item.dealer ? '主机·经销' : '主机·直销';
+            typeCls = 'host' + (item.dealer ? ' dealer' : '');
+        } else {
+            typeLabel = item.displayType || item.typeName;
+            typeCls = item.type;
+        }
 
         h += '<tr>'
-           + '<td><span class="type-badge ' + item.type + '">' + typeLabel + '</span></td>'
+           + '<td><span class="type-badge ' + typeCls + '">' + escapeHtml(typeLabel) + '</span></td>'
            + '<td class="material-name">' + nl2br(item.name) + '</td>'
            + imgCell
            + '<td class="material-desc">' + nl2br(item.desc) + '</td>'
-           + '<td class="material-code">' + item.code + '</td>'
+           + '<td class="material-code">' + escapeHtml(item.code) + '</td>'
            + '<td>' + renderRemark(item.remark) + '</td>'
            + '<td>' + actionBtn + '</td>'
            + '</tr>';
@@ -3135,11 +3175,11 @@
             var cnt = scSelectedAccessories.filter(function(a) { return a.key === keys[i] && a.type !== 'standard'; }).length;
             var txt = items.length + ' 个配件';
             if (cnt > 0) txt += ' · <span class="acc-count-selected">' + cnt + ' 个已选</span>';
-            h += '<div class="accessory-category" onclick="openScAccessoryModal(\'' + keys[i] + '\')">'
+            h += '<div class="accessory-category" onclick="openScAccessoryModal(\'' + jsAttr(keys[i]) + '\')">'
                +   '<div class="accessory-category-left">'
                +     '<div class="accessory-icon">' + cfg.icon + '</div>'
                +     '<div>'
-               +       '<div class="accessory-category-name">' + cfg.name + '</div>'
+               +       '<div class="accessory-category-name">' + escapeHtml(cfg.name) + '</div>'
                +       '<div class="accessory-category-count">' + txt + '</div>'
                +     '</div>'
                +   '</div>'
@@ -3238,13 +3278,13 @@
                     typeLabel = a.key || '选配';
                 }
                 h += '<tr>'
-                   + '<td><span class="type-badge optional">' + typeLabel + '</span></td>'
+                   + '<td><span class="type-badge optional">' + escapeHtml(typeLabel) + '</span></td>'
                    + '<td class="material-name">' + nl2br(a.name) + '</td>'
                    + imgCell2
                    + '<td class="material-desc">' + nl2br(a.value || '') + '</td>'
-                   + '<td class="material-code">' + (a.code || '-') + '</td>'
+                   + '<td class="material-code">' + escapeHtml(a.code || '-') + '</td>'
                    + '<td>' + renderRemark(a.remark || '') + '</td>'
-                   + '<td><button class="btn-remove" onclick="removeScItem(\'' + ('' + a.code).replace(/'/g, "\\'") + '\')">✕</button></td>'
+                   + '<td><button class="btn-remove" onclick="removeScItem(\'' + jsAttr(a.code) + '\')">✕</button></td>'
                    + '</tr>';
             });
             h += '</tbody></table><div class="table-footer"><span>共 ' + scSelectedAccessories.length + ' 行</span></div>';
@@ -3314,21 +3354,21 @@
             if (item.type === 'host') {
                 var specUrl = getSpecUrl(item.name);
                 actionBtn = specUrl
-                    ? '<a href="' + specUrl + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
+                    ? '<a href="' + escapeHtml(specUrl) + '" target="_blank" style="font-size:10px;color:#3b82f6;text-decoration:none;white-space:nowrap">📋 Spec</a>'
                     : '<span style="font-size:10px;color:#94a3b8;white-space:nowrap" title="暂无产品页">📋 Spec</span>';
             } else if (item.type === 'optional') {
-                actionBtn = '<button class="btn-remove" onclick="removeScItem(\'' + ('' + item.code).replace(/'/g, "\\'") + '\')">✕</button>';
+                actionBtn = '<button class="btn-remove" onclick="removeScItem(\'' + jsAttr(item.code) + '\')">✕</button>';
             }
 
             var imgCell = '<td class="img-thumb-cell">' + getImageHtml(item.img, 'img-thumb', 42, 42, item.type === 'host' ? 'camera' : 'accessory') + '</td>';
             var typeLabel = (item.type === 'host') ? '主机' : (item.displayType || item.typeName);
 
             h += '<tr>'
-               + '<td><span class="type-badge ' + item.type + '">' + typeLabel + '</span></td>'
+               + '<td><span class="type-badge ' + item.type + '">' + escapeHtml(typeLabel) + '</span></td>'
                + '<td class="material-name">' + nl2br(item.name) + '</td>'
                + imgCell
                + '<td class="material-desc">' + nl2br(item.desc) + '</td>'
-               + '<td class="material-code">' + (item.code || '-') + '</td>'
+               + '<td class="material-code">' + escapeHtml(item.code || '-') + '</td>'
                + '<td>' + renderRemark(item.remark) + '</td>'
                + '<td>' + actionBtn + '</td>'
                + '</tr>';
@@ -3403,13 +3443,13 @@
             var tagText = r.type + ' · ' + r.cat;
             h += '<div class="quick-search-item" onclick="' + selectFn + '(' + r.idx + ')">'
                +   '<div class="qs-row1">'
-               +     '<span class="qs-name">' + r.name + '</span>'
-               +     '<span class="qs-tag">' + tagText + '</span>'
+               +     '<span class="qs-name">' + escapeHtml(r.name) + '</span>'
+               +     '<span class="qs-tag">' + escapeHtml(tagText) + '</span>'
                +   '</div>'
                +   '<div class="qs-row2">'
-               +     '<span class="qs-code">' + r.code + '</span>'
+               +     '<span class="qs-code">' + escapeHtml(r.code) + '</span>'
                +     '<span>|</span>'
-               +     '<span class="qs-desc">' + r.desc + '</span>'
+               +     '<span class="qs-desc">' + escapeHtml(r.desc) + '</span>'
                +   '</div>'
                +   '<div class="qs-row3">' + row3Text + '</div>'
                + '</div>';
@@ -3806,7 +3846,7 @@
     var html = '';
     seriesNames.forEach(function(name, index) {
         var active = index === 0 ? ' active' : '';
-        html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderIdOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)"><span>' + name + '</span><span class="series-count">' + map[name].length + '</span></div>';
+        html += '<div class="series-item' + active + '" data-series="' + escapeHtml(name) + '" onclick="renderIdOverviewTable(\'' + jsAttr(name) + '\', this)"><span>' + escapeHtml(name) + '</span><span class="series-count">' + map[name].length + '</span></div>';
     });
     container.innerHTML = html;
     var first = container.querySelector('.series-item');
@@ -3874,7 +3914,7 @@
         // 构建表格
         var html = '<table class="data-table"><thead><tr>'
             + '<th style="width:50px">序号</th>'
-            + '<th style="width:70px">类型</th>'
+            + '<th class="col-type" style="width:70px">类型</th>'
             + '<th style="min-width:200px">物料名称</th>'
             + '<th style="width:70px;text-align:center">图片</th>'
             + '<th style="min-width:80px">物料代码</th>'
@@ -3884,9 +3924,10 @@
 
         rows.forEach(function(row, index) {
             var isCamera = row[0] === 'ID系列';
+            var isDealer = isCamera && isDealerChannel(row);
             var typeLabel;
             if (isCamera) {
-                typeLabel = '主机';
+                typeLabel = isDealer ? '主机·经销' : '主机·直销';
             } else {
                 // 如果配件类型是"扩展配件"，显示 row[2]（子类别名称）
                 // 否则显示 row[1]（原有类别名称）
@@ -3896,7 +3937,7 @@
                     typeLabel = row[1] || '配件';
                 }
             }
-            var typeClass = isCamera ? 'host' : 'standard';
+            var typeClass = isCamera ? ('host' + (isDealer ? ' dealer' : '')) : 'standard';
             var trClass = isCamera ? '' : 'row-accessory';
             var name = row[3] || '';
             var img = isCamera ? (row[25] || '') : (row[9] || '');
@@ -3906,12 +3947,12 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
+            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[1] || '').trim()) + '" data-ser="' + escapeHtml((row[2] || '').trim()) + '" data-model="' + escapeHtml((row[3] || '').trim()) + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
-                +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
+                +  '<td><span class="type-badge ' + typeClass + '">' + escapeHtml(typeLabel) + '</span></td>'
                 +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
-                +  '<td class="material-code">' + code + '</td>'
+                +  '<td class="material-code">' + escapeHtml(code) + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
                 +  '<td>' + renderRemark(remark) + '</td>'
                 +  '</tr>';
@@ -3992,7 +4033,7 @@
         var html = '';
         seriesNames.forEach(function(name, index) {
             var active = index === 0 ? ' active' : '';
-            html += '<div class="series-item' + active + '" data-series="' + name.replace(/"/g, '&quot;') + '" onclick="renderScOverviewTable(\'' + name.replace(/'/g, "\\'") + '\', this)"><span>' + name + '</span><span class="series-count">' + map[name].length + '</span></div>';
+            html += '<div class="series-item' + active + '" data-series="' + escapeHtml(name) + '" onclick="renderScOverviewTable(\'' + jsAttr(name) + '\', this)"><span>' + escapeHtml(name) + '</span><span class="series-count">' + map[name].length + '</span></div>';
         });
         container.innerHTML = html;
         var first = container.querySelector('.series-item');
@@ -4064,12 +4105,12 @@
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + (code || '').replace(/"/g, '&quot;') + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + ((row[1] || '').trim()).replace(/"/g, '&quot;') + '" data-ser="' + ((row[2] || '').trim()).replace(/"/g, '&quot;') + '" data-model="' + ((row[3] || '').trim()).replace(/"/g, '&quot;') + '">'
+            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[1] || '').trim()) + '" data-ser="' + escapeHtml((row[2] || '').trim()) + '" data-model="' + escapeHtml((row[3] || '').trim()) + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
-                +  '<td><span class="type-badge ' + typeClass + '">' + typeLabel + '</span></td>'
+                +  '<td><span class="type-badge ' + typeClass + '">' + escapeHtml(typeLabel) + '</span></td>'
                 +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
                 +  '<td class="img-thumb-cell">' + imgHtml + '</td>'
-                +  '<td class="material-code">' + code + '</td>'
+                +  '<td class="material-code">' + escapeHtml(code) + '</td>'
                 +  '<td class="material-desc">' + nl2br(desc) + '</td>'
                 +  '<td>' + renderRemark(remark) + '</td>'
                 +  '</tr>';
@@ -4211,7 +4252,7 @@
         });
         var html = '';
         scenes.forEach(function(s) {
-            html += '<button class="vm-filter-btn" onclick="filterVmScene(this, \'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
+            html += '<button class="vm-filter-btn" onclick="filterVmScene(this, \'' + jsAttr(s) + '\')">' + escapeHtml(s) + '</button>';
         });
         document.getElementById('vmSceneFilter').innerHTML = html;
     }
@@ -4288,11 +4329,11 @@
         data.forEach(function(item, i) {
             h += '<tr>';
             h += '<td class="col-num">' + (i + 1) + '</td>';
-            h += '<td class="col-name">' + item.name + '</td>';
-            h += '<td class="col-code">' + item.codeStd + '</td>';
-            h += '<td class="col-code">' + item.codeNeu + '</td>';
-            h += '<td class="col-swname">' + (item.swName || '-') + '</td>';
-            h += '<td class="col-swcode">' + (item.swCode || '-') + '</td>';
+            h += '<td class="col-name">' + escapeHtml(item.name) + '</td>';
+            h += '<td class="col-code">' + escapeHtml(item.codeStd) + '</td>';
+            h += '<td class="col-code">' + escapeHtml(item.codeNeu) + '</td>';
+            h += '<td class="col-swname">' + escapeHtml(item.swName || '-') + '</td>';
+            h += '<td class="col-swcode">' + escapeHtml(item.swCode || '-') + '</td>';
 
             // ---- 支持模块列 ----
             if (modSpans[i] > 0) {
@@ -4395,16 +4436,16 @@
         count.textContent = '共 ' + pdaFilteredModels.length + ' 款型号';
         var h = '<tr><th>参数项</th>';
         pdaFilteredModels.forEach(function(m) {
-            h += '<th title="' + m.sub + '">' + m.sub + '</th>';
+            h += '<th title="' + escapeHtml(m.sub) + '">' + escapeHtml(m.sub) + '</th>';
         });
         h += '</tr>';
         head.innerHTML = h;
         var b = '';
         data.paramOrder.forEach(function(p) {
-            b += '<tr><td title="' + p + '">' + p + '</td>';
+            b += '<tr><td title="' + escapeHtml(p) + '">' + escapeHtml(p) + '</td>';
             pdaFilteredModels.forEach(function(m) {
                 var val = m.params[p] || '-';
-                b += '<td title="' + val.replace(/"/g, '&quot;') + '">' + val + '</td>';
+                b += '<td title="' + escapeHtml(val) + '">' + escapeHtml(val) + '</td>';
             });
             b += '</tr>';
         });
@@ -4419,7 +4460,7 @@
         });
         var h = '';
         series.forEach(function(s) {
-            h += '<button class="cmp-filter-btn" onclick="filterCmpSeries(this,\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>';
+            h += '<button class="cmp-filter-btn" onclick="filterCmpSeries(this,\'' + jsAttr(s) + '\')">' + escapeHtml(s) + '</button>';
         });
         document.getElementById('cmpSeriesFilter').innerHTML = h;
     }
@@ -4487,23 +4528,60 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    /* ==================== HTML 转义 ==================== */
+
+    /**
+     * 把任意值转义成可安全插入 HTML 文本节点 / 属性值的字符串。
+     * 数据由 editor.html 人工录入，含 < > & " ' 时若不转义会撑坏表格结构与属性，
+     * 因此所有「数据 → innerHTML」的插值都必须先过这里。
+     * 只做转义，不产生任何标签；需要标签的位置请显式拼接。
+     */
+    function escapeHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+    window.escapeHtml = escapeHtml;
+
+    /**
+     * 用于 onclick / ondblclick 等内联事件属性里的字符串参数。
+     * 顺序不能反：先按 JS 单引号字符串转义（\ → \\ ，' → \'),
+     * 再做 HTML 属性转义，否则数据里的引号会提前截断属性。
+     */
+    function jsAttr(s) {
+        return escapeHtml(String(s === null || s === undefined ? '' : s)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'"));
+    }
+
+    /* 兼容旧调用名（经销对照表等处在用） */
     function esc(s) {
-        return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        return s ? escapeHtml(s) : '';
     }
 
     /* ==================== 图片工具函数 ==================== */
 
-    function nl2br(s) { return (s || '').replace(/\n/g, '<br>'); }
+    /** 先转义、再把换行变成 <br>，用于多行文本单元格 */
+    function nl2br(s) { return escapeHtml(s).replace(/\n/g, '<br>'); }
+
+    /**
+     * 备注列：转义后保留 DPL_xxx 对应的图片缩略图。
+     * 做法是先把图片位置换成占位符，整体转义，再把占位符回填成 <img>，
+     * 这样既不会漏转义文字，也不会把 img 标签本身转义掉。
+     */
     function renderRemark(text) {
         if (!text) return '';
-        var lines = text.split('\n');
+        var PH = '\u0000IMG\u0000';
+        var lines = String(text).split('\n');
         return lines.map(function(line) {
             var m = line.match(/\b(DPL_\w+)\b/);
-            if (m) {
-                var imgHtml = getImageHtml('PIC/' + m[1], 'img-thumb', 80, 80);
-                return line.replace(m[0], imgHtml);
-            }
-            return line;
+            if (!m) return escapeHtml(line);
+            var imgHtml = getImageHtml('PIC/' + m[1], 'img-thumb', 80, 80);
+            return escapeHtml(line.replace(m[0], PH)).split(PH).join(imgHtml);
         }).join('<br>');
     }
     function getImageHtml(imgName, className, width, height, imgType) {
@@ -4798,18 +4876,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             html += '<div class="update-item' + (isFeatured ? ' featured' : '') + '">';
             html += '<div class="update-item-header">';
-            html += '<span class="update-item-date">' + item.date + '</span>';
-            html += '<span class="update-item-product-type ' + item.productType + '">' + item.productType + '</span>';
-            html += '<span class="update-item-type ' + item.type + '">' + item.type + '</span>';
+            html += '<span class="update-item-date">' + escapeHtml(item.date) + '</span>';
+            html += '<span class="update-item-product-type ' + escapeHtml(item.productType) + '">' + escapeHtml(item.productType) + '</span>';
+            html += '<span class="update-item-type ' + escapeHtml(item.type) + '">' + escapeHtml(item.type) + '</span>';
             html += '</div>';
             html += '<div class="update-item-content">';
             if (isFeatured) {
                 html += '<span class="update-item-featured">精品</span>';
             }
-            html += item.content.replace(/\\n/g, '<br>');
+            html += escapeHtml(item.content).replace(/\\n/g, '<br>');
             html += '</div>';
             html += '<div class="update-item-footer">';
-            html += '<div class="update-item-series">涉及系列：<span>' + item.series + '</span></div>';
+            html += '<div class="update-item-series">涉及系列：<span>' + escapeHtml(item.series) + '</span></div>';
             if (hasDoc) {
                 var docExt = item.docName.split('.').pop().toLowerCase();
                 var docIcon = '📎';
@@ -4819,7 +4897,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     docIcon = '🖼️';
                 }
                 html += '<a class="update-item-doc" href="docs/' + encodeURIComponent(item.docName) + '" target="_blank" title="打开文件">';
-                html += docIcon + ' ' + item.docName;
+                html += docIcon + ' ' + escapeHtml(item.docName);
                 html += '</a>';
             }
             html += '</div>';
