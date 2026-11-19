@@ -73,11 +73,12 @@
         .quick-search-item:hover{background:#fff7ed}
         .qs-row1{display:flex;align-items:center;gap:6px;margin-bottom:2px}
         .qs-name{font-size:12px;font-weight:600;color:#1e293b;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .qs-tag{font-size:9px;padding:1px 5px;border-radius:3px;background:#f1f5f9;color:#64748b;flex-shrink:0}
+        .qs-row3-text{white-space:nowrap;flex-shrink:0}
+        .qs-cat{font-size:9px;padding:1px 5px;border-radius:3px;background:#f1f5f9;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;margin-left:auto}
         .qs-row2{font-size:10px;color:#94a3b8;display:flex;gap:4px;margin-bottom:2px}
         .qs-code{color:#3b82f6;font-family:monospace}
         .qs-desc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .qs-row3{font-size:10px;color:#3b82f6;cursor:pointer}
+        .qs-row3{font-size:10px;color:#3b82f6;cursor:pointer;display:flex;align-items:center;gap:8px}
         .qs-row3:hover{color:#1d4ed8}
         .content{flex:1 1 0%;min-width:0;padding-left:8px;padding-bottom:80px;display:flex;flex-direction:column}
         .content-panel{background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);overflow:hidden;display:flex;flex-direction:column}
@@ -3445,18 +3446,19 @@
         }
         var h = '';
         results.forEach(function(r) {
-            var tagText = r.type + ' · ' + r.cat;
             h += '<div class="quick-search-item" onclick="' + selectFn + '(' + r.idx + ')">'
                +   '<div class="qs-row1">'
                +     '<span class="qs-name">' + escapeHtml(r.name) + '</span>'
-               +     '<span class="qs-tag">' + escapeHtml(tagText) + '</span>'
                +   '</div>'
                +   '<div class="qs-row2">'
                +     '<span class="qs-code">' + escapeHtml(r.code) + '</span>'
                +     '<span>|</span>'
                +     '<span class="qs-desc">' + escapeHtml(r.desc) + '</span>'
                +   '</div>'
-               +   '<div class="qs-row3">' + row3Text + '</div>'
+               +   '<div class="qs-row3">'
+               +     '<span class="qs-row3-text">' + escapeHtml(row3Text) + '</span>'
+               +     '<span class="qs-cat">' + escapeHtml(r.cat) + '</span>'
+               +   '</div>'
                + '</div>';
         });
         el.innerHTML = h;
@@ -3698,7 +3700,7 @@
         var q = document.getElementById('idOverviewSearchInput').value.trim().toLowerCase();
         var el = document.getElementById('idOverviewSearchResults');
         if (!q) { el.style.display = 'none'; return; }
-        renderQuickSearchResults(el, matchIdQuickSearch(q), 'selectIdOverviewJump', '点击跳转至该产品');
+        renderQuickSearchResults(el, matchIdQuickSearch(q), 'selectIdOverviewJump', '点击跳转');
     }
     function selectIdOverviewJump(idx) { jumpOverviewToProduct('id', idx); }
 
@@ -3706,7 +3708,7 @@
         var q = document.getElementById('scOverviewSearchInput').value.trim().toLowerCase();
         var el = document.getElementById('scOverviewSearchResults');
         if (!q) { el.style.display = 'none'; return; }
-        renderQuickSearchResults(el, matchScQuickSearch(q), 'selectScOverviewJump', '点击跳转至该产品');
+        renderQuickSearchResults(el, matchScQuickSearch(q), 'selectScOverviewJump', '点击跳转');
     }
     function selectScOverviewJump(idx) { jumpOverviewToProduct('sc', idx); }
 
