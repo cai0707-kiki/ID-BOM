@@ -167,7 +167,7 @@
         .version-bar a{color:#f97316;text-decoration:none;}
         .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);z-index:1000;align-items:center;justify-content:center;transition:background 0.3s ease;padding:12px;overflow-y:auto;overscroll-behavior:contain}
         .modal-overlay.active{display:flex;background:rgba(0,0,0,0.5)}
-        .modal{background:white;border-radius:14px;width:min(900px,calc(100vw - 24px));max-width:100%;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);min-height:0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(15,23,42,.22),0 8px 20px rgba(15,23,42,.10);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
+        .modal{background:white;border-radius:14px;width:min(900px,calc(100vw - 24px));max-width:100%;max-height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(15,23,42,.22),0 8px 20px rgba(15,23,42,.10);transform:scale(0.9);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
         .modal-overlay.active .modal{transform:scale(1);opacity:1}
         .modal-header{padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;min-height:54px;background:linear-gradient(135deg,#fef3c7,#fde68a);position:relative}
         .modal-title{font-size:14px;font-weight:600;color:#1e293b}
@@ -590,7 +590,7 @@
     .quick-search-input{font-size:14px;padding:10px 10px 10px 32px}
 
     /* ====== 弹窗 ====== */
-    .modal{width:96vw;max-width:none;max-height:calc(100vh - 16px);max-height:calc(100dvh - 16px);border-radius:8px;overflow:hidden}
+    .modal{width:96vw;max-width:none;max-height:100%;border-radius:8px;overflow:hidden}
     .modal-body{padding:10px;flex:1 1 auto;min-width:0;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
     .accessory-table{min-width:700px;width:100%;display:table}
     .accessory-table .col-series{min-width:80px}
@@ -2187,17 +2187,39 @@
     /* ==================== 弹窗尺寸自适应 ==================== */
 
     function resizeModalBody() {
+        var overlay = document.getElementById('accessoryModal');
         var modal = document.querySelector('#accessoryModal .modal');
         var body = document.querySelector('#accessoryModal .modal-body');
         var header = document.querySelector('#accessoryModal .modal-header');
         var footer = document.querySelector('#accessoryModal .modal-footer');
-        if (!modal || !body || !header || !footer) return;
-        var vh = window.innerHeight || document.documentElement.clientHeight;
-        var maxH = Math.floor(vh * 0.85);
-        var headerH = header.offsetHeight || 50;
-        var footerH = footer.offsetHeight || 46;
-        var pad = 28;
-        body.style.maxHeight = (maxH - headerH - footerH - pad) + 'px';
+        if (!overlay || !modal || !body || !header || !footer) return;
+
+        /* 用 overlay 的实际可用高度(与 CSS 同一坐标系,已被 zoom 正确折算)
+           overlay 为 position:fixed + top/bottom:0,其 clientHeight 即当前缩放
+           下的真实可视高度; window.innerHeight 是未缩放的视口高,在
+           html{zoom:N} 环境下会把 maxHeight 算大 N 倍,导致弹窗超出屏幕。 */
+        var cs = getComputedStyle(overlay);
+        var padV = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+        var avail = overlay.clientHeight - padV;
+
+        /* overlay 未显示时 clientHeight 为 0,退回 zoom 折算后的视口高 */
+        if (!avail || avail < 120) {
+            var z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+            var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+            avail = Math.floor(vh / z) - padV;
+        }
+        if (!avail || avail < 120) return;
+
+        var headerH = header.offsetHeight || 54;
+        var footerH = footer.offsetHeight || 56;
+        var bodyMax = Math.floor(avail - headerH - footerH);
+
+        /* 不超过内容自然高度,避免短列表被拉出空白 */
+        body.style.maxHeight = "";
+        var natural = body.scrollHeight;
+        if (natural && natural < bodyMax) bodyMax = natural;
+
+        body.style.maxHeight = bodyMax + "px";
     }
 
     window.addEventListener('resize', resizeModalBody);
