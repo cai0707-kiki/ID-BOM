@@ -1855,7 +1855,7 @@
     /** 判断某条主机记录是否属于经销渠道 */
     function isDealerChannel(row) {
         if (!row) return false;
-        var series = '|' + (row[1] || '') + '|' + (row[2] || '') + '|';
+        var series = '|' + (row[COL.CATEGORY] || '') + '|' + (row[COL.SERIES] || '') + '|';
         for (var i = 0; i < DEALER_SERIES_KEYS.length; i++) {
             if (series.indexOf(DEALER_SERIES_KEYS[i]) >= 0) return true;
         }
@@ -1902,7 +1902,12 @@
         BRACKET_FLAG: 10,   // 安装板标识
         EXT_TAG: 23,        // 扩展配件标签
         EXT_FLAG: 24,       // 扩展配件标识
-        IMG: 25             // IMG
+        IMG: 25,            // IMG
+        /* 相机行里「配件引用标签列」的区间：7,9,11,…,23（共 9 个类别）
+         * 循环写法 for (i = ACC_TAG_START; i <= ACC_TAG_END; i += ACC_TAG_STEP) */
+        ACC_TAG_START: 7,
+        ACC_TAG_END: 23,
+        ACC_TAG_STEP: 2
     };
 
     /* 配件专属列（10 列表） */
@@ -3473,22 +3478,22 @@
     /* ==================== SC 快速搜索 ==================== */
 
     function matchScQuickSearch(q) {
-        var colPriority = [2, 3, 4, 5, 6];
+        var colPriority = [COL.SERIES, COL.NAME, COL.CODE, COL.DESC, COL.REMARK];
         var results = [];
         for (var c = 0; c < colPriority.length; c++) {
             var col = colPriority[c];
             results = [];
             for (var i = 0; i < scAllRows.length; i++) {
                 var r = scAllRows[i];
-                var isCam = r[0] === 'SC系列';
-                var isAcc = r[0] === '配件';
+                var isCam = r[COL.GROUP] === 'SC系列';
+                var isAcc = r[COL.GROUP] === '配件';
                 if (!isCam && !isAcc) continue;
                 var val = (r[col] || '').toLowerCase();
                 if (val.indexOf(q) >= 0) {
                     results.push({
                         idx: i, type: isCam ? 'SC系列' : '配件',
-                        cat: r[1] || '', series: r[2] || '', name: r[3] || '',
-                        code: r[4] || '', desc: r[5] || ''
+                        cat: r[COL.CATEGORY] || '', series: r[COL.SERIES] || '', name: r[COL.NAME] || '',
+                        code: r[COL.CODE] || '', desc: r[COL.DESC] || ''
                     });
                     if (results.length >= 50) break;
                 }
@@ -3538,10 +3543,10 @@
         document.getElementById('scQuickSearchInput').value = '';
         document.getElementById('scQuickSearchResults').style.display = 'none';
 
-        if (r[0] === 'SC系列') {
-            var cat = r[1] || '';
-            var series = r[2] || '';
-            var model = r[3] || '';
+        if (r[COL.GROUP] === 'SC系列') {
+            var cat = r[COL.CATEGORY] || '';
+            var series = r[COL.SERIES] || '';
+            var model = r[COL.NAME] || '';
 
             var catSel = document.getElementById('scCategorySelect');
             for (var i = 0; i < catSel.options.length; i++) {
@@ -3564,14 +3569,14 @@
             updateSelectStyle(modelSel);
             onScModelChange();
 
-        } else if (r[0] === '配件') {
-            var name = r[3] || '';
-            var code = r[4] || '';
+        } else if (r[COL.GROUP] === '配件') {
+            var name = r[COL.NAME] || '';
+            var code = r[COL.CODE] || '';
             var exists = code && scSelectedAccessories.some(function(a) { return a.code === code; });
             if (!exists) {
                 scSelectedAccessories.push({
-                    key: '选配', name: name, value: r[5] || '',
-                    code: code, remark: r[6] || '', img: r[9] || '', type: 'optional'
+                    key: '选配', name: name, value: r[COL.DESC] || '',
+                    code: code, remark: r[COL.REMARK] || '', img: r[ACC.IMG] || '', type: 'optional'
                 });
                 renderScTable();
             }
@@ -3617,22 +3622,22 @@
 
     function matchIdQuickSearch(q) {
         // 按优先级匹配：产品系列 > 物料名称 > 物料代码 > 描述 > 备注
-        var colPriority = [2, 3, 4, 5, 6];
+        var colPriority = [COL.SERIES, COL.NAME, COL.CODE, COL.DESC, COL.REMARK];
         var results = [];
         for (var c = 0; c < colPriority.length; c++) {
             var col = colPriority[c];
             results = [];
             for (var i = 0; i < idAllRows.length; i++) {
                 var r = idAllRows[i];
-                var isCam = r[0] === 'ID系列';
-                var isAcc = r[0] === '配件';
+                var isCam = r[COL.GROUP] === 'ID系列';
+                var isAcc = r[COL.GROUP] === '配件';
                 if (!isCam && !isAcc) continue;
                 var val = (r[col] || '').toLowerCase();
                 if (val.indexOf(q) >= 0) {
                     results.push({
                         idx: i, type: isCam ? 'ID系列' : '配件',
-                        cat: r[1] || '', series: r[2] || '', name: r[3] || '',
-                        code: r[4] || '', desc: r[5] || ''
+                        cat: r[COL.CATEGORY] || '', series: r[COL.SERIES] || '', name: r[COL.NAME] || '',
+                        code: r[COL.CODE] || '', desc: r[COL.DESC] || ''
                     });
                     if (results.length >= 50) break;
                 }
@@ -3655,8 +3660,8 @@
         document.getElementById('idQuickSearchInput').value = '';
         document.getElementById('idQuickSearchResults').style.display = 'none';
 
-        if (r[0] === 'ID系列') {
-            var cat = r[1], series = r[2], model = r[3];
+        if (r[COL.GROUP] === 'ID系列') {
+            var cat = r[COL.CATEGORY], series = r[COL.SERIES], model = r[COL.NAME];
             var catSel = document.getElementById('idCategorySelect');
             for (var i = 0; i < catSel.options.length; i++) {
                 if (catSel.options[i].value === cat) { catSel.selectedIndex = i; break; }
@@ -3675,13 +3680,13 @@
             }
             onIdModelChange();
 
-        } else if (r[0] === '配件') {
-            var name = r[3] || '';
+        } else if (r[COL.GROUP] === '配件') {
+            var name = r[COL.NAME] || '';
             var exists = idSelectedAccessories.some(function(a) { return a.name === name; });
             if (!exists) {
                 idSelectedAccessories.push({
-                    key: '选配', name: name, value: r[5] || '',
-                    code: r[4] || '', remark: r[6] || '', img: r[9] || '', type: 'optional'
+                    key: '选配', name: name, value: r[COL.DESC] || '',
+                    code: r[COL.CODE] || '', remark: r[COL.REMARK] || '', img: r[ACC.IMG] || '', type: 'optional'
                 });
                 renderIdTable();
             }
@@ -3733,11 +3738,11 @@
         if (inputEl) inputEl.value = '';
         if (resultsEl) resultsEl.style.display = 'none';
 
-        var isCam = side === 'id' ? r[0] === 'ID系列' : r[0] === 'SC系列';
-        var code = r[4] || '';
+        var isCam = side === 'id' ? r[COL.GROUP] === 'ID系列' : r[COL.GROUP] === 'SC系列';
+        var code = r[COL.CODE] || '';
         var targetSeries = '';
         if (isCam) {
-            targetSeries = r[1] || '';
+            targetSeries = r[COL.CATEGORY] || '';
         } else {
             var sm = side === 'id' ? getIdSeriesMap() : getScSeriesMap();
             targetSeries = findFirstSeriesForAccessory(sm.order,
@@ -3850,8 +3855,8 @@
     var map = {};
     var order = [];
     idAllRows.forEach(function(row) {
-        if (row[0] !== 'ID系列') return;
-        var key = row[1];
+        if (row[COL.GROUP] !== 'ID系列') return;
+        var key = row[COL.CATEGORY];
         if (!map[key]) {
             map[key] = [];
             order.push(key);
@@ -3866,12 +3871,12 @@
     var accMap = {};
     // 1. 获取该系列所有相机
     var cameraRows = idAllRows.filter(function(r) {
-        return r[0] === 'ID系列' && r[1] === seriesName;
+        return r[COL.GROUP] === 'ID系列' && r[COL.CATEGORY] === seriesName;
     });
     // 2. 收集所有引用标签（相机行的配件列：7,9,11,13,15,17,19,21,23）
     var refTags = [];
     cameraRows.forEach(function(r) {
-        for (var i = 7; i <= 23; i += 2) {
+        for (var i = CAM.ACC_TAG_START; i <= CAM.ACC_TAG_END; i += CAM.ACC_TAG_STEP) {
             var val = r[i] || '';
             if (val) {
                 var tags = val.split(';').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
@@ -3882,12 +3887,12 @@
     refTags = [...new Set(refTags)];
     // 3. 匹配配件行（配件数据的标签列统一在索引7）
     idAllRows.forEach(function(row) {
-        if (row[0] !== '配件') return;
-        var accTag = (row[7] || '').toLowerCase();
+        if (row[COL.GROUP] !== '配件') return;
+        var accTag = (row[ACC.TAG] || '').toLowerCase();
         var parts = accTag.split(';').map(function(s) { return s.trim(); });
         for (var i = 0; i < refTags.length; i++) {
             if (parts.indexOf(refTags[i]) !== -1) {
-                var code = row[4] || '';
+                var code = row[COL.CODE] || '';
                 if (!accMap[code]) {
                     accMap[code] = row;
                 }
@@ -3956,7 +3961,7 @@
 
         // 获取该系列的相机行
         var cameraRows = idAllRows.filter(function(r) {
-            return r[0] === 'ID系列' && r[1] === seriesName;
+            return r[COL.GROUP] === 'ID系列' && r[COL.CATEGORY] === seriesName;
         });
         // 获取该系列关联的配件行
         var accessoryRows = getIdAccessoriesForSeries(seriesName);
@@ -3990,7 +3995,7 @@
             + '</tr></thead><tbody>';
 
         rows.forEach(function(row, index) {
-            var isCamera = row[0] === 'ID系列';
+            var isCamera = row[COL.GROUP] === 'ID系列';
             var isDealer = isCamera && isDealerChannel(row);
             var typeLabel;
             if (isCamera) {
@@ -3998,23 +4003,23 @@
             } else {
                 // 如果配件类型是"扩展配件"，显示 row[2]（子类别名称）
                 // 否则显示 row[1]（原有类别名称）
-                if (row[1] === '扩展配件') {
-                    typeLabel = row[2] || '扩展配件';
+                if (row[COL.CATEGORY] === '扩展配件') {
+                    typeLabel = row[COL.SERIES] || '扩展配件';
                 } else {
-                    typeLabel = row[1] || '配件';
+                    typeLabel = row[COL.CATEGORY] || '配件';
                 }
             }
             var typeClass = isCamera ? ('host' + (isDealer ? ' dealer' : '')) : 'standard';
             var trClass = isCamera ? '' : 'row-accessory';
-            var name = row[3] || '';
-            var img = isCamera ? (row[25] || '') : (row[9] || '');
-            var code = row[4] || '';
-            var desc = row[5] || '';
-            var remark = row[6] || '';
+            var name = row[COL.NAME] || '';
+            var img = isCamera ? (row[CAM.IMG] || '') : (row[ACC.IMG] || '');
+            var code = row[COL.CODE] || '';
+            var desc = row[COL.DESC] || '';
+            var remark = row[COL.REMARK] || '';
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[1] || '').trim()) + '" data-ser="' + escapeHtml((row[2] || '').trim()) + '" data-model="' + escapeHtml((row[3] || '').trim()) + '">'
+            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[COL.CATEGORY] || '').trim()) + '" data-ser="' + escapeHtml((row[COL.SERIES] || '').trim()) + '" data-model="' + escapeHtml((row[COL.NAME] || '').trim()) + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + escapeHtml(typeLabel) + '</span></td>'
                 +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
@@ -4043,8 +4048,8 @@
         var map = {};
         var order = [];
         scAllRows.forEach(function(row) {
-            if (row[0] !== 'SC系列') return;
-            var key = row[1];
+            if (row[COL.GROUP] !== 'SC系列') return;
+            var key = row[COL.CATEGORY];
             if (!map[key]) {
                 map[key] = [];
                 order.push(key);
@@ -4057,11 +4062,11 @@
     function getScAccessoriesForSeries(seriesName) {
         var accMap = {};
         var cameraRows = scAllRows.filter(function(r) {
-            return r[0] === 'SC系列' && r[1] === seriesName;
+            return r[COL.GROUP] === 'SC系列' && r[COL.CATEGORY] === seriesName;
         });
         var refTags = [];
         cameraRows.forEach(function(r) {
-            for (var i = 7; i <= 23; i += 2) {
+            for (var i = CAM.ACC_TAG_START; i <= CAM.ACC_TAG_END; i += CAM.ACC_TAG_STEP) {
                 var val = r[i] || '';
                 if (val) {
                     var tags = val.split(';').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
@@ -4071,12 +4076,12 @@
         });
         refTags = [...new Set(refTags)];
         scAllRows.forEach(function(row) {
-            if (row[0] !== '配件') return;
-            var accTag = (row[7] || '').toLowerCase();
+            if (row[COL.GROUP] !== '配件') return;
+            var accTag = (row[ACC.TAG] || '').toLowerCase();
             var parts = accTag.split(';').map(function(s) { return s.trim(); });
             for (var i = 0; i < refTags.length; i++) {
                 if (parts.indexOf(refTags[i]) !== -1) {
-                    var code = row[4] || '';
+                    var code = row[COL.CODE] || '';
                     if (!accMap[code]) {
                         accMap[code] = row;
                     }
@@ -4122,7 +4127,7 @@
         }
 
         var cameraRows = scAllRows.filter(function(r) {
-            return r[0] === 'SC系列' && r[1] === seriesName;
+            return r[COL.GROUP] === 'SC系列' && r[COL.CATEGORY] === seriesName;
         });
         var accessoryRows = getScAccessoriesForSeries(seriesName);
         accessoryRows.sort(function(a, b) {
@@ -4151,28 +4156,28 @@
             + '</tr></thead><tbody>';
 
         rows.forEach(function(row, index) {
-            var isCamera = row[0] === 'SC系列';
+            var isCamera = row[COL.GROUP] === 'SC系列';
             var typeLabel;
             if (isCamera) {
                 typeLabel = '主机';
             } else {
-                if (row[1] === '扩展配件') {
-                    typeLabel = row[2] || '扩展配件';
+                if (row[COL.CATEGORY] === '扩展配件') {
+                    typeLabel = row[COL.SERIES] || '扩展配件';
                 } else {
-                    typeLabel = row[1] || '配件';
+                    typeLabel = row[COL.CATEGORY] || '配件';
                 }
             }
             var typeClass = isCamera ? 'host' : 'standard';
             var trClass = isCamera ? '' : 'row-accessory';
-            var name = row[3] || '';
-            var img = isCamera ? (row[25] || '') : (row[9] || '');
-            var code = row[4] || '';
-            var desc = row[5] || '';
-            var remark = row[6] || '';
+            var name = row[COL.NAME] || '';
+            var img = isCamera ? (row[CAM.IMG] || '') : (row[ACC.IMG] || '');
+            var code = row[COL.CODE] || '';
+            var desc = row[COL.DESC] || '';
+            var remark = row[COL.REMARK] || '';
 
             var imgHtml = getImageHtml(img, 'img-thumb', 42, 42, isCamera ? 'camera' : 'accessory');
 
-            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[1] || '').trim()) + '" data-ser="' + escapeHtml((row[2] || '').trim()) + '" data-model="' + escapeHtml((row[3] || '').trim()) + '">'
+            html += '<tr class="' + trClass + '" data-code="' + escapeHtml(code) + '" data-kind="' + (isCamera ? 'host' : 'acc') + '" data-cat="' + escapeHtml((row[COL.CATEGORY] || '').trim()) + '" data-ser="' + escapeHtml((row[COL.SERIES] || '').trim()) + '" data-model="' + escapeHtml((row[COL.NAME] || '').trim()) + '">'
                 +  '<td style="text-align:center">' + (index + 1) + '</td>'
                 +  '<td><span class="type-badge ' + typeClass + '">' + escapeHtml(typeLabel) + '</span></td>'
                 +  '<td>' + nl2br(name) + buildHostNameExtra(name, isCamera) + '</td>'
