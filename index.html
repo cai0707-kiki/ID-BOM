@@ -2287,7 +2287,7 @@
 
         idAllRows.forEach(function(r) {
             var accCol = getAccCol(r, cfg);
-            if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[1] && r[1].trim() === cfg.name) {
+            if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[COL.CATEGORY] && r[COL.CATEGORY].trim() === cfg.name) {
                 var accFlagCol = getAccFlagCol(r, cfg);
                 var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
                 var accTag = (r[accCol] || '').toLowerCase();
@@ -2302,16 +2302,16 @@
                 }
 
                 if (matchTag || refTags.length === 0) {
-                    var series = idCurrentMatch[1] || '';
-                    if (key === '一体线' && series.indexOf('ID2000XM') >= 0 && (r[4] || '') === '101515363') return;
+                    var series = idCurrentMatch[COL.CATEGORY] || '';
+                    if (key === '一体线' && series.indexOf('ID2000XM') >= 0 && (r[COL.CODE] || '') === '101515363') return;
                     var bothStd = camStdTags[matchTag] && accFlag === '1';
                     _tmpItems.push({
-                        series: r[2] || '',
-                        name: r[3] || '',
-                        desc: r[5] || '',
-                        code: r[4] || '',
-                        remark: r[6] || '',
-                        img: r[9] || '',
+                        series: r[COL.SERIES] || '',
+                        name: r[COL.NAME] || '',
+                        desc: r[COL.DESC] || '',
+                        code: r[COL.CODE] || '',
+                        remark: r[COL.REMARK] || '',
+                        img: r[ACC.IMG] || '',
                         isStd: bothStd
                     });
                 }
@@ -2352,7 +2352,7 @@
 
         scAllRows.forEach(function(r) {
             var accCol = getAccCol(r, cfg);
-            if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[1] && r[1].trim() === cfg.name) {
+            if (r.length > accCol && (r[accCol] || '').trim() !== '' && r[COL.CATEGORY] && r[COL.CATEGORY].trim() === cfg.name) {
                 var accFlagCol = getAccFlagCol(r, cfg);
                 var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
                 var accTag = (r[accCol] || '').toLowerCase();
@@ -2369,12 +2369,12 @@
                 if (matchTag || refTags.length === 0) {
                     var bothStd = camStdTags[matchTag] && accFlag === '1';
                     _tmpItems.push({
-                        series: r[2] || '',
-                        name: r[3] || '',
-                        desc: r[5] || '',
-                        code: r[4] || '',
-                        remark: r[6] || '',
-                        img: r[9] || '',
+                        series: r[COL.SERIES] || '',
+                        name: r[COL.NAME] || '',
+                        desc: r[COL.DESC] || '',
+                        code: r[COL.CODE] || '',
+                        remark: r[COL.REMARK] || '',
+                        img: r[ACC.IMG] || '',
                         isStd: bothStd
                     });
                 }
@@ -2781,7 +2781,7 @@
             for (var j = 0; j < idAllRows.length; j++) {
                 var r = idAllRows[j];
                 var accCol = getAccCol(r, cfg);
-                if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
+                if (r.length > accCol && r[COL.CATEGORY] && r[COL.CATEGORY].trim() === cfg.name) {
                     var accFlagCol = getAccFlagCol(r, cfg);
                     var accTag = (r[accCol] || '').toLowerCase();
                     var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
@@ -2795,12 +2795,12 @@
                         if (exactMatch && camStdTags[refTags[k]] && accFlag === '1') {
                             var item = {
                                 key: keys[i], 
-                                subCategory: (keys[i] === '扩展配件') ? (r[2] || '') : '',  // ← 新增
-                                name: r[3] || cfg.name, 
-                                value: r[5] || val,
-                                code: r[4] || '', 
-                                remark: r[6] || '', 
-                                img: r[9] || '', 
+                                subCategory: (keys[i] === '扩展配件') ? (r[COL.SERIES] || '') : '',  // ← 新增
+                                name: r[COL.NAME] || cfg.name, 
+                                value: r[COL.DESC] || val,
+                                code: r[COL.CODE] || '', 
+                                remark: r[COL.REMARK] || '', 
+                                img: r[ACC.IMG] || '', 
                                 type: 'standard'
                             };
                             idSelectedAccessories.push(item);
@@ -3284,7 +3284,7 @@
             for (var j = 0; j < scAllRows.length; j++) {
                 var r = scAllRows[j];
                 var accCol = getAccCol(r, cfg);
-                if (r.length > accCol && r[1] && r[1].trim() === cfg.name) {
+                if (r.length > accCol && r[COL.CATEGORY] && r[COL.CATEGORY].trim() === cfg.name) {
                     var accFlagCol = getAccFlagCol(r, cfg);
                     var accTag = (r[accCol] || '').toLowerCase();
                     var accFlag = accFlagCol >= 0 ? (r[accFlagCol] || '') : '';
@@ -3298,12 +3298,12 @@
                         if (exactMatch && camStdTags[refTags[k]] && accFlag === '1') {
                             var item = {
                                 key: keys[i],
-                                subCategory: (keys[i] === '扩展配件') ? (r[2] || '') : '',
-                                name: r[3] || cfg.name,
-                                value: r[5] || val,
-                                code: r[4] || '',
-                                remark: r[6] || '',
-                                img: r[9] || '',
+                                subCategory: (keys[i] === '扩展配件') ? (r[COL.SERIES] || '') : '',
+                                name: r[COL.NAME] || cfg.name,
+                                value: r[COL.DESC] || val,
+                                code: r[COL.CODE] || '',
+                                remark: r[COL.REMARK] || '',
+                                img: r[ACC.IMG] || '',
                                 type: 'standard'
                             };
                             scSelectedAccessories.push(item);
