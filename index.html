@@ -265,9 +265,9 @@
         flex-direction:column;
         gap:0;
         flex:1 1 0% !important;
-        min-height:0 !important;
+        min-height:0;
         height:auto !important;
-        max-height:none !important;
+        max-height:none;
         overflow:visible !important;
     }
 
@@ -294,9 +294,9 @@
     /* ====== 对照表 ====== */
     .cmp-sidebar{
         width:100% !important;
-        max-width:100% !important;
-        min-width:0 !important;
-        flex-shrink:0 !important;
+        max-width:100%;
+        min-width:0;
+        flex-shrink:0;
         position:sticky;
         top:0;
         z-index:5;
@@ -312,9 +312,9 @@
     .cmp-filter-title{font-size:12px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
     .cmp-filter-all{font-size:11px;padding:3px 12px;flex-shrink:0}
     .cmp-filter-list{
-        display:flex !important;
+        display:flex;
         flex-direction:row !important;
-        flex-wrap:wrap !important;
+        flex-wrap:wrap;
         gap:5px !important;
         max-height:none !important;
         overflow-y:visible !important;
@@ -322,11 +322,11 @@
         width:100%;
     }
     .cmp-filter-btn{
-        display:inline-block !important;
-        width:auto !important;
+        display:inline-block;
+        width:auto;
         padding:4px 12px !important;
         border-radius:14px !important;
-        font-size:11px !important;
+        font-size:11px;
         white-space:nowrap;
         flex-shrink:0;
         border:1px solid #e2e8f0;
@@ -343,20 +343,20 @@
     }
     .cmp-content{
         flex:1 1 0% !important;
-        min-height:0 !important;
+        min-height:0;
         height:auto !important;
         overflow:visible !important;
-        max-height:none !important;
+        max-height:none;
         padding:0 10px;
     }
     .cmp-body{
         flex:1 1 0% !important;
-        min-height:200px !important;
+        min-height:200px;
         height:auto !important;
-        max-height:none !important;
+        max-height:none;
         overflow-x:auto !important;
-        overflow-y:visible !important;
-        display:block !important;
+        overflow-y:visible;
+        display:block;
         padding:0 10px 60px 10px !important;   /* 底部留白 */
     }
     .cmp-table{
@@ -364,7 +364,7 @@
         min-width:700px;
         width:100%;
         table-layout:auto;
-        display:table !important;
+        display:table;
     }
     .cmp-table th,.cmp-table td{
         padding:5px 8px;
@@ -380,9 +380,9 @@
     /* ====== VM选型 ====== */
     .vm-sidebar{
         width:100% !important;
-        max-width:100% !important;
-        min-width:0 !important;
-        flex-shrink:0 !important;
+        max-width:100%;
+        min-width:0;
+        flex-shrink:0;
         position:sticky;
         top:0;
         z-index:5;
@@ -398,9 +398,9 @@
     .vm-filter-title{font-size:12px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
     .vm-filter-all{font-size:11px;padding:3px 12px;flex-shrink:0}
     .vm-filter-list{
-        display:flex !important;
+        display:flex;
         flex-direction:row !important;
-        flex-wrap:wrap !important;
+        flex-wrap:wrap;
         gap:5px !important;
         max-height:none !important;
         overflow-y:visible !important;
@@ -408,11 +408,11 @@
         width:100%;
     }
     .vm-filter-btn{
-        display:inline-block !important;
-        width:auto !important;
+        display:inline-block;
+        width:auto;
         padding:4px 12px !important;
         border-radius:14px !important;
-        font-size:11px !important;
+        font-size:11px;
         white-space:nowrap;
         flex-shrink:0;
         border:1px solid #e2e8f0;
@@ -429,20 +429,20 @@
     }
     .vm-content{
         flex:1 1 0% !important;
-        min-height:0 !important;
+        min-height:0;
         height:auto !important;
         overflow:visible !important;
-        max-height:none !important;
+        max-height:none;
         padding:0 10px;
     }
     .vm-body{
         flex:1 1 0% !important;
-        min-height:200px !important;
+        min-height:200px;
         height:auto !important;
-        max-height:none !important;
+        max-height:none;
         overflow-x:auto !important;
-        overflow-y:visible !important;
-        display:block !important;
+        overflow-y:visible;
+        display:block;
         padding:0 10px 60px 10px !important;   /* 底部留白 */
     }
     .vm-table{
@@ -450,7 +450,7 @@
         min-width:900px;      /* VM 共 8 列，比对照表 5 列宽 */
         width:100%;
         table-layout:auto;
-        display:table !important;
+        display:table;
     }
     .vm-table th,.vm-table td{
         padding:5px 8px;
@@ -469,16 +469,16 @@
     #pageIdOverview,#pageScOverview{flex-direction:column;max-height:none;overflow:visible;height:auto}
     .series-sidebar{
         width:100% !important;
-        max-width:100% !important;
-        min-width:0 !important;
-        flex-shrink:0 !important;
+        max-width:100%;
+        min-width:0;
+        flex-shrink:0;
         border-radius:0;
         padding:6px 12px !important;
-        overflow-x:auto !important;
-        overflow-y:visible !important;
+        overflow-x:auto;
+        overflow-y:visible;
         -webkit-overflow-scrolling:touch;
-        position:sticky !important;
-        top:52px !important;
+        position:sticky;
+        top:52px;
         z-index:10;
         background:#f0f2f5;
         margin-bottom:4px;
@@ -486,18 +486,18 @@
         border-bottom:1px solid #e2e8f0;
     }
     .series-list{
-        display:flex !important;
+        display:flex;
         flex-direction:row !important;
-        flex-wrap:wrap !important;
+        flex-wrap:wrap;
         gap:5px !important;
         padding:4px 0 !important;
         width:100%;
     }
     .series-item{
-        display:inline-block !important;
-        width:auto !important;
+        display:inline-block;
+        width:auto;
         padding:4px 12px !important;
-        font-size:11px !important;
+        font-size:11px;
         border-left:none !important;
         border-bottom:2px solid transparent !important;
         border-radius:14px !important;
@@ -513,7 +513,7 @@
     .series-item.active{
         border-left:none !important;
         border-bottom:2px solid transparent !important;
-        border-color:#f97316 !important;
+        border-color:#f97316;
         background:#fff7ed !important;
         color:#f97316 !important;
         font-weight:600;
@@ -522,7 +522,7 @@
     .overview-content{
         overflow:visible;
         flex:1 1 0% !important;
-        min-height:0 !important;
+        min-height:0;
         height:auto !important;
         padding:0 10px !important;
     }
@@ -530,13 +530,13 @@
     .overview-count{font-size:10px}
     .overview-table-wrap{
         flex:1 1 0% !important;
-        min-height:200px !important;
+        min-height:200px;
         height:auto !important;
-        max-height:none !important;
+        max-height:none;
         overflow-x:auto !important;
-        overflow-y:visible !important;
-        display:block !important;
-        width:100% !important;
+        overflow-y:visible;
+        display:block;
+        width:100%;
         padding:0 0 60px 0 !important;         /* 底部留白 */
         -webkit-overflow-scrolling:touch;
     }
@@ -545,7 +545,7 @@
         min-width:600px;
         width:100%;
         table-layout:auto;
-        display:table !important;
+        display:table;
     }
     .overview-table-wrap .data-table td{padding:4px 6px}
     .overview-table-wrap .data-table .img-thumb{width:32px;height:32px}
@@ -560,12 +560,12 @@
 
     #idTableArea,#scTableArea{
         flex:1 1 0% !important;
-        min-height:200px !important;
+        min-height:200px;
         height:auto !important;
-        max-height:none !important;
-        overflow-x:auto !important;
-        overflow-y:visible !important;
-        display:block !important;
+        max-height:none;
+        overflow-x:auto;
+        overflow-y:visible;
+        display:block;
         padding:0 4px 60px 4px !important;     /* 底部留白 */
         -webkit-overflow-scrolling:touch;
     }
@@ -574,7 +574,7 @@
         min-width:700px;
         width:100%;
         table-layout:auto;
-        display:table !important;
+        display:table;
     }
     .data-table th,.data-table td{padding:5px 6px}
 
@@ -609,7 +609,7 @@
 
     /* ====== 版本条（移动端优化：半透明毛玻璃 + 底部固定） ====== */
     .version-bar{
-        display:block !important;
+        display:block;
         position:fixed;
         bottom:8px;
         left:50%;
@@ -630,7 +630,7 @@
         text-overflow:ellipsis;
     }
     .version-bar a{
-        color:#f97316 !important;
+        color:#f97316;
         text-decoration:none;
     }
 }
