@@ -1,6 +1,6 @@
 {
   "name": "id-bom",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "海康机器人产品配单工具",
   "scripts": {
     "resize": "node resize.js -h"
