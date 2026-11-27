@@ -2718,6 +2718,53 @@
         }
     }
 
+    /* ==================== 灯板 → 镜头罩 自动关联（ID 智能配单） ==================== */
+
+    /* 灯板物料码 → 应当自动关联的镜头罩物料码
+       后续增删规则只需改这里，不必动逻辑 */
+    var ID_LIGHT_HOOD_LINK = {
+        '202410440': '202410512',   // 红外灯板 → 红外镜头罩
+        '202410463': '202410504'    // 紫外灯板 → 紫外镜头罩
+    };
+
+    /**
+     * 根据当前已选灯板，自动关联对应镜头罩。
+     * 由 confirmAccessories 在「确认灯板选择」后调用一次；
+     * 用户之后手动调整镜头罩不会被覆盖。
+     * 目标镜头罩不在本型号候选池中时静默跳过。
+     */
+    function applyIdLightHoodLink() {
+        var lights = idSelectedAccessories.filter(function(a) { return a.key === '灯板'; });
+        if (lights.length !== 1) return;
+
+        var hoodCode = ID_LIGHT_HOOD_LINK[lights[0].code];
+        if (!hoodCode) return;
+
+        var hoodItems = buildIdAccItems('镜头罩');
+        var target = null;
+        for (var i = 0; i < hoodItems.length; i++) {
+            if (hoodItems[i].code === hoodCode) { target = hoodItems[i]; break; }
+        }
+        if (!target) return;
+
+        var cur = idSelectedAccessories.filter(function(a) { return a.key === '镜头罩'; });
+        if (cur.length === 1 && cur[0].code === hoodCode) return;
+
+        idSelectedAccessories = idSelectedAccessories.filter(function(a) {
+            return a.key !== '镜头罩';
+        });
+        idSelectedAccessories.push({
+            key: '镜头罩',
+            subCategory: '',
+            name: target.name,
+            value: target.desc,
+            code: target.code,
+            remark: target.remark,
+            img: target.img,
+            type: 'optional'
+        });
+    }
+
     /* ==================== 确认配件选择 ==================== */
 
     function confirmAccessories() {
@@ -2745,6 +2792,12 @@
             }
         });
         _modalSet('selectedAccessories', newSel);
+
+        // 灯板 → 镜头罩 自动关联（仅 ID 侧，且仅在选择灯板后触发）
+        if (modalSource === 'id' && key === '灯板') {
+            applyIdLightHoodLink();
+            newSel = idSelectedAccessories;
+        }
         closeModal();
         if (modalSource === 'sc') {
             renderScTable();
